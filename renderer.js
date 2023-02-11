@@ -10,9 +10,9 @@ export default {
       enable: this.enableTheme,
       disable: this.disableTheme,
     };
-    window.Popcorn = Popcorn;
 
-    this.themesProxy = new Proxy(window.Popcorn.themes, this.proxyHandler);
+    this.themesProxy = new Proxy(Popcorn.themes, this.proxyHandler);
+    window.Popcorn = this.themesProxy;
     this.addStyles();
     this.populateThemes();
     this.watchThemes();
@@ -23,7 +23,7 @@ export default {
     const style = document.createElement('style');
     style.dataset.popcornTheme = true;
     style.textContent =
-      '[class^=PopcornUI-]{box-sizing:border-box}.PopcornUI-dialog,.PopcornUI-dialog+.backdrop{z-index:2147483647}.PopcornUI-dialog{--pop-text-color:#e6e6e6;--pop-gray:#a6a6a6;--pop-red:#e23636;--pop-green:#00b318;background-color:#383838;min-height:clamp(12rem + 10vh,40vh,60vh);width:clamp(12rem + 10vw,40vw,60vw)}.PopcornUI-dialog+.backdrop,.PopcornUI-dialog::backdrop{background-color:rgba(0,0,0,.45)}.PopcornUI-wrapper{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))}.PopcornUI-item{background-color:rgba(0,0,0,.15);color:var(--pop-text-color);display:grid;font-size:1.5rem;grid-template-rows:auto 1fr auto;padding:.5rem;row-gap:.5rem}.PopcornUI-meta{border-top:.125rem solid var(--pop-text-color);font-size:1.25rem;padding-block-start:.5rem}.PopcornUI-valid[data-value=true]{color:var(--pop-green)}.PopcornUI-valid[data-value=true]:before{content:"\\2714  "}.PopcornUI-valid[data-value=false]{color:var(--pop-red)}.PopcornUI-valid[data-value=false]:before{content:"\\2718  "}.PopcornUI-valid[data-value=unknown]{color:var(--pop-gray)}.PopcornUI-valid[data-value=unknown]:before{content:"\\2049  "}.PopcornUI-toggle{all:unset;cursor:pointer;padding:.5rem;text-align:center}[data-enabled=true]>.PopcornUI-toggle{background-color:var(--pop-red)}[data-enabled=false]>.PopcornUI-toggle{background-color:var(--pop-green)}';
+      '[class^=PopcornUI-]{box-sizing:border-box}.PopcornUI-dialog,.PopcornUI-dialog+.backdrop{z-index:2147483647}.PopcornUI-dialog{--pop-text-color:#e6e6e6;--pop-gray:#a6a6a6;--pop-red:#e23636;--pop-green:#00b318;background-color:#383838;min-height:clamp(12rem + 10vh,40vh,60vh);width:clamp(12rem + 10vw,40vw,60vw)}.PopcornUI-dialog+.backdrop,.PopcornUI-dialog::backdrop{background-color:rgba(0,0,0,.45)}.PopcornUI-wrapper{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))}.PopcornUI-item{background-color:rgba(0,0,0,.15);color:var(--pop-text-color);display:grid;grid-template-rows:auto 1fr auto;padding:.5rem;row-gap:.5rem}.PopcornUI-name{font-size:1.25rem;line-height:1.5rem;overflow:scroll}.PopcornUI-name::-webkit-scrollbar{display:none}.PopcornUI-meta{border-top:.125rem solid var(--pop-text-color);font-size:1.25rem;padding-block-start:.5rem}.PopcornUI-valid[data-value=true]{color:var(--pop-green)}.PopcornUI-valid[data-value=true]:before{content:"\\2714  "}.PopcornUI-valid[data-value=false]{color:var(--pop-red)}.PopcornUI-valid[data-value=false]:before{content:"\\2718  "}.PopcornUI-valid[data-value=unknown]{color:var(--pop-gray)}.PopcornUI-valid[data-value=unknown]:before{content:"\\2049  "}.PopcornUI-toggle{all:unset;cursor:pointer;padding:.5rem;text-align:center}[data-enabled=true]>.PopcornUI-toggle{background-color:var(--pop-red)}[data-enabled=false]>.PopcornUI-toggle{background-color:var(--pop-green)}';
 
     document.head.append(
       document.createComment('section:Popcorn'),
@@ -161,7 +161,10 @@ export default {
       item.classList.add('PopcornUI-item');
       item.dataset.enabled = themeMeta.enabled;
       item.dataset.id = theme;
-      item.textContent = theme;
+
+      const name = document.createElement('span');
+      name.classList.add('PopcornUI-name');
+      name.textContent = theme;
 
       const meta = document.createElement('div');
       meta.classList.add('PopcornUI-meta');
@@ -177,7 +180,7 @@ export default {
       toggle.textContent = themeMeta.enabled ? 'Disable' : 'Enable';
       toggle.addEventListener('click', () => this.toggleTheme(theme));
 
-      item.append(meta, toggle);
+      item.append(name, meta, toggle);
       wrapper.appendChild(item);
     }
   },
