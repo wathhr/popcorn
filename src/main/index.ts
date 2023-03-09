@@ -1,11 +1,18 @@
+import { join } from 'path';
+import fg from 'fast-glob';
+
+const root = join(__dirname, '../');
+
+import { requireFile } from '@utils/misc';
 import LoggerModule from '@utils/logger';
-
 const Logger = new LoggerModule('Main', 'ansi');
+const { config } = requireFile(join(root, 'index.json'));
 
-const main = {
-  start() {
-    Logger.log('Main');
-  },
-};
+const themeJsons = fg.sync(config.themes, {
+  cwd: root,
+  absolute: true,
+});
 
-export default main;
+Logger.log(themeJsons);
+
+Logger.log('Main');

@@ -1,4 +1,7 @@
-import { color } from '@utils/constants';
+const color = {
+  arr: [255, 215, 0],
+  str: 'rgb(255, 215, 0)',
+};
 
 export class Logger {
   module: string;
