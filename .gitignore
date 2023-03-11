@@ -1,3 +1,5 @@
+types/
+
 # NPM related
 node_modules/
 package-lock.json
@@ -6,6 +8,7 @@ yarn.lock
 
 # Private
 **/todo*
+themes/*
 
 # Necessary
 !**/.gitkeep

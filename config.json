@@ -1,0 +1,11 @@
+{
+  "hotkey": "ctrl+shift+p",
+  "themeDirs": [
+    "./themes/*/index.json",
+    "%USERPROFILE%/discord/themes/*/index.json",
+    "$HOME/discord/themes/*/index.json"
+  ],
+  "enabled": {
+    "wathhr.test": false
+  }
+}

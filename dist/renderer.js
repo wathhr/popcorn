@@ -1,1 +1,58 @@
-var e={arr:[255,215,0],str:"rgb(255, 215, 0)"},s=class{module;output;constructor(r,t="console"){this.module=r,this.output=this.#t(t)}#t(r){switch(r){case"ansi":case"terminal":return"ansi";default:return"console"}}#s(r){switch(r){case"info":case"warn":case"error":case"debug":return r;default:return"log"}}#e(r,t){return`\x1B[38;2;${r[0]};${r[1]};${r[2]}m${t}\x1B[0m`}#r(r,t){let o=this.output==="ansi"?[`[${this.#e(e.arr,"Popcorn")} > ${this.module}]`]:[`[%cPopcorn%c > ${this.module}]`,`color: ${e.str};`,""];console[this.#s(r)](...o,...t)}log=(...r)=>this.#r("log",r);info=(...r)=>this.#r("info",r);warn=(...r)=>this.#r("warn",r);error=(...r)=>this.#r("error",r);debug=(...r)=>this.#r("debug",r)},n=s;var a=new n("Renderer"),i={start(){a.log("Renderer")}},g=i;export{g as default};
+// src/utils/logger.ts
+var color = {
+  arr: [255, 215, 0],
+  str: "rgb(255, 215, 0)"
+};
+var LoggerModule = class {
+  module;
+  output;
+  constructor(name, type = "console") {
+    this.module = name;
+    this.output = this.#parseOutput(type);
+  }
+  #parseOutput(output) {
+    switch (output) {
+      case "ansi":
+      case "terminal":
+        return "ansi";
+      default:
+        return "console";
+    }
+  }
+  #parseType(type) {
+    switch (type) {
+      case "info":
+      case "warn":
+      case "error":
+      case "debug":
+        return type;
+      default:
+        return "log";
+    }
+  }
+  #ansiColor(color2, message) {
+    return `\x1B[38;2;${color2[0]};${color2[1]};${color2[2]}m${message}\x1B[0m`;
+  }
+  #log(type, message) {
+    const banner = this.output === "ansi" ? [`[${this.#ansiColor(color.arr, "Popcorn")} > ${this.module}]`] : [`[%cPopcorn%c > ${this.module}]`, `color: ${color.str};`, ""];
+    console[this.#parseType(type)](...banner, ...message);
+  }
+  log = (...message) => this.#log("log", message);
+  info = (...message) => this.#log("info", message);
+  warn = (...message) => this.#log("warn", message);
+  error = (...message) => this.#log("error", message);
+  debug = (...message) => this.#log("debug", message);
+};
+var logger_default = LoggerModule;
+
+// src/renderer/index.ts
+var Logger = new logger_default("Renderer");
+var preload = {
+  async start() {
+    Logger.log(await PopcornNative.getThemes());
+  }
+};
+var renderer_default = preload;
+export {
+  renderer_default as default
+};

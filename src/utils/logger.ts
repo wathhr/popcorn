@@ -3,7 +3,7 @@ const color = {
   str: 'rgb(255, 215, 0)',
 };
 
-export class Logger {
+export class LoggerModule {
   module: string;
   output: string;
 
@@ -54,4 +54,4 @@ export class Logger {
   debug = (...message: any[]) => this.#log('debug', message);
 }
 
-export default Logger;
+export default LoggerModule;

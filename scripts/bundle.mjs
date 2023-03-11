@@ -30,7 +30,7 @@ const esbuildOptions = {
   minify: minify,
   write: true,
   outdir: 'dist',
-  ...(externalModules && { external: ['./node_modules/*'] }),
+  external: ['electron', ...(externalModules ? ['./node_modules/*'] : [])],
   logLevel: 'info',
 };
 
