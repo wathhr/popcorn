@@ -1,8 +1,8 @@
 import { join } from 'path';
 import fs from 'fs';
 import fg from 'fast-glob';
-import { requireFile } from '@utils/requireFile';
-import { resolvePath } from '@utils/resolvePath';
+import { requireFile } from './common/requireFile';
+import { resolvePath } from './common/resolvePath';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Main', 'ansi');
 
@@ -22,17 +22,17 @@ Logger.log('Detected themes:', themeJsons);
 export const themeMappings = {};
 
 const themes = {};
-for (const theme of themeJsons) {
-  const meta: Meta = require(theme);
-  const mainLocation = join(theme, '..', meta.main);
+for (const json of themeJsons) {
+  const meta: Meta = require(json);
+  const mainLocation = join(json, '..', meta.main);
   themeMappings[meta.id] = mainLocation;
 
-  themes[meta.id] = {
+  const theme: SimpleTheme = {
     enabled: config.enabled[meta.id] ?? true,
-    jsonLocation: theme,
-    mainLocation: mainLocation,
+    jsonLocation: json,
     css: fs.readFileSync(mainLocation, 'utf8'),
-  }
+  };
+  themes[meta.id] = theme;
 }
 
 export default themes;
