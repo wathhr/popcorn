@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "auto-bind": "^5.0.1",
+    "chokidar": "^3.5.3",
     "fast-glob": "^3.2.12"
   }
 }

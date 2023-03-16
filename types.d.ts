@@ -14,6 +14,7 @@ declare type Config = {
 declare type SimpleTheme = {
   enabled: boolean;
   jsonLocation: string;
+  mainLocation: string;
   css: string;
 };
 

@@ -9,6 +9,7 @@ yarn.lock
 # Private
 **/todo*
 themes/*
+config.json
 
 # Necessary
 !**/.gitkeep

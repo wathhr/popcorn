@@ -1,4 +1,5 @@
 import autoBind from 'auto-bind';
+import proxyHandler from './proxy';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Renderer');
 
@@ -12,16 +13,9 @@ declare global {
 export default new (class Renderer {
   comments: { start: Comment; end: Comment };
   themeElements: Map<string, HTMLElement> = new Map();
+  proxy: typeof Popcorn.themes;
 
   constructor() {
-    const startComment = document.createComment('section:Popcorn');
-    const endComment = document.createComment('endsection');
-    document.head.append(startComment, endComment);
-    this.comments = {
-      start: startComment,
-      end: endComment,
-    };
-
     autoBind(this);
   }
 
@@ -34,25 +28,41 @@ export default new (class Renderer {
       toggle: this.toggle,
     };
     window.Popcorn = Popcorn;
+    this.proxy = new Proxy(Popcorn.themes, proxyHandler);
+    window.Popcorn.themes = this.proxy;
 
-    await this.populateThemes();
+    const startComment = document.createComment('section:Popcorn');
+    const endComment = document.createComment('endsection');
+    document.head.append(startComment, endComment);
+    this.comments = {
+      start: startComment,
+      end: endComment,
+    };
+
+    this.populateThemes();
   }
 
   private async populateThemes() {
-    for (const theme of Object.keys(Popcorn.themes)) {
-      const themeMeta = Popcorn.themes[theme];
+    for (const theme of Object.keys(this.proxy)) {
+      const themeMeta = this.proxy[theme];
 
-      themeMeta.enable = (id: string, save = true) => this.enable(id, save);
-      themeMeta.disable = (id: string, save = true) => this.disable(id, save);
-      themeMeta.toggle = (id: string, save = true) => this.toggle(id, save);
+      this.populateTheme(theme);
       Logger.log(theme, themeMeta);
 
       if (themeMeta.enabled) await this.enable(theme, false);
     }
   }
 
-  async enable(id: string, save = true) {
-    const themeMeta = Popcorn.themes[id];
+  private async populateTheme(id: string) {
+    const themeMeta = this.proxy[id];
+
+    themeMeta.enable = (id: string, save = true) => this.enable(id, save);
+    themeMeta.disable = (id: string, save = true) => this.disable(id, save);
+    themeMeta.toggle = (id: string, save = true) => this.toggle(id, save);
+  }
+
+  private async enable(id: string, save = true) {
+    const themeMeta = this.proxy[id];
     themeMeta.enabled = true;
 
     if (this.themeElements.has(id)) {
@@ -68,10 +78,10 @@ export default new (class Renderer {
 
     this.themeElements.set(id, style);
 
-    if (save) Logger.log('🤯🤯🤯');
+    if (save) PopcornNative.saveState(id, true);
   }
-  async disable(id: string, save = true) {
-    const themeMeta = Popcorn.themes[id];
+  private async disable(id: string, save = true) {
+    const themeMeta = this.proxy[id];
     themeMeta.enabled = false;
 
     const style = this.themeElements.get(id);
@@ -82,10 +92,10 @@ export default new (class Renderer {
     this.themeElements.delete(id);
     style.remove();
 
-    if (save) Logger.log('🤯🤯🤯');
+    if (save) PopcornNative.saveState(id, false);
   }
-  async toggle(id: string, save = true) {
-    const themeMeta = Popcorn.themes[id];
+  private async toggle(id: string, save = true) {
+    const themeMeta = this.proxy[id];
     themeMeta.enabled = !themeMeta.enabled;
 
     if (themeMeta.enabled) await this.enable(id, save);
