@@ -13,22 +13,26 @@ if (!fs.existsSync(join(root, 'config.json'))) {
   Logger.warn(`No config file found, creating one.`);
   fs.writeFileSync(
     join(root, 'config.json'),
-    `{
-  "hotkey": "ctrl+shift+p",
-  "themeDirs": [
-    "./themes/*/index.json",
-    "%USERPROFILE%/discord/themes/*/index.json",
-    "$HOME/discord/themes/*/index.json"
-  ]
-}`
+    [
+      '{',
+      '  "hotkey": "ctrl+shift+p",',
+      '  "themeDirs": [',
+      '    "./themes/*/index.json",',
+      process.platform === 'win32'
+        ? '    "%USERPROFILE%/discord/themes/*/index.json"'
+        : '    "$HOME/discord/themes/*/index.json"',
+      '  ],',
+      '  "enabled": {}',
+      '}',
+    ].join('\n')
   );
 }
 
 const config: Config = requireFile(join(root, 'config.json'));
 export default config;
 
-const resolvedThemes = config.themeDirs.map((path: string) =>
-  resolvePath(path).replace(/\\/g, '/') // fg doesn't like backslashes
+const resolvedThemes = config.themeDirs.map(
+  (path: string) => resolvePath(path).replace(/\\/g, '/') // fg doesn't like backslashes
 );
 const themeJsons = fg.sync(resolvedThemes, {
   absolute: true,
