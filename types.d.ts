@@ -9,6 +9,7 @@ declare type Config = {
   hotkey: string;
   themeDirs: string[];
   enabled: { [id: string]: boolean };
+  verbose?: boolean;
 };
 
 declare type SimpleTheme = {

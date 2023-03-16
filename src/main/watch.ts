@@ -1,7 +1,8 @@
 import chokidar from 'chokidar';
 import { BrowserWindow } from 'electron';
 import { IPC } from '@constants';
-import { themes, updateTheme } from './config';
+import config from './config';
+import { themes, updateTheme } from './themes';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Watcher', 'ansi');
 
@@ -19,18 +20,18 @@ themeWatcher.on('change', (path) => {
 
   updateTheme(themes[id].jsonLocation);
 
-  Logger.log(`Theme changed: ${id}`);
+  if (config.verbose) Logger.debug(`Theme changed: ${id}`);
   BrowserWindow.getAllWindows().forEach((window) =>
     window.webContents.send(IPC.onThemeChange, themes[id])
   );
 });
 
 export function watchThemeFile(path: string) {
-  Logger.log(`Watching theme file: ${path}`);
+  if (config.verbose) Logger.debug(`Watching theme file: ${path}`);
   themeWatcher.add(path);
 }
 
 export function unwatchThemeFile(path: string) {
-  Logger.log(`Stopped watching theme file: ${path}`);
+  if (config.verbose) Logger.debug(`Stopped watching theme file: ${path}`);
   themeWatcher.unwatch(path);
 }

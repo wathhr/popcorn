@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { join } from 'path';
 import { ipcMain } from 'electron';
-import { themes } from './config';
+import { themes } from './themes';
 import { IPC } from '@constants';
 import { requireFile } from './common/requireFile';
 import { root } from './common/misc';
