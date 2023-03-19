@@ -9,11 +9,14 @@ declare global {
   }
 }
 
+// @ts-expect-error
+const config = await PopcornNative.config;
+
 // prettier adds these awesome ()() i love it
 export default new (class Renderer {
   comments: { start: Comment; end: Comment };
   themeElements: Map<string, HTMLElement> = new Map();
-  proxy: typeof Popcorn.themes;
+  themeProxy: typeof Popcorn.themes;
 
   constructor() {
     autoBind(this);
@@ -27,9 +30,9 @@ export default new (class Renderer {
       disable: this.disable,
       toggle: this.toggle,
     };
+    this.themeProxy = new Proxy(Popcorn.themes, proxyHandler);
+    Popcorn.themes = this.themeProxy;
     window.Popcorn = Popcorn;
-    this.proxy = new Proxy(Popcorn.themes, proxyHandler);
-    window.Popcorn.themes = this.proxy;
 
     const startComment = document.createComment('section:Popcorn');
     const endComment = document.createComment('endsection');
@@ -40,29 +43,48 @@ export default new (class Renderer {
     };
 
     this.populateThemes();
+    this.watchThemes();
   }
 
-  private async populateThemes() {
-    for (const theme of Object.keys(this.proxy)) {
-      const themeMeta = this.proxy[theme];
+  async populateThemes() {
+    for (const theme of Object.keys(this.themeProxy)) {
+      const themeMeta = this.themeProxy[theme];
 
       this.populateTheme(theme);
-      Logger.log(theme, themeMeta);
 
       if (themeMeta.enabled) await this.enable(theme, false);
     }
   }
 
-  private async populateTheme(id: string) {
-    const themeMeta = this.proxy[id];
+  async watchThemes() {
+    PopcornNative.onThemeChange(({id, theme}) => {
+      if (config.verbose) Logger.debug(`Theme changed: ${id}`);
+      this.themeProxy[id] = theme as Theme;
+      this.populateTheme(id);
+      this.updateTheme(id);
+    });
+  }
+
+  async updateTheme(id: string) {
+    const themeElement = this.themeElements.get(id);
+    if (!themeElement) {
+      Logger.warn(`No theme found with id: "${id}"`);
+      return;
+    };
+
+    themeElement.textContent = this.themeProxy[id].css;
+  }
+
+  async populateTheme(id: string) {
+    const themeMeta = this.themeProxy[id];
 
     themeMeta.enable = (id: string, save = true) => this.enable(id, save);
     themeMeta.disable = (id: string, save = true) => this.disable(id, save);
     themeMeta.toggle = (id: string, save = true) => this.toggle(id, save);
   }
 
-  private async enable(id: string, save = true) {
-    const themeMeta = this.proxy[id];
+  async enable(id: string, save = true) {
+    const themeMeta = this.themeProxy[id];
     themeMeta.enabled = true;
 
     if (this.themeElements.has(id)) {
@@ -77,11 +99,13 @@ export default new (class Renderer {
     this.comments.end.before(style);
 
     this.themeElements.set(id, style);
+    PopcornNative.watchTheme(JSON.stringify(themeMeta));
 
+    Logger.log(`"${id}" enabled.`);
     if (save) PopcornNative.saveState(id, true);
   }
-  private async disable(id: string, save = true) {
-    const themeMeta = this.proxy[id];
+  async disable(id: string, save = true) {
+    const themeMeta = this.themeProxy[id];
     themeMeta.enabled = false;
 
     const style = this.themeElements.get(id);
@@ -91,11 +115,13 @@ export default new (class Renderer {
     }
     this.themeElements.delete(id);
     style.remove();
+    PopcornNative.unwatchTheme(JSON.stringify(themeMeta));
 
+    Logger.log(`"${id}" disabled.`);
     if (save) PopcornNative.saveState(id, false);
   }
-  private async toggle(id: string, save = true) {
-    const themeMeta = this.proxy[id];
+  async toggle(id: string, save = true) {
+    const themeMeta = this.themeProxy[id];
     themeMeta.enabled = !themeMeta.enabled;
 
     if (themeMeta.enabled) await this.enable(id, save);

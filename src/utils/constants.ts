@@ -1,4 +1,5 @@
 export const IPC = {
+  getConfig: 'POPCORN_GET_CONFIG',
   getQuickCss: 'POPCORN_GET_QUICK_CSS',
   getTheme: 'POPCORN_GET_THEME',
   getThemes: 'POPCORN_GET_THEMES',

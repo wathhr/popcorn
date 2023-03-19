@@ -1,13 +1,16 @@
 import fs from 'fs';
 import { join } from 'path';
 import { ipcMain } from 'electron';
-import { themes } from './themes';
+import config from './config';
 import { IPC } from '@constants';
 import { requireFile } from './common/requireFile';
 import { root } from './common/misc';
+import { themes } from './themes';
 import { watchThemeFile, unwatchThemeFile } from './watch';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('IPC', 'ansi');
+
+ipcMain.handle(IPC.getConfig, () => config);
 
 ipcMain.handle(IPC.getThemes, () => themes);
 
@@ -21,14 +24,22 @@ ipcMain.on(IPC.saveState, (_, id: string, state: boolean) => {
   });
 });
 
-ipcMain.on(IPC.watchTheme, (_, id: string) => {
-  const theme = themes[id];
-  watchThemeFile(theme.jsonLocation);
-  watchThemeFile(theme.mainLocation);
+ipcMain.on(IPC.watchTheme, (_, theme: string) => {
+  try {
+    const themeData = JSON.parse(theme);
+    watchThemeFile(themeData.jsonLocation);
+    watchThemeFile(themeData.mainLocation);
+  } catch (e) {
+    watchThemeFile(theme);
+  }
 });
 
-ipcMain.on(IPC.unwatchTheme, (_, id: string) => {
-  const theme = themes[id];
-  unwatchThemeFile(theme.jsonLocation);
-  unwatchThemeFile(theme.mainLocation);
+ipcMain.on(IPC.unwatchTheme, (_, theme: string) => {
+  try {
+    const themeData = JSON.parse(theme);
+    unwatchThemeFile(themeData.jsonLocation);
+    unwatchThemeFile(themeData.mainLocation);
+  } catch (e) {
+    unwatchThemeFile(theme);
+  }
 });
