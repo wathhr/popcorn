@@ -12,11 +12,17 @@
   },
   "devDependencies": {
     "@types/node": "^18.14.6",
-    "esbuild": "^0.17.11"
+    "esbuild": "^0.17.11",
+    "esbuild-svelte": "^0.7.3",
+    "postcss": "^8.4.21",
+    "svelte": "^3.57.0",
+    "svelte-preprocess": "^5.0.3",
+    "typescript": "^5.0.2"
   },
   "dependencies": {
     "auto-bind": "^5.0.1",
     "chokidar": "^3.5.3",
+    "dialog-polyfill": "^0.5.6",
     "fast-glob": "^3.2.12"
   }
 }

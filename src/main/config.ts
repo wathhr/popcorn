@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { join } from 'path';
 import { argv } from 'process';
-import { requireFile } from './common/requireFile';
 import { root } from './common/misc';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Main', 'ansi');
@@ -26,9 +25,9 @@ if (!fs.existsSync(join(root, 'config.json'))) {
   );
 }
 
-export const config: Config = requireFile(join(root, 'config.json'));
+export const config: Config = require(join(root, 'config.json'));
 if (config.verbose == null) config.verbose = false;
-if (argv.includes('--verbose')) config.verbose = true;
+if (argv.includes('--verbose') || process.env.NODE_ENV === 'development') config.verbose = true;
 export default config;
 
 if (config.verbose) Logger.debug(config);

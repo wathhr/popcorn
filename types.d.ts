@@ -13,10 +13,11 @@ declare type Config = {
 };
 
 declare type SimpleTheme = {
+  css: string;
   enabled: boolean;
+  id: string;
   jsonLocation: string;
   mainLocation: string;
-  css: string;
 };
 
 declare type Theme = SimpleTheme & {

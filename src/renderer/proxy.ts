@@ -1,3 +1,4 @@
+import { rerenderItem } from './ui/index.svelte';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Proxy');
 
@@ -10,6 +11,7 @@ export default {
     }
   },
   set: (target, key, value) => {
+    rerenderItem(target.id)
     target[key] = value;
     return true;
   },

@@ -1,5 +1,7 @@
 import { parseArgs } from 'util';
 import * as esbuild from 'esbuild';
+import sveltePlugin from 'esbuild-svelte';
+import preprocess from 'svelte-preprocess';
 
 const options = {
   externalModules: { type: 'boolean' },
@@ -50,7 +52,19 @@ for (const type of actualTypes) {
     minify: minify,
     write: true,
     outdir: 'dist',
-    external: ['electron', ...(externalModules ? ['./node_modules/*'] : [])],
+    external: [
+      'electron',
+      'config.json',
+      ...(externalModules ? ['./node_modules/*'] : []),
+    ],
+    ...(type === 'renderer' && {
+      plugins: [
+        sveltePlugin({
+          // TODO: Remove postcss dependency
+          preprocess: preprocess(),
+        }),
+      ],
+    }),
     logLevel: 'info',
   };
 

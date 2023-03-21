@@ -1,5 +1,6 @@
 import autoBind from 'auto-bind';
 import proxyHandler from './proxy';
+import UI from './ui/index.svelte';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Renderer');
 
@@ -42,6 +43,7 @@ export default new (class Renderer {
       end: endComment,
     };
 
+    new UI({ target: document.body });
     this.populateThemes();
     this.watchThemes();
   }
@@ -122,10 +124,9 @@ export default new (class Renderer {
   }
   async toggle(id: string, save = true) {
     const themeMeta = this.themeProxy[id];
-    themeMeta.enabled = !themeMeta.enabled;
 
-    if (themeMeta.enabled) await this.enable(id, save);
-    else await this.disable(id, save);
+    if (!themeMeta.enabled) this.enable(id, save);
+    else this.disable(id, save);
   }
 
   async stop() {

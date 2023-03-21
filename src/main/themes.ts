@@ -37,10 +37,11 @@ export function updateTheme(json: string) {
   const mainLocation = join(json, '..', meta.main).replace(/\\/g, '/');
 
   const theme: SimpleTheme = {
+    css: fs.readFileSync(mainLocation, 'utf8'),
     enabled: config.enabled[meta.id] ?? true, // TODO: change this to false whenever UI is added
+    id: meta.id,
     jsonLocation: json,
     mainLocation: mainLocation,
-    css: fs.readFileSync(mainLocation, 'utf8'),
   };
   themes[meta.id] = theme;
 }
