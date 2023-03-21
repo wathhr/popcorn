@@ -9,7 +9,7 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
-  import dialogPolyfill from 'dialog-polyfill';
+  import dialogPolyfill from 'dialog-polyfill'; // TODO: fix this not working for external modules
   import { createContext } from '../utils/hotkeys';
   const themes = Popcorn.themes;
 
@@ -52,7 +52,7 @@
     {#each Object.keys(themes) as id}
       {@const theme = themes[id]}
       {#key shouldRerender?.[id]}
-        <div class="PopcornUI-theme" id={id} data-enabled={theme.enabled}>
+        <div class="PopcornUI-theme" {id} data-enabled={theme.enabled}>
           <h1 class="PopcornUI-theme-id">{id}</h1>
           <button
             class="PopcornUI-theme-toggle"

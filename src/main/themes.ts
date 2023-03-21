@@ -38,7 +38,7 @@ export function updateTheme(json: string) {
 
   const theme: SimpleTheme = {
     css: fs.readFileSync(mainLocation, 'utf8'),
-    enabled: config.enabled[meta.id] ?? true, // TODO: change this to false whenever UI is added
+    enabled: config.enabled[meta.id] ?? false,
     id: meta.id,
     jsonLocation: json,
     mainLocation: mainLocation,
