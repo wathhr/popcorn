@@ -13,7 +13,7 @@ if (!fs.existsSync(join(root, 'config.json'))) {
     [
       '{',
       '  "hotkey": "ctrl+shift+p",',
-      '  "themeDirs": [',
+      '  "themeFiles": [',
       '    "./themes/*/index.json",',
       process.platform === 'win32'
         ? '    "%USERPROFILE%/discord/themes/*/index.json"'

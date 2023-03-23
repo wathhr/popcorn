@@ -7,7 +7,7 @@ declare type Meta = {
 
 declare type Config = {
   hotkey: string;
-  themeDirs: string[];
+  themeFiles: string[];
   enabled: { [id: string]: boolean };
   verbose?: boolean;
 };
@@ -24,6 +24,7 @@ declare type Theme = SimpleTheme & {
   enable: (save?: boolean) => void;
   disable: (save?: boolean) => void;
   toggle: (save?: boolean) => void;
+  valid: boolean | 'unknown';
 };
 
 declare type Popcorn = {

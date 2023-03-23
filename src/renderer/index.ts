@@ -17,8 +17,11 @@ export default new (class Renderer {
   comments: { start: Comment; end: Comment };
   themeCache: Map<string, HTMLElement> = new Map();
   themeProxy: typeof Popcorn.themes;
+  shouldValidate: boolean;
 
   constructor() {
+    this.shouldValidate = PopcornNative.validateCSS !== null;
+
     autoBind(this);
   }
 
@@ -82,6 +85,23 @@ export default new (class Renderer {
     themeMeta.enable = (save = true) => this.enable(id, save);
     themeMeta.disable = (save = true) => this.disable(id, save);
     themeMeta.toggle = (save = true) => this.toggle(id, save);
+
+    themeMeta.valid = 'unknown';
+    this.validateTheme(id);
+  }
+
+  async validateTheme(id: string) {
+    if (!this.shouldValidate) return;
+
+    const themeMeta = this.themeProxy[id];
+    PopcornNative.validateCSS(themeMeta.css)
+      .then((result) => {
+        themeMeta.valid = Boolean(result.valid);
+      })
+      .catch((e) => {
+        Logger.error(`Failed to validate "${id}".`, e);
+        themeMeta.valid = 'unknown';
+      });
   }
 
   enable(id: string, save = true) {

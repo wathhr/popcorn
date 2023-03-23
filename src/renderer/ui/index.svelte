@@ -54,6 +54,15 @@
       {#key shouldRerender?.[id]}
         <div class="PopcornUI-theme" {id} data-enabled={theme.enabled}>
           <h1 class="PopcornUI-theme-id">{id}</h1>
+          <div class="PopcornUI-meta">
+            <span class="PopcornUI-valid" data-value={theme.valid}>
+              {theme.valid === 'unknown'
+                ? 'Validity Unknown'
+                : theme.valid
+                ? 'Valid'
+                : 'Invalid'}
+            </span>
+          </div>
           <button
             class="PopcornUI-theme-toggle"
             on:click={() => window.Popcorn.toggle(id)}
@@ -69,6 +78,7 @@
   [class^='PopcornUI-'] {
     box-sizing: border-box;
   }
+
   .PopcornUI-dialog + .backdrop,
   .PopcornUI-dialog {
     z-index: 2147483647;
@@ -86,11 +96,13 @@
   .PopcornUI-dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.45);
   }
+
   .PopcornUI-themes-wrapper {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
+
   .PopcornUI-theme {
     background-color: rgba(0, 0, 0, 0.15);
     color: var(--pop-text-color);
@@ -99,6 +111,7 @@
     padding: 0.5rem;
     row-gap: 0.5rem;
   }
+
   .PopcornUI-theme-id {
     font-size: 1.25rem;
     line-height: 1.5rem;
@@ -107,7 +120,8 @@
   .PopcornUI-theme-id::-webkit-scrollbar {
     display: none;
   }
-  /* .PopcornUI-meta {
+
+  .PopcornUI-meta {
     border-top: 0.125rem solid var(--pop-text-color);
     font-size: 1.25rem;
     padding-block-start: 0.5rem;
@@ -116,20 +130,21 @@
     color: var(--pop-green);
   }
   .PopcornUI-valid[data-value='true']:before {
-    content: '\\2714  ';
+    content: '\2714  ';
   }
   .PopcornUI-valid[data-value='false'] {
     color: var(--pop-red);
   }
   .PopcornUI-valid[data-value='false']:before {
-    content: '\\2718  ';
+    content: '\2718  ';
   }
   .PopcornUI-valid[data-value='unknown'] {
     color: var(--pop-gray);
   }
   .PopcornUI-valid[data-value='unknown']:before {
-    content: '\\2049  ';
-  } */
+    content: '\2049  ';
+  }
+
   .PopcornUI-theme-toggle {
     all: unset;
     cursor: pointer;

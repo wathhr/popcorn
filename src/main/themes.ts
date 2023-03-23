@@ -8,7 +8,7 @@ import { watchThemeFile } from './watch';
 import LoggerModule from '@utils/logger';
 const Logger = new LoggerModule('Main', 'ansi');
 
-const resolvedThemes = config.themeDirs.map(
+const resolvedThemes = config.themeFiles.map(
   (path: string) => resolvePath(path).replace(/\\/g, '/') // fg doesn't like backslashes
 );
 const themeJsons = fg.sync(resolvedThemes, {
