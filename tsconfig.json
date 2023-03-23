@@ -3,8 +3,6 @@
     "downlevelIteration": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "target": "esnext",
     "outDir": "./dist",
     "sourceMap": true,
     "baseUrl": ".",
@@ -17,4 +15,9 @@
       ],
     },
   },
+  "include": [
+    "src/**/*.ts",
+    "types.d.ts",
+    "types/*.d.ts"
+  ]
 }

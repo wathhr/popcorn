@@ -10,13 +10,12 @@ declare global {
   }
 }
 
-// @ts-expect-error
 const config = await PopcornNative.config;
 
 // prettier adds these awesome ()() i love it
 export default new (class Renderer {
   comments: { start: Comment; end: Comment };
-  themeElements: Map<string, HTMLElement> = new Map();
+  themeCache: Map<string, HTMLElement> = new Map();
   themeProxy: typeof Popcorn.themes;
 
   constructor() {
@@ -68,7 +67,7 @@ export default new (class Renderer {
   }
 
   async updateTheme(id: string) {
-    const themeElement = this.themeElements.get(id);
+    const themeElement = this.themeCache.get(id);
     if (!themeElement) {
       Logger.warn(`No theme found with id: "${id}"`);
       return;
@@ -80,16 +79,16 @@ export default new (class Renderer {
   async populateTheme(id: string) {
     const themeMeta = this.themeProxy[id];
 
-    themeMeta.enable = (id: string, save = true) => this.enable(id, save);
-    themeMeta.disable = (id: string, save = true) => this.disable(id, save);
-    themeMeta.toggle = (id: string, save = true) => this.toggle(id, save);
+    themeMeta.enable = (save = true) => this.enable(id, save);
+    themeMeta.disable = (save = true) => this.disable(id, save);
+    themeMeta.toggle = (save = true) => this.toggle(id, save);
   }
 
-  async enable(id: string, save = true) {
+  enable(id: string, save = true) {
     const themeMeta = this.themeProxy[id];
     themeMeta.enabled = true;
 
-    if (this.themeElements.has(id)) {
+    if (this.themeCache.has(id)) {
       Logger.log(`"${id}" is already enabled.`);
       return;
     }
@@ -100,29 +99,30 @@ export default new (class Renderer {
     style.dataset.popcorn = 'true';
     this.comments.end.before(style);
 
-    this.themeElements.set(id, style);
+    this.themeCache.set(id, style);
     PopcornNative.watchTheme(JSON.stringify(themeMeta));
 
     Logger.log(`"${id}" enabled.`);
     if (save) PopcornNative.saveState(id, true);
   }
-  async disable(id: string, save = true) {
+  disable(id: string, save = true) {
     const themeMeta = this.themeProxy[id];
     themeMeta.enabled = false;
 
-    const style = this.themeElements.get(id);
+    const style = this.themeCache.get(id);
     if (!style) {
       Logger.warn(`"${id}" is not enabled.`);
       return;
     }
-    this.themeElements.delete(id);
+
+    this.themeCache.delete(id);
     style.remove();
     PopcornNative.unwatchTheme(JSON.stringify(themeMeta));
 
     Logger.log(`"${id}" disabled.`);
     if (save) PopcornNative.saveState(id, false);
   }
-  async toggle(id: string, save = true) {
+  toggle(id: string, save = true) {
     const themeMeta = this.themeProxy[id];
 
     if (!themeMeta.enabled) this.enable(id, save);

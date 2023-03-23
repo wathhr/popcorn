@@ -5,6 +5,8 @@
   export function rerenderItem(id: string) {
     rerenderStore.set(id);
   }
+
+  const config = await PopcornNative.config;
 </script>
 
 <script lang="ts">
@@ -25,18 +27,16 @@
     isOpened = !isOpened;
     document.documentElement.dataset.popcornUiOpen = isOpened.toString();
   }
-  PopcornNative.config.then((res: Config) => {
-    const context = createContext();
-    context.register(res.hotkey, (event: KeyboardEvent) => {
+  const context = createContext();
+  context.register(config.hotkey, (event: KeyboardEvent) => {
+    event.stopImmediatePropagation();
+    toggleUI();
+  });
+  context.register('escape', (event: KeyboardEvent) => {
+    if (isOpened) {
       event.stopImmediatePropagation();
       toggleUI();
-    });
-    context.register('escape', (event: KeyboardEvent) => {
-      if (isOpened) {
-        event.stopImmediatePropagation();
-        toggleUI();
-      }
-    });
+    }
   });
 
   // Rerenders the UI when something changes

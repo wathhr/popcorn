@@ -1,6 +1,6 @@
-const fs = require('fs');
-const { join } = require('path');
-const { app } = require('electron');
+import fs from 'fs';
+import { join } from 'path';
+import { app } from 'electron';
 
 // Inject CSS for the in-app UI
 app.on('web-contents-created', (_, webContents) => {

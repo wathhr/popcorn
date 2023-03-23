@@ -21,15 +21,15 @@ declare type SimpleTheme = {
 };
 
 declare type Theme = SimpleTheme & {
-  enable: (id: string, save?: boolean) => Promise<void>;
-  disable: (id: string, save?: boolean) => Promise<void>;
-  toggle: (id: string, save?: boolean) => Promise<void>;
+  enable: (save?: boolean) => void;
+  disable: (save?: boolean) => void;
+  toggle: (save?: boolean) => void;
 };
 
 declare type Popcorn = {
   themes: { [id: string]: Theme };
-  enable: (id: string, save?: boolean) => Promise<void>;
-  disable: (id: string, save?: boolean) => Promise<void>;
-  toggle: (id: string, save?: boolean) => Promise<void>;
+  enable: (id: string, save?: boolean) => void;
+  disable: (id: string, save?: boolean) => void;
+  toggle: (id: string, save?: boolean) => void;
   quickCss?: any;
 };
