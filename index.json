@@ -3,12 +3,5 @@
   "id": "walter.popcorn",
   "dependencies": [
     "wathhr.csp-disable"
-  ],
-  "config": {
-    "hotkey": "ctrl+shift+p",
-    "themes": [
-      "./themes/*/index.json",
-      "%USERPROFILE%/Discord/Themes/*/index.json"
-    ]
-  }
+  ]
 }

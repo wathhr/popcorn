@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@constants": [
+        "./src/utils/constants"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+    },
+  },
+  "include": [
+    "src/**/*.ts",
+    "types.d.ts",
+    "types/*.d.ts"
+  ]
+}
