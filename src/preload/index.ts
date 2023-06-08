@@ -1,27 +1,40 @@
 import { ipcRenderer, contextBridge } from 'electron';
 import { IPC } from '@constants';
-import LoggerModule from '@utils/logger';
+import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Preload');
 
-const config = ipcRenderer.invoke(IPC.getConfig);
+const config: Promise<Config> = ipcRenderer.invoke(IPC.getConfig);
 
-// prettier-ignore
-const PopcornNative = {
+const PopcornNative: PopcornNative = {
+  // Misc
   config: config,
 
-  validateCSS: null,
+  // Themes
   getThemes: () => ipcRenderer.invoke(IPC.getThemes),
-  onThemeChange: (listener: (change: { id: string, theme: SimpleTheme }) => void) => ipcRenderer.on(IPC.onThemeChange, (_, change) => listener(change)),
-  saveState: (id: string, state: boolean) => ipcRenderer.send(IPC.saveState, id, state),
-  unwatchTheme: (id: string | Theme) => ipcRenderer.send(IPC.unwatchTheme, id),
-  watchTheme: (id: string | Theme) => ipcRenderer.send(IPC.watchTheme, id),
+  onThemeChange: (listener) => ipcRenderer.on(IPC.onThemeChange, (_, change) => listener(change)),
+  saveThemeState: (id, state) => ipcRenderer.send(IPC.saveThemeState, id, state),
+
+  // QuickCSS
+  getQuickCss: () => ipcRenderer.invoke(IPC.getQuickCss),
+  onQuickCssChange: (listener) => ipcRenderer.on(IPC.onQuickCssChange, (_, updated) => listener(updated)),
+  createQuickCssNode: (location, type) => ipcRenderer.send(IPC.createQuickCssNode, location, type),
+  deleteQuickCssNode: (location) => ipcRenderer.send(IPC.deleteQuickCssNode, location),
+  renameQuickCssNode: (location, newLocation) => ipcRenderer.send(IPC.renameQuickCssNode, location, newLocation),
+  updateQuickCssFile: (location, content) => ipcRenderer.send(IPC.updateQuickCssFile, location, content),
 };
 
 try {
-  const cssValidator = require('w3c-css-validator');
+  const cssValidator: typeof import('w3c-css-validator') = require('w3c-css-validator');
   PopcornNative.validateCSS = cssValidator.validateText;
 } catch (e) {
-  Logger.info('Disabled CSSValidator');
+  Logger.info('Disabled CSS Validator');
 }
 
 contextBridge.exposeInMainWorld('PopcornNative', PopcornNative);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ipcRenderer.on(IPC.log, (_, type, ...message: any[]) => {
+  const Logger = new LoggerModule('Main');
+
+  Logger[type](...message);
+});

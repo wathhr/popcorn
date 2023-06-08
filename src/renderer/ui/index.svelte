@@ -1,24 +1,13 @@
-<script lang="ts" context="module">
-  import { Writable, writable } from 'svelte/store';
-  const rerenderStore: Writable<string> = writable();
-
-  export function rerenderItem(id: string) {
-    rerenderStore.set(id);
-  }
-
-  const config = await PopcornNative.config;
-</script>
-
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import dialogPolyfill from 'dialog-polyfill'; // TODO: fix this not working for external modules
+  import { onMount } from 'svelte/internal';
+  import { config } from '..';
+  import TabView from './components/TabView.svelte';
+  import ThemesTab from './tabs/Themes.svelte';
+  import QuickCssTab from './tabs/QuickCss.svelte';
   import { createContext } from '../utils/hotkeys';
-  const themes = Popcorn.themes;
 
   let dialog: HTMLDialogElement;
-  onMount(() => dialogPolyfill.registerDialog(dialog));
 
-  // UI toggling
   let isOpened = false;
   function toggleUI() {
     if (isOpened) dialog.close();
@@ -27,134 +16,90 @@
     isOpened = !isOpened;
     document.documentElement.dataset.popcornUiOpen = isOpened.toString();
   }
-  const context = createContext();
-  context.register(config.hotkey, (event: KeyboardEvent) => {
-    event.stopImmediatePropagation();
-    toggleUI();
-  });
-  context.register('escape', (event: KeyboardEvent) => {
-    if (isOpened) {
+
+  onMount(() => {
+    const context = createContext({ autoEnable: true });
+    context.register(config.hotkey, (event: KeyboardEvent) => {
       event.stopImmediatePropagation();
+      event.stopPropagation();
+      event.preventDefault();
       toggleUI();
-    }
+    });
+    context.register('escape', (event: KeyboardEvent) => {
+      if (isOpened) {
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        event.preventDefault();
+        toggleUI();
+      }
+    });
   });
 
-  // Rerenders the UI when something changes
-  let shouldRerender: { [id: string]: boolean } = {};
-  rerenderStore.subscribe((id) => {
-    shouldRerender[id] = !shouldRerender?.[id] ?? true;
-    rerenderStore.set(null);
-  });
+  const tabs = [
+    {
+      name: 'Themes',
+      component: ThemesTab,
+    },
+    {
+      name: 'QuickCSS',
+      component: QuickCssTab,
+    },
+  ];
 </script>
 
 <dialog bind:this={dialog} class="PopcornUI-dialog">
-  <div class="PopcornUI-themes-wrapper">
-    {#each Object.keys(themes) as id}
-      {@const theme = themes[id]}
-      {#key shouldRerender?.[id]}
-        <div class="PopcornUI-theme" {id} data-enabled={theme.enabled}>
-          <h1 class="PopcornUI-theme-id">{id}</h1>
-          <div class="PopcornUI-meta">
-            <span class="PopcornUI-valid" data-value={theme.valid}>
-              {theme.valid === 'unknown'
-                ? 'Validity Unknown'
-                : theme.valid
-                ? 'Valid'
-                : 'Invalid'}
-            </span>
-          </div>
-          <button
-            class="PopcornUI-theme-toggle"
-            on:click={() => window.Popcorn.toggle(id)}
-            >{theme.enabled ? 'Disable' : 'Enable'}</button
-          >
-        </div>
-      {/key}
-    {/each}
-  </div>
+  <TabView {tabs} />
 </dialog>
 
-<style global>
-  [class^='PopcornUI-'] {
+<style>
+  :global(:where(.PopcornUI-dialog :not(svg, svg *))) {
+    all: revert;
     box-sizing: border-box;
+    user-select: none;
+  }
+  :global(:where(.PopcornUI-dialog :focus-visible)) {
+    outline: auto 0.25rem -webkit-focus-ring-color !important;
+    outline-offset: 0.25em !important;
   }
 
-  .PopcornUI-dialog + .backdrop,
+  .PopcornUI-dialog {
+    --pop-inactive: hsl(0, 0%, 65%);
+    --pop-hover: hsl(0, 0%, 90%);
+    --pop-active: hsl(0, 0%, 100%);
+
+    --pop-gray: var(--pop-inactive);
+    --pop-red-hsl: 0, 75%, 55%;
+    --pop-red: hsl(var(--pop-red-hsl));
+    --pop-green-hsl: 128, 100%, 35%;
+    --pop-green: hsl(var(--pop-green-hsl));
+    --pop-blue-hsl: 215, 95%, 60%;
+    --pop-blue: hsl(var(--pop-blue-hsl));
+
+    --pop-fg-normal: hsl(0, 0%, 80%);
+    --pop-bg-normal: hsla(0, 0%, 0%, 0.15);
+    --pop-bg-hover: hsla(0, 0%, 80%, 0.2);
+    --pop-bg-active: hsla(0, 0%, 80%, 0.4);
+
+    --pop-tooltip-fg: var(--pop-fg-normal);
+    --pop-tooltip-bg: hsl(0, 0%, 5%);
+
+    overflow: hidden;
+    inline-size: clamp(12rem + 10vw, 40vw, 60vw);
+    block-size: clamp(12rem + 10vh, 40vh, 60vh);
+    padding: 1rem;
+    color: var(--pop-fg-normal);
+    background-color: #383838;
+  }
+  .PopcornUI-dialog[open] {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+  .PopcornUI-dialog + :global(.backdrop),
   .PopcornUI-dialog {
     z-index: 2147483647;
   }
-  .PopcornUI-dialog {
-    --pop-text-color: #e6e6e6;
-    --pop-gray: #a6a6a6;
-    --pop-red: #e23636;
-    --pop-green: #00b318;
-    background-color: #383838;
-    min-height: clamp(12rem + 10vh, 40vh, 60vh);
-    width: clamp(12rem + 10vw, 40vw, 60vw);
-  }
-  .PopcornUI-dialog + .backdrop,
+  .PopcornUI-dialog + :global(.backdrop),
   .PopcornUI-dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.45);
-  }
-
-  .PopcornUI-themes-wrapper {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .PopcornUI-theme {
-    background-color: rgba(0, 0, 0, 0.15);
-    color: var(--pop-text-color);
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    padding: 0.5rem;
-    row-gap: 0.5rem;
-  }
-
-  .PopcornUI-theme-id {
-    font-size: 1.25rem;
-    line-height: 1.5rem;
-    overflow: scroll;
-  }
-  .PopcornUI-theme-id::-webkit-scrollbar {
-    display: none;
-  }
-
-  .PopcornUI-meta {
-    border-top: 0.125rem solid var(--pop-text-color);
-    font-size: 1.25rem;
-    padding-block-start: 0.5rem;
-  }
-  .PopcornUI-valid[data-value='true'] {
-    color: var(--pop-green);
-  }
-  .PopcornUI-valid[data-value='true']:before {
-    content: '\2714  ';
-  }
-  .PopcornUI-valid[data-value='false'] {
-    color: var(--pop-red);
-  }
-  .PopcornUI-valid[data-value='false']:before {
-    content: '\2718  ';
-  }
-  .PopcornUI-valid[data-value='unknown'] {
-    color: var(--pop-gray);
-  }
-  .PopcornUI-valid[data-value='unknown']:before {
-    content: '\2049  ';
-  }
-
-  .PopcornUI-theme-toggle {
-    all: unset;
-    cursor: pointer;
-    padding: 0.5rem;
-    text-align: center;
-  }
-  [data-enabled='true'] > .PopcornUI-theme-toggle {
-    background-color: var(--pop-red);
-  }
-  [data-enabled='false'] > .PopcornUI-theme-toggle {
-    background-color: var(--pop-green);
   }
 </style>

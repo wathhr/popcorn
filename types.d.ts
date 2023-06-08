@@ -1,36 +1,33 @@
-/// <reference path="./types/electron.d.ts" />
+declare const NODE_ENV: 'development' | 'production';
+
+declare type Config = {
+  hotkey: string;
+  quickCssDir: string;
+  themeFiles: string[];
+  enabled: { [id: string]: boolean };
+  verbose?: boolean;
+};
 
 declare type Meta = {
   id: string;
   main: string;
 };
 
-declare type Config = {
-  hotkey: string;
-  themeFiles: string[];
-  enabled: { [id: string]: boolean };
-  verbose?: boolean;
-};
-
 declare type SimpleTheme = {
-  css: string;
   enabled: boolean;
   id: string;
   jsonLocation: string;
   mainLocation: string;
 };
 
-declare type Theme = SimpleTheme & {
-  enable: (save?: boolean) => void;
-  disable: (save?: boolean) => void;
-  toggle: (save?: boolean) => void;
-  valid: boolean | 'unknown';
+declare type QuickCssFolder = {
+  name: string;
+  location: string;
+  files: (QuickCssFile | QuickCssFolder)[];
 };
 
-declare type Popcorn = {
-  themes: { [id: string]: Theme };
-  enable: (id: string, save?: boolean) => void;
-  disable: (id: string, save?: boolean) => void;
-  toggle: (id: string, save?: boolean) => void;
-  quickCss?: any;
+declare type QuickCssFile = {
+  name: string;
+  location: string;
+  content: string;
 };

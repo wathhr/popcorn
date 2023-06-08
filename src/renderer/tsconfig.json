@@ -2,6 +2,21 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "esnext",
-    "target": "esnext"
-  },
+    "target": "esnext",
+    "paths": {
+      "@common/*": [
+        "src/common/*",
+        "src/renderer/utils/*"
+      ],
+      "@components/*": [
+        "src/renderer/ui/components/*"
+      ],
+      "@ui": [
+        "src/renderer/ui"
+      ],
+      "@ui/*": [
+        "src/renderer/ui/*"
+      ]
+    },
+  }
 }

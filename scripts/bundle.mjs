@@ -13,7 +13,7 @@ const {
   values: {
     externalModules = false,
     minify = process.env.NODE_ENV === 'production',
-    types = '',
+    types = 'all',
     watch = false,
   },
 } = parseArgs({ options });
@@ -46,12 +46,16 @@ for (const type of actualTypes) {
         out: type,
       },
     ],
-    bundle: true,
     platform: 'node',
+    bundle: true,
     format: type === 'renderer' ? 'esm' : 'cjs',
     minify: minify,
     write: true,
     outdir: 'dist',
+    sourcemap: minify ? false : 'inline',
+    define: {
+      'NODE_ENV': process.env.NODE_ENV ? '\'' + process.env.NODE_ENV + '\'' : 'production',
+    },
     external: [
       'electron',
       'config.json',
@@ -60,8 +64,11 @@ for (const type of actualTypes) {
     ...(type === 'renderer' && {
       plugins: [
         sveltePlugin({
-          // TODO: Remove postcss dependency
           preprocess: preprocess(),
+          compilerOptions: {
+            cssHash: ({ hash, css }) => `PopcornUI-${hash(css)}`,
+            dev: !minify,
+          },
         }),
       ],
     }),
@@ -74,4 +81,13 @@ for (const type of actualTypes) {
 builds.map(async (context) => {
   if (watch) return (await esbuild.context(context)).watch();
   return esbuild.build(context);
+});
+
+process.on('SIGINT', () => {
+  console.log('Stopping...');
+  builds.map(async (build) => {
+    return await build.dispose();
+  });
+
+  process.exit(0);
 });

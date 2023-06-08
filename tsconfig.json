@@ -3,15 +3,17 @@
     "downlevelIteration": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "esnext",
     "outDir": "./dist",
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@constants": [
-        "./src/utils/constants"
+      "@common/*": [
+        "src/common/*"
       ],
-      "@utils/*": [
-        "./src/utils/*"
+      "@constants": [
+        "src/common/constants"
       ],
     },
   },

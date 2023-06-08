@@ -10,5 +10,6 @@ app.on('web-contents-created', (_, webContents) => {
 });
 
 import './config';
-import './ipc';
-import './watch';
+import './protocol';
+import './quickcss';
+import './themes';

@@ -1,13 +1,10 @@
-const color = {
-  str: 'gold',
-  arr: [255, 215, 0],
-};
+import { IPC } from '@common/constants';
 
 export class LoggerModule {
   private module: string;
   private output: string;
 
-  constructor(name: string, type: string = 'console') {
+  constructor(name: string, type = 'console') {
     this.module = name;
     this.output = this.#parseOutput(type);
   }
@@ -57,7 +54,10 @@ export class LoggerModule {
           arr: [255, 140, 0],
         };
       default:
-        return null;
+        return {
+          str: 'gold',
+          arr: [255, 215, 0],
+        };
     }
   }
 
@@ -65,14 +65,24 @@ export class LoggerModule {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${message}\x1b[0m`;
   }
 
-  #log(type: string, message: any[]) {
-    const logColor = this.#parseColor(type) ?? color;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  async #log(type: string, message: any[]) {
+    type = this.#parseType(type);
+    const logColor = this.#parseColor(type);
+
     const banner =
       this.output === 'ansi'
         ? [`[${this.#ansiColor(logColor.arr, 'Popcorn')} > ${this.module}]`]
-        : [`[%cPopcorn%c > ${this.module}]`, `color: ${logColor.str || color.str};`, ''];
+        : [`[%cPopcorn%c > ${this.module}]`, `color: ${logColor.str};`, ''];
 
-    console[this.#parseType(type)](...banner, ...message);
+    console[type](...banner, ...message);
+
+    // TODO: Don't send everything
+    if (this.output === 'ansi') {
+      const { BrowserWindow } = await import('electron');
+
+      BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(IPC.log, type, ...message));
+    }
   }
 
   log = (...message: any[]) => this.#log('log', message);

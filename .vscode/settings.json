@@ -1,6 +1,3 @@
 {
-  "svelte.enable-ts-plugin": true,
-  "svelte.plugin.svelte.compilerWarnings": {
-    "css-unused-selector": "ignore"
-  }
+  "svelte.enable-ts-plugin": true
 }

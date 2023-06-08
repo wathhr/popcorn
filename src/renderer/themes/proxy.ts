@@ -1,6 +1,4 @@
-import { rerenderItem } from './ui/index.svelte';
-import LoggerModule from '@utils/logger';
-const Logger = new LoggerModule('Proxy');
+import { rerenderTheme } from '@ui/tabs/Themes.svelte';
 
 export default {
   get(target, key) {
@@ -11,8 +9,8 @@ export default {
     }
   },
   set: (target, key, value) => {
-    rerenderItem(target.id)
     target[key] = value;
+    if ('id' in target) rerenderTheme(target.id);
     return true;
   },
 };
