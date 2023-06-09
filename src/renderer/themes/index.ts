@@ -16,7 +16,7 @@ export default class Themes {
     autoBind(this);
   }
 
-  async start() {
+  start() {
     this.populateThemes();
     this.watchThemes();
   }
@@ -125,9 +125,5 @@ export default class Themes {
 
     if (!themeMeta.enabled) this.enable(id, save);
     else this.disable(id, save);
-  }
-
-  stop() {
-    this.styleCache.forEach((style) => style.remove());
   }
 }

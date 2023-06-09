@@ -4,7 +4,7 @@ import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('QuickCSS');
 
 export default class QuickCss {
-  async start() {
+  start() {
     this.populateQuickCss();
     this.watchQuickCss();
     selectedFolder.set(window.Popcorn.quickCss);
@@ -58,9 +58,5 @@ export default class QuickCss {
       rerenderSidebar();
       this.populateQuickCss();
     });
-  }
-
-  async stop() {
-    document.getElementById('popcorn-quickcss').remove();
   }
 }
