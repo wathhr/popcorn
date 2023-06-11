@@ -26,14 +26,14 @@
 <div class="themes-wrapper">
   {#each Object.keys(themes) as id}
     {@const theme = themes[id]}
-    {@const isValid = theme.valid && theme.valid !== 'unknown'}
+    {@const isValid = theme.valid === true}
     {#key $rerenderStore[id]}
       <div class="theme-container" {id} data-enabled={theme.enabled}>
         <h1 class="theme-id">{id}</h1>
         <div class="theme-meta">
           <div
             class="theme-validity"
-            data-value={isValid ? undefined : theme.valid}
+            data-value={theme.valid}
             data-error={isValid ? undefined : createTooltipContent(theme.errors)}
           >
             {#if isValid}

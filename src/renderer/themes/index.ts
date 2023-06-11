@@ -1,129 +1,116 @@
 import autoBind from 'auto-bind';
-import themeProxy from './proxy';
+import { rerenderTheme } from '@ui/tabs/Themes.svelte';
 import { comments, config, shouldValidate } from '..';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Themes');
 
-export default class Themes {
-  styleCache = new Map<string, HTMLLinkElement>();
-  themeRevisions = new Map<string, number>();
-  proxy: typeof Popcorn.themes;
+export class Theme {
+  public id: string;
+  #element: HTMLLinkElement;
 
-  constructor() {
-    this.proxy = new Proxy(window.Popcorn.themes, themeProxy);
-    window.Popcorn.themes = this.proxy;
-
+  constructor(id: string, enabled = true) {
     autoBind(this);
+
+    this.id = id;
+    this.#enabled = enabled;
+
+    if (shouldValidate) this.#validate();
+    if (enabled) this.enable(false);
   }
 
+  #enabled: boolean;
+  get enabled() {
+    return this.#enabled;
+  }
+  set enabled(value) {
+    value ? this.enable() : this.disable();
+    this.#enabled = value;
+  }
+
+  enable(save = true) {
+    if (this.#element) {
+      Logger.log(`"${this.id}" is already enabled.`);
+      return;
+    }
+
+    this.#enabled = true;
+
+    const link = this.#element = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.id = this.id;
+    link.href = `popcorn://theme/${this.id}`;
+    link.dataset.popcorn = 'true';
+    comments.end.before(link);
+
+    Logger.log(`"${this.id}" enabled.`);
+    rerenderTheme(this.id);
+    if (save) PopcornNative.saveThemeState(this.id, true);
+  }
+  disable(save = true) {
+    if (!this.#element) {
+      Logger.warn(`"${this.id}" is not enabled.`);
+      return;
+    }
+
+    this.#enabled = false;
+
+    this.#element.remove();
+    this.#element = null;
+
+    Logger.log(`"${this.id}" disabled.`);
+    rerenderTheme(this.id);
+    if (save) PopcornNative.saveThemeState(this.id, false);
+  }
+  toggle(save = true) {
+    if (this.enabled) this.disable(save);
+    else this.enable(save);
+  }
+
+  update() {
+    const promise = fetch(`popcorn://theme/${this.id}`);
+    this.#validate(promise);
+  }
+
+  // Use getters and setters here?
+  public valid: boolean | 'unknown' = 'unknown';
+  public errors: cssValidatorErrors = [];
+  async #validate(content?: string | Promise<Response>) {
+    content ??= fetch(`popcorn://theme/${this.id}`);
+    let text: string;
+    if (typeof content === 'string') text = content;
+    else text = await (await content).text();
+
+    PopcornNative.validateCSS(text)
+      .then((result) => {
+        if (config.verbose) Logger.debug(`Validated "${this.id}".`, result);
+
+        this.valid = result.valid;
+        this.errors = result.errors;
+        rerenderTheme(this.id);
+      })
+      .catch((e) => {
+        Logger.error(`Failed to validate "${this.id}".`, e);
+      });
+  }
+}
+
+export default class Themes {
   start() {
-    this.populateThemes();
     this.watchThemes();
   }
 
-  private populateThemes() {
-    for (const theme in this.proxy) {
-      const themeMeta = this.proxy[theme];
-      if (themeMeta.enabled) this.enable(theme, false);
+  populateThemes(simpleThemes: { [id: string]: SimpleTheme }) {
+    const themes: { [id: string]: Theme } = {};
+    for (const id in simpleThemes) {
+      themes[id] = new Theme(id, simpleThemes[id].enabled);
     }
+
+    return themes;
   }
 
-  private watchThemes() {
-    PopcornNative.onThemeChange(async ({ id, theme }) => {
-      if (config.verbose) Logger.debug(`Theme changed: ${id}`);
-      this.proxy[id] = this.populateTheme(theme);
-      this.updateTheme(id);
+  watchThemes() {
+    PopcornNative.onThemeChange(({ id }) => {
+      window.Popcorn.themes[id].update();
     });
-  }
-
-  updateTheme(id: string) {
-    const themeElement = this.styleCache.get(id);
-    if (!themeElement) {
-      Logger.warn(`No theme found with id: "${id}"`);
-      return;
-    }
-
-    const rev = (this.themeRevisions.get(id) ?? 0) + 1;
-    this.themeRevisions.set(id, rev);
-    themeElement.href = `popcorn://theme/${id}?${rev}`;
-  }
-
-  populateTheme(theme: SimpleTheme): Theme {
-    const id = theme.id;
-    const convertedTheme: Theme = {
-      ...theme,
-      enable: (save = true) => this.enable(id, save),
-      disable: (save = true) => this.disable(id, save),
-      toggle: (save = true) => this.toggle(id, save),
-      valid: 'unknown',
-      errors: [],
-    };
-
-    if (shouldValidate) this.validateTheme(theme.id);
-
-    return convertedTheme;
-  }
-
-  async validateTheme(id: string) {
-    const themeMeta = this.proxy[id];
-    const content = await (await fetch(`popcorn://theme/${id}`)).text();
-
-    PopcornNative.validateCSS(content)
-      .then((result) => {
-        console.log(themeMeta.valid, this.proxy[id].valid);
-        themeMeta.valid = result.valid;
-        themeMeta.errors = result.errors;
-        console.log(themeMeta.valid, this.proxy[id].valid);
-      })
-      .catch((e) => {
-        Logger.error(`Failed to validate "${id}".`, e);
-        themeMeta.valid = 'unknown';
-      });
-  }
-
-  enable(id: string, save = true) {
-    const themeMeta = this.proxy[id];
-
-    if (this.styleCache.has(id)) {
-      Logger.log(`"${id}" is already enabled.`);
-      return;
-    }
-
-    themeMeta.enabled = true;
-
-    const elem = document.createElement('link');
-    elem.rel = 'stylesheet';
-    elem.id = id;
-    elem.href = `popcorn://theme/${id}`;
-    elem.dataset.popcorn = 'true';
-    comments.end.before(elem);
-
-    this.styleCache.set(id, elem);
-
-    Logger.log(`"${id}" enabled.`);
-    if (save) PopcornNative.saveThemeState(id, true);
-  }
-  disable(id: string, save = true) {
-    const themeMeta = this.proxy[id];
-
-    const style = this.styleCache.get(id);
-    if (!style) {
-      Logger.warn(`"${id}" is not enabled.`);
-      return;
-    }
-
-    themeMeta.enabled = false;
-
-    this.styleCache.delete(id);
-    style.remove();
-
-    Logger.log(`"${id}" disabled.`);
-    if (save) PopcornNative.saveThemeState(id, false);
-  }
-  toggle(id: string, save = true) {
-    const themeMeta = this.proxy[id];
-
-    if (!themeMeta.enabled) this.enable(id, save);
-    else this.disable(id, save);
   }
 }

@@ -18,16 +18,18 @@ export const shouldValidate = Boolean(PopcornNative.validateCSS);
 
 export default new class Renderer {
   async start() {
+    document.head.append(comments.start, comments.end);
+
+    const themes = new Themes();
+    const quickCss = new QuickCss();
     const Popcorn = {
-      themes: (await PopcornNative.getThemes()) as { [id: string]: Theme },
+      themes: themes.populateThemes(await PopcornNative.getThemes()),
       quickCss: await PopcornNative.getQuickCss(),
     };
     window.Popcorn = Popcorn;
 
-    document.head.append(comments.start, comments.end);
-
     new UI({ target: document.body });
-    new Themes().start();
-    new QuickCss().start();
+    themes.start();
+    quickCss.start();
   }
 };

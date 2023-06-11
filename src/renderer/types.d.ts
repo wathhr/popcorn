@@ -9,13 +9,7 @@ declare type Popcorn = {
   quickCss: QuickCssFolder;
 };
 
-declare type Theme = SimpleTheme & {
-  enable: (save?: boolean) => void;
-  disable: (save?: boolean) => void;
-  toggle: (save?: boolean) => void;
-  valid?: boolean | 'unknown';
-  errors?: cssValidatorErrors;
-};
+declare type Theme = import('./themes').Theme;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (...args: any) => Promise<infer R> ? R : any
