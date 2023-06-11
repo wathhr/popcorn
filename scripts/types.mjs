@@ -20,10 +20,10 @@ const fetch = (url) =>
           resp.headers.location.indexOf('http') === 0
             ? resp.headers.location
             : (() => {
-                const urlObject = new URL(url);
+              const urlObject = new URL(url);
 
-                return urlObject.origin + resp.headers.location;
-              })();
+              return urlObject.origin + resp.headers.location;
+            })();
 
         return fetch(newUrl).then(resolve);
       }

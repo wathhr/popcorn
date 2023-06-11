@@ -10,8 +10,8 @@ declare global {
 }
 
 export const comments = {
-  start: document.createComment('section:Popcorn'),
-  end: document.createComment('endsection'),
+  start: document.createComment(' section:Popcorn '),
+  end: document.createComment(' endsection '),
 };
 export const config = await PopcornNative.config;
 export const shouldValidate = Boolean(PopcornNative.validateCSS);

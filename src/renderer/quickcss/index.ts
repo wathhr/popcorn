@@ -4,55 +4,70 @@ import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('QuickCSS');
 
 export default class QuickCss {
+  private styleElements = new Map<'imports' | 'contents', HTMLStyleElement>();
+
   start() {
     this.populateQuickCss();
     this.watchQuickCss();
     selectedFolder.set(window.Popcorn.quickCss);
   }
 
-  async populateQuickCss() {
-    // TODO: Fix @imports reloading every time quickcss changes
+  populateQuickCss() {
     function compileQuickCss(folder: QuickCssFolder) {
+      let imports = '';
       let contents = '';
-      const imports: string[] = [];
 
       const importRegex = /^@import\s+(?:url\(['"]?.*?['"]?\)|['"].*?['"])(\s+[^;]+?)?;$/gmi;
       for (const node of folder.files) {
-        if ('files' in node) contents += compileQuickCss(node);
-        else {
+        if ('files' in node) {
+          const result = compileQuickCss(node);
+          imports += result[0];
+          contents += result[1];
+        } else {
           const contentNoImports = node.content.replace(importRegex, (match) => {
-            imports.push(match.replace(/;$/, '') + '; /* ' + node.location + ' */');
+            imports += match.replace(/;$/, '') + '; /* ' + node.location + ' */';
             return '';
-          });
+          }).trim();
 
-          if (!/^\s*$/.test(contentNoImports))
+          if (contentNoImports)
             contents += '\n\n/* ' + node.location + ' */\n' + contentNoImports;
         }
       }
 
-      return imports.join('\n') + contents;
+      return [imports, contents];
     }
 
-    const compiledCss = compileQuickCss(Popcorn.quickCss);
-    const style = document.getElementById('popcorn-quickcss');
-    if (!style) {
-      const style = document.createElement('style');
-      style.id = 'popcorn-quickcss';
-      style.textContent = compiledCss;
-      style.dataset.popcorn = 'true';
-      style.dataset.info =
-        'This was added here so it can override the other styles.';
-      comments.end.after(style);
-    } else {
-      style.textContent = compiledCss;
+    const [compiledImports, compiledContents] = compileQuickCss(Popcorn.quickCss);
+
+    const importStyle = this.styleElements.get('imports');
+    if (!importStyle) {
+      const importStyle = document.createElement('style');
+      importStyle.id = 'popcorn-quickcss-imports';
+      importStyle.textContent = compiledImports;
+      importStyle.dataset.popcorn = 'true';
+      comments.end.after(importStyle);
+      this.styleElements.set('imports', importStyle);
+    } else if (compiledImports !== importStyle.textContent) {
+      importStyle.textContent = compiledImports;
+    }
+
+    const contentStyle = this.styleElements.get('contents');
+    if (!contentStyle) {
+      const contentStyle = document.createElement('style');
+      contentStyle.id = 'popcorn-quickcss-contents';
+      contentStyle.textContent = compiledContents;
+      contentStyle.dataset.popcorn = 'true';
+      comments.end.after(contentStyle);
+      this.styleElements.set('contents', contentStyle);
+    } else if (compiledContents !== contentStyle.textContent) {
+      contentStyle.textContent = compiledContents;
     }
   }
 
-  async watchQuickCss() {
+  watchQuickCss() {
     PopcornNative.onQuickCssChange((updated) => {
       if (config.verbose) Logger.debug('QuickCSS Updated');
 
-      // TODO: Use a proxy for this maybe?
       Popcorn.quickCss = updated;
 
       rerenderSidebar();
