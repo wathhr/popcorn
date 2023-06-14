@@ -126,7 +126,7 @@ ipcMain.on(IPC.updateQuickCssFile, (event, location: string, content: string) =>
   const actualLocation = join(config.quickCssDir, location);
 
   let success = false;
-  fs.writeFile(actualLocation, content, { flag: 'r+' })
+  fs.writeFile(actualLocation, content)
     .then(() => {
       Logger.log(`Successfully saved ${location}.`);
       success = true;
