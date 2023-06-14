@@ -31,3 +31,9 @@ declare type QuickCssFile = {
   location: string;
   content: string;
 };
+
+declare type StatusMessage = {
+  type: string;
+  success: boolean;
+  data?: any
+};

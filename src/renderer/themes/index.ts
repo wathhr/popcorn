@@ -6,16 +6,18 @@ const Logger = new LoggerModule('Themes');
 
 export class Theme {
   public id: string;
+  public jsonLocation: string;
   #element: HTMLLinkElement;
 
-  constructor(id: string, enabled = true) {
+  constructor(id: string, themeData: SimpleTheme) {
     autoBind(this);
 
     this.id = id;
-    this.#enabled = enabled;
+    this.jsonLocation = themeData.jsonLocation;
+    this.#enabled = themeData.enabled;
 
     if (shouldValidate) this.#validate();
-    if (enabled) this.enable(false);
+    if (themeData.enabled) this.enable(false);
   }
 
   #enabled: boolean;
@@ -71,7 +73,6 @@ export class Theme {
     this.#validate(promise);
   }
 
-  // Use getters and setters here?
   public valid: boolean | 'unknown' = 'unknown';
   public errors: cssValidatorErrors = [];
   async #validate(content?: string | Promise<Response>) {
@@ -99,18 +100,18 @@ export default class Themes {
     this.watchThemes();
   }
 
-  populateThemes(simpleThemes: { [id: string]: SimpleTheme }) {
-    const themes: { [id: string]: Theme } = {};
-    for (const id in simpleThemes) {
-      themes[id] = new Theme(id, simpleThemes[id].enabled);
-    }
-
-    return themes;
-  }
-
   watchThemes() {
     PopcornNative.onThemeChange(({ id }) => {
       window.Popcorn.themes[id].update();
     });
   }
+}
+
+export function populateThemes(simpleThemes: { [id: string]: SimpleTheme }) {
+  const themes: { [id: string]: Theme } = {};
+  for (const id in simpleThemes) {
+    themes[id] = new Theme(id, simpleThemes[id]);
+  }
+
+  return themes;
 }

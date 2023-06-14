@@ -13,54 +13,32 @@ export default class QuickCss {
   }
 
   populateQuickCss() {
-    function compileQuickCss(folder: QuickCssFolder) {
-      let imports = '';
-      let contents = '';
-
-      const importRegex = /^@import\s+(?:url\(['"]?.*?['"]?\)|['"].*?['"])(\s+[^;]+?)?;$/gmi;
-      for (const node of folder.files) {
-        if ('files' in node) {
-          const result = compileQuickCss(node);
-          imports += result[0];
-          contents += result[1];
-        } else {
-          const contentNoImports = node.content.replace(importRegex, (match) => {
-            imports += match.replace(/;$/, '') + '; /* ' + node.location + ' */';
-            return '';
-          }).trim();
-
-          if (contentNoImports)
-            contents += '\n\n/* ' + node.location + ' */\n' + contentNoImports;
-        }
-      }
-
-      return [imports, contents];
-    }
-
-    const [compiledImports, compiledContents] = compileQuickCss(Popcorn.quickCss);
+    const { imports, contents } = compileQuickCss(Popcorn.quickCss);
 
     const importStyle = this.styleElements.get('imports');
     if (!importStyle) {
       const importStyle = document.createElement('style');
       importStyle.id = 'popcorn-quickcss-imports';
-      importStyle.textContent = compiledImports;
+      importStyle.textContent = imports;
       importStyle.dataset.popcorn = 'true';
       comments.end.after(importStyle);
+
       this.styleElements.set('imports', importStyle);
-    } else if (compiledImports !== importStyle.textContent) {
-      importStyle.textContent = compiledImports;
+    } else if (imports !== importStyle.textContent) {
+      importStyle.textContent = imports;
     }
 
     const contentStyle = this.styleElements.get('contents');
     if (!contentStyle) {
       const contentStyle = document.createElement('style');
       contentStyle.id = 'popcorn-quickcss-contents';
-      contentStyle.textContent = compiledContents;
+      contentStyle.textContent = contents;
       contentStyle.dataset.popcorn = 'true';
       comments.end.after(contentStyle);
+
       this.styleElements.set('contents', contentStyle);
-    } else if (compiledContents !== contentStyle.textContent) {
-      contentStyle.textContent = compiledContents;
+    } else if (contents !== contentStyle.textContent) {
+      contentStyle.textContent = contents;
     }
   }
 
@@ -74,4 +52,43 @@ export default class QuickCss {
       this.populateQuickCss();
     });
   }
+}
+
+function compileQuickCss(folder: QuickCssFolder) {
+  let imports = '';
+  let contents = '';
+
+  const importRegex = /^@import\s+(?:url\(['"]?.*?['"]?\)|['"].*?['"])(\s+[^;]+?)?;$/gmi;
+  for (const node of folder.files) {
+    if ('files' in node) {
+      const result = compileQuickCss(node);
+      imports += result.imports;
+      contents += result.contents;
+    } else {
+      const contentNoImports = node.content.replace(importRegex, (match) => {
+        imports += match.replace(/;$/, '') + `; /* ${node.location} */\n`;
+        return '';
+      }).trim();
+
+      if (contentNoImports) contents += `\n\n/* ${node.location} */\n` + contentNoImports;
+    }
+  }
+
+  return { imports, contents };
+}
+
+export function getQuickCssNode(location: string, node: QuickCssFolder = window.Popcorn.quickCss): QuickCssFile | QuickCssFolder {
+  if (node.location === location) return node;
+
+  for (const child of node.files) {
+    if ('content' in child) {
+      if (child.location === location) return child;
+      else continue;
+    }
+
+    const result = getQuickCssNode(location, child);
+    if (result) return result;
+  }
+
+  return null;
 }

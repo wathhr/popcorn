@@ -1,4 +1,4 @@
-import Themes from './themes';
+import Themes, { populateThemes } from './themes';
 import QuickCss from './quickcss';
 import UI from '@ui/index.svelte';
 
@@ -23,7 +23,7 @@ export default new class Renderer {
     const themes = new Themes();
     const quickCss = new QuickCss();
     const Popcorn = {
-      themes: themes.populateThemes(await PopcornNative.getThemes()),
+      themes: populateThemes(await PopcornNative.getThemes()),
       quickCss: await PopcornNative.getQuickCss(),
     };
     window.Popcorn = Popcorn;
@@ -33,3 +33,5 @@ export default new class Renderer {
     quickCss.start();
   }
 };
+
+import './ipc';

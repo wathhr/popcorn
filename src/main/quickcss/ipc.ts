@@ -1,11 +1,11 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { join } from 'path';
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain } from 'electron';
 import config from '../config';
-import { IPC } from '@constants';
+import { IPC, MESSAGES } from '@constants';
 import { quickCss, updateQuickCss } from '.';
 import { start, stop } from './watcher';
-import { hasValue } from '../utils';
+import { hasValue, sendToAll } from '../utils';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('IPC > QuickCSS', 'ansi');
 
@@ -18,20 +18,33 @@ ipcMain.on(IPC.createQuickCssNode, (event, location: string, type: 'file' | 'fol
   let name: string;
   while (!name) {
     const possibleName = type + (i ? '-' + i++ : '') + (type === 'folder' ? '' : '.css');
-    !hasValue(quickCss, 'location', join(location, possibleName)) && (name = possibleName);
+    hasValue(quickCss, 'location', join(location, possibleName)) || (name = possibleName);
   }
 
   const actualLocation = join(config.quickCssDir, location, name);
-  try {
-    if (type === 'folder') fs.mkdirSync(actualLocation);
-    else fs.openSync(actualLocation, 'wx');
-    Logger.log(`Successfully created ${type} ${name}.`);
-  } catch (e) {
-    Logger.error(`Failed to create ${type} ${name}:`, e);
-  }
+
+  let success = false;
+  (type === 'file' ? fs.open(actualLocation, 'wx') : fs.mkdir(actualLocation))
+    .then(() => {
+      Logger.log(`Successfully created ${type} ${name}.`);
+      success = true;
+    })
+    .catch((e) => {
+      Logger.error(`Failed to create ${type} ${name}:`, e);
+    })
+    .finally(() => {
+      event.reply(IPC.statusMessage, {
+        type: MESSAGES.quickCss.created,
+        success,
+        data: {
+          type,
+          location: name
+        }
+      });
+    });
 });
 
-ipcMain.on(IPC.deleteQuickCssNode, (event, location: string) => {
+ipcMain.on(IPC.deleteQuickCssNode, async (event, location: string) => {
   if (config.verbose) Logger.debug('Received QuickCSS file remove message from', event.sender.getTitle());
 
   if (!hasValue(quickCss, 'location', location)) {
@@ -45,32 +58,61 @@ ipcMain.on(IPC.deleteQuickCssNode, (event, location: string) => {
     return;
   }
 
-  try {
-    fs.removeSync(actualLocation);
-    Logger.log(`Successfully deleted ${location}.`);
-  } catch (e) {
-    Logger.error(`Failed to delete ${location}:`, e);
-  }
+  const type = await fs.lstat(actualLocation).then((stat) => stat.isDirectory() ? 'folder' : 'file');
+
+  let success = false;
+  fs.rm(actualLocation, { recursive: true })
+    .then(() => {
+      Logger.log(`Successfully deleted ${location}.`);
+      success = true;
+    })
+    .catch((e) => {
+      Logger.error(`Failed to delete ${location}:`, e);
+    })
+    .finally(() => {
+      event.reply(IPC.statusMessage, {
+        type: MESSAGES.quickCss.deleted,
+        success,
+        data: {
+          type,
+          location
+        }
+      });
+    });
 });
 
 ipcMain.on(IPC.renameQuickCssNode, (event, location: string, newName: string) => {
   if (config.verbose) Logger.debug('Received rename message from', event.sender.getTitle());
 
+  const newLocation = join(location, '..', newName);
   const actualLocation = join(config.quickCssDir, location);
-  const actualNewName = join(actualLocation, '..', newName);
+  const actualNewLocation = join(config.quickCssDir, newLocation);
 
-  // Watcher needs to be stopped first otherwise it throws an error (on windows)
-  stop();
-  try {
-    fs.renameSync(actualLocation, actualNewName);
-    Logger.log(`Successfully renamed ${location} to ${newName}.`);
-  } catch (e) {
-    Logger.error(`Failed to rename ${location} to ${newName}:`, e);
-  } finally {
-    start();
-    updateQuickCss();
-    BrowserWindow.getAllWindows().forEach((window) => window.webContents.send(IPC.onQuickCssChange, quickCss));
-  }
+  stop(); // Watcher needs to be stopped first otherwise it throws an error (on windows)
+
+  let success = false;
+  fs.rename(actualLocation, actualNewLocation)
+    .then(() => {
+      Logger.log(`Successfully renamed ${location} to ${newName}.`);
+      success = true;
+
+      updateQuickCss();
+      sendToAll(IPC.onQuickCssChange, quickCss);
+    })
+    .catch((e) => {
+      Logger.error(`Failed to rename ${location} to ${newName}:`, e);
+    })
+    .finally(() => {
+      start();
+      event.reply(IPC.statusMessage, {
+        type: MESSAGES.quickCss.renamed,
+        success,
+        data: {
+          oldLocation: location,
+          newLocation: newLocation
+        }
+      });
+    });
 });
 
 ipcMain.on(IPC.updateQuickCssFile, (event, location: string, content: string) => {
@@ -82,10 +124,21 @@ ipcMain.on(IPC.updateQuickCssFile, (event, location: string, content: string) =>
   }
 
   const actualLocation = join(config.quickCssDir, location);
-  try {
-    fs.writeFileSync(actualLocation, content);
-    Logger.log(`Successfully saved ${location}.`);
-  } catch (e) {
-    Logger.error(`Failed to save ${location}:`, e);
-  }
+
+  let success = false;
+  fs.writeFile(actualLocation, content, { flag: 'r+' })
+    .then(() => {
+      Logger.log(`Successfully saved ${location}.`);
+      success = true;
+    })
+    .catch((e) => {
+      Logger.error(`Failed to save ${location}:`, e);
+    })
+    .finally(() => {
+      event.reply(IPC.statusMessage, {
+        type: MESSAGES.quickCss.updated,
+        success,
+        data: location
+      });
+    });
 });

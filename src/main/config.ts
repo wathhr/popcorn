@@ -7,31 +7,32 @@ import { IPC } from '@common/constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Main', 'ansi');
 
-// TODO: rewrite this
-const defaultFileContent = [
-  '{',
-  '  "hotkey": "ctrl+shift+p",',
-  '  "quickCssDir": "./quickcss",',
-  '  "themeFiles": [',
-  '    "./themes/*/index.json",',
-  process.platform === 'win32'
-    ? '    "%USERPROFILE%/discord/themes/*/index.json"'
-    : '    "$HOME/discord/themes/*/index.json"',
-  '  ],',
-  '  "enabled": {}',
-  '}',
-].join('\n');
+const defaultConfig: Config = {
+  hotkey: 'ctrl+shift+p',
+  quickCssDir: './quickcss',
+  themeFiles: [
+    './themes/*/index.json',
+    ...(process.platform === 'win32'
+      ? ['%USERPROFILE%/discord/themes/*/index.json']
+      : ['$HOME/discord/themes/*/index.json']
+    ),
+  ],
+  enabled: {},
+};
 
 if (!fs.existsSync(join(root, 'config.json'))) {
   Logger.warn('No config file found, creating one.');
-  fs.writeFileSync(join(root, 'config.json'), defaultFileContent);
+  fs.writeFileSync(join(root, 'config.json'), JSON.stringify(defaultConfig, null, 2));
 }
 
-export const config: Config = require(join(root, 'config.json'));
+const configJson = require(join(root, 'config.json'));
+const configJsonWithDefaults = {
+  ...defaultConfig,
+  ...configJson,
+};
+export const config: Config = configJsonWithDefaults;
 
-if (config.verbose == null) config.verbose = false;
-if (argv.includes('--verbose') || process.env.NODE_ENV === 'development')
-  config.verbose = true;
+if (argv.includes('--verbose') || NODE_ENV === 'development') config.verbose = true;
 
 config.quickCssDir = isAbsolute(config.quickCssDir)
   ? config.quickCssDir

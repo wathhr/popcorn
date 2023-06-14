@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import { join } from 'path';
 import { ipcMain } from 'electron';
 import config from '../config';
@@ -17,10 +17,11 @@ ipcMain.on(IPC.saveThemeState, (event, id: string, state: boolean) => {
   const configFile: Config = require(join(root, 'config.json')); // Requiring again in case the file was changed since launch
 
   configFile.enabled[id] = state;
-  try {
-    fs.writeFileSync(join(root, 'config.json'), JSON.stringify(configFile, null, 2));
-    Logger.log(`Saved theme state "${state}" for ${id}.`);
-  } catch (e) {
-    Logger.error(`Failed to save theme state for "${id}":`, e);
-  }
+  fs.writeFile(join(root, 'config.json'), JSON.stringify(configFile, null, 2))
+    .then(() => {
+      Logger.log(`Saved theme state "${state}" for ${id}.`);
+    })
+    .catch((e) => {
+      Logger.error(`Failed to save theme state for "${id}":`, e);
+    });
 });

@@ -65,7 +65,6 @@ export class LoggerModule {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${message}\x1b[0m`;
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   async #log(type: string, message: any[]) {
     type = this.#parseType(type);
     const logColor = this.#parseColor(type);

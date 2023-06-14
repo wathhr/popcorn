@@ -8,6 +8,7 @@ const config: Promise<Config> = ipcRenderer.invoke(IPC.getConfig);
 const PopcornNative: PopcornNative = {
   // Misc
   config: config,
+  onStatusMessage: (listener) => ipcRenderer.on(IPC.statusMessage, (_, message) => listener(message)),
 
   // Themes
   getThemes: () => ipcRenderer.invoke(IPC.getThemes),
@@ -32,7 +33,6 @@ try {
 
 contextBridge.exposeInMainWorld('PopcornNative', PopcornNative);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ipcRenderer.on(IPC.log, (_, type, ...message: any[]) => {
   const Logger = new LoggerModule('Main');
 
