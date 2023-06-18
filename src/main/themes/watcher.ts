@@ -1,9 +1,9 @@
 import chokidar from 'chokidar';
 import { debounce } from 'ts-debounce';
-import { BrowserWindow } from 'electron';
+import { themes, updateTheme } from '.';
+import { sendToAll } from '../utils';
 import config from '../config';
 import { IPC } from '@constants';
-import { themes, updateTheme } from '.';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Watcher > Themes', 'ansi');
 
@@ -14,12 +14,18 @@ const watcher = chokidar.watch([], {
   depth: 1,
 });
 
+const possibleKeys = [
+  'json',
+  'main',
+  'splash',
+];
 watcher.on(
   'change',
   debounce((path) => {
-    path = path.replace(/\\/g, '/');
     const id = Object.keys(themes).find((id) => {
-      return themes[id].jsonLocation === path || themes[id].mainLocation === path;
+      for (const key of possibleKeys) {
+        if (themes[id][key] === path) return true;
+      }
     });
 
     if (!id) {
@@ -27,12 +33,10 @@ watcher.on(
       return;
     }
 
-    updateTheme(themes[id].jsonLocation);
+    updateTheme(themes[id].json);
 
     if (config.verbose) Logger.debug(`Theme changed: ${id}`);
-    BrowserWindow.getAllWindows().forEach((window) =>
-      window.webContents.send(IPC.onThemeChange, { id: id, theme: themes[id] })
-    );
+    sendToAll(IPC.onThemeChange, { id: id, theme: themes[id] });
   }, 100)
 );
 

@@ -3,6 +3,7 @@ declare type PopcornNative = {
   config: Promise<Config>;
   validateCSS?: typeof import('w3c-css-validator').validateText;
   onStatusMessage(listener: (message: StatusMessage) => void): void;
+  isSplash: boolean;
 
   // Themes
   getThemes(): Promise<{ [id: string]: SimpleTheme }>;

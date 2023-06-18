@@ -8,6 +8,7 @@ export const IPC = prefixValues({
   // Misc
   getConfig: 'GET_CONFIG',
   statusMessage: 'STATUS_MESSAGE',
+  getWindowData: 'GET_WINDOW_DATA',
   log: 'LOG',
 
   // Themes
@@ -26,10 +27,10 @@ export const IPC = prefixValues({
 
 export const MESSAGES = {
   quickCss: prefixValues({
-    created: 'QUICKCSS_CREATED',
-    deleted: 'QUICKCSS_DELETED',
-    renamed: 'QUICKCSS_RENAMED',
-    updated: 'QUICKCSS_UPDATED',
+    created: 'CREATED',
+    deleted: 'DELETED',
+    renamed: 'RENAMED',
+    updated: 'UPDATED',
   }, prefixes.quickCss),
 };
 

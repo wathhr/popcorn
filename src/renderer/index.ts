@@ -20,17 +20,17 @@ export default new class Renderer {
   async start() {
     document.head.append(comments.start, comments.end);
 
-    const themes = new Themes();
-    const quickCss = new QuickCss();
+    const themes = await PopcornNative.getThemes();
+    const quickCss = await PopcornNative.getQuickCss();
     const Popcorn = {
-      themes: populateThemes(await PopcornNative.getThemes()),
-      quickCss: await PopcornNative.getQuickCss(),
+      themes: populateThemes(themes),
+      quickCss,
     };
     window.Popcorn = Popcorn;
 
     new UI({ target: document.body });
-    themes.start();
-    quickCss.start();
+    new Themes().start();
+    new QuickCss().start();
   }
 };
 

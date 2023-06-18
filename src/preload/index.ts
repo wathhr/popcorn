@@ -9,6 +9,7 @@ const PopcornNative: PopcornNative = {
   // Misc
   config: config,
   onStatusMessage: (listener) => ipcRenderer.on(IPC.statusMessage, (_, message) => listener(message)),
+  isSplash: isSplash(),
 
   // Themes
   getThemes: () => ipcRenderer.invoke(IPC.getThemes),
@@ -38,3 +39,27 @@ ipcRenderer.on(IPC.log, (_, type, ...message: any[]) => {
 
   Logger[type](...message);
 });
+
+function isSplash() {
+  const possibleVars = [
+    'splash',
+    'Splash',
+    'SPLASH',
+    '__SPLASH',
+    '__SPLASH__',
+    'splashScreen',
+    'SplashScreen',
+    'SPLASHSCREEN',
+    '__SPLASHSCREEN',
+    '__SPLASHSCREEN__'
+  ];
+
+  for (const varName of possibleVars) {
+    if (window[varName]) return true;
+  }
+
+  const { windowOptions } = ipcRenderer.sendSync(IPC.getWindowData);
+  if (!windowOptions.webPreferences.nativeWindowOpen) return true;
+
+  return false;
+}

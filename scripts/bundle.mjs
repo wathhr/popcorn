@@ -1,17 +1,17 @@
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import * as esbuild from 'esbuild';
 import sveltePlugin from 'esbuild-svelte';
 import preprocess from 'svelte-preprocess';
 
 const options = {
-  externalModules: { type: 'boolean' },
   minify: { type: 'boolean' },
   types: { type: 'string' },
   watch: { type: 'boolean' },
 };
 const {
   values: {
-    externalModules = false,
     minify = process.env.NODE_ENV === 'production',
     types = 'all',
     watch = false,
@@ -37,12 +37,16 @@ if (!actualTypes) {
   process.exit(1);
 }
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
+
 const builds = [];
 for (const type of actualTypes) {
+  /** @type {import('esbuild').BuildOptions} */
   const options = {
     entryPoints: [
       {
-        in: `./src/${type}/index.ts`,
+        in: join(root, `src/${type}/index.ts`),
         out: type,
       },
     ],
@@ -58,8 +62,7 @@ for (const type of actualTypes) {
     },
     external: [
       'electron',
-      'config.json',
-      ...(externalModules ? ['./node_modules/*'] : []),
+      join(root, 'config.json'),
     ],
     ...(type === 'renderer' && {
       plugins: [

@@ -11,13 +11,15 @@ declare type Config = {
 declare type Meta = {
   id: string;
   main: string;
+  splash?: string;
 };
 
 declare type SimpleTheme = {
   enabled: boolean;
   id: string;
-  jsonLocation: string;
-  mainLocation: string;
+  json: string;
+  main: string;
+  splash?: string;
 };
 
 declare type QuickCssFolder = {

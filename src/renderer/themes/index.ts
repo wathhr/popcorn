@@ -5,15 +5,16 @@ import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Themes');
 
 export class Theme {
+  private static readonly link = PopcornNative.isSplash ? 'popcorn://splash-theme/' : 'popcorn://theme/';
   public id: string;
-  public jsonLocation: string;
+  public json: string;
   #element: HTMLLinkElement;
 
   constructor(id: string, themeData: SimpleTheme) {
     autoBind(this);
 
     this.id = id;
-    this.jsonLocation = themeData.jsonLocation;
+    this.json = themeData.json;
     this.#enabled = themeData.enabled;
 
     if (shouldValidate) this.#validate();
@@ -40,7 +41,7 @@ export class Theme {
     const link = this.#element = document.createElement('link');
     link.rel = 'stylesheet';
     link.id = this.id;
-    link.href = `popcorn://theme/${this.id}`;
+    link.href = Theme.link + this.id;
     link.dataset.popcorn = 'true';
     comments.end.before(link);
 
@@ -68,20 +69,22 @@ export class Theme {
     else this.enable(save);
   }
 
-  update() {
-    const promise = fetch(`popcorn://theme/${this.id}`);
-    this.#validate(promise);
+  private rev = 0;
+  async update() {
+    // TODO: Figure out why doing fetch() doesn't work
+    this.#element.href = Theme.link + this.id + `?${++this.rev}`;
+
+    const promise = await fetch(Theme.link + this.id, { cache: 'no-store' });
+    const text = await promise.text();
+    if (shouldValidate) this.#validate(text);
   }
 
   public valid: boolean | 'unknown' = 'unknown';
   public errors: cssValidatorErrors = [];
-  async #validate(content?: string | Promise<Response>) {
-    content ??= fetch(`popcorn://theme/${this.id}`);
-    let text: string;
-    if (typeof content === 'string') text = content;
-    else text = await (await content).text();
+  async #validate(content?: string) {
+    content ??= await (await fetch(Theme.link + this.id, { cache: 'no-store' })).text();
 
-    PopcornNative.validateCSS(text)
+    PopcornNative.validateCSS(content)
       .then((result) => {
         if (config.verbose) Logger.debug(`Validated "${this.id}".`, result);
 
