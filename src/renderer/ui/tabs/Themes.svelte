@@ -10,44 +10,64 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-icons-pack/Icon.svelte'; // This import does not get bundled properly with externalModules
+  import { tooltip } from 'svooltip';
+  import Icon from 'svelte-icons-pack/Icon.svelte';
   import RiEditorQuestionMark from 'svelte-icons-pack/ri/RiEditorQuestionMark';
   import VscCheck from 'svelte-icons-pack/vsc/VscCheck';
   import VscChromeClose from 'svelte-icons-pack/vsc/VscChromeClose';
-  const themes = Popcorn.themes;
+  import { shouldValidate } from 'src/renderer';
 
   function createTooltipContent(errors: cssValidatorErrors) {
-    return errors
-      ?.map((error) => `Line ${error.line}: ${error.message}`)
-      .join('\n ');
+    return errors.map((error) => `Line ${error.line}: ${error.message}`).join('\n ');
+  }
+
+  function getValidityData(validity: Theme['valid']): {
+    icon: typeof RiEditorQuestionMark;
+    text: string;
+  } {
+    switch (validity) {
+      case true:
+        return {
+          icon: VscCheck,
+          text: 'Valid',
+        };
+      case false:
+        return {
+          icon: VscChromeClose,
+          text: 'Invalid',
+        };
+      case 'unknown':
+      default:
+        return {
+          icon: RiEditorQuestionMark,
+          text: 'Validity Unknown',
+        };
+    }
   }
 </script>
 
 <div class="themes-wrapper">
-  {#each Object.keys(themes) as id}
-    {@const theme = themes[id]}
-    {@const isValid = theme.valid === true}
+  {#each Object.keys(window.Popcorn.themes) as id}
+    {@const theme = window.Popcorn.themes[id]}
+    {@const { icon, text } = getValidityData(theme.valid)}
     {#key $rerenderStore[id]}
       <div class="theme-container" {id} data-enabled={theme.enabled}>
-        <h1 class="theme-id">{id}</h1>
-        <div class="theme-meta">
-          <div
-            class="theme-validity"
-            data-value={theme.valid}
-            data-error={isValid ? undefined : createTooltipContent(theme.errors)}
-          >
-            {#if isValid}
-              <Icon color="currentColor" src={VscCheck} />
-              <span class="theme-validity-text">Valid</span>
-            {:else if theme.valid === false}
-              <Icon color="currentColor" src={VscChromeClose} />
-              <span class="theme-validity-text">Invalid</span>
-            {:else}
-              <Icon color="currentColor" src={RiEditorQuestionMark} />
-              <span class="theme-validity-text">Validity Unknown</span>
-            {/if}
-          </div>
-        </div>
+        <h1 class="theme-id">
+          {id}
+          {#if shouldValidate}
+            <div
+              class="theme-validity"
+              data-value={theme.valid}
+              use:tooltip={{
+                content: theme.valid ? text : createTooltipContent(theme.errors),
+                target: '#PopcornUI-layers',
+              }}
+            >
+              <Icon color="currentColor" src={icon} />
+            </div>
+          {/if}
+        </h1>
+        <div class="theme-description">{theme.description ?? ''}</div>
         <button
           class="theme-toggle"
           on:click={() => window.Popcorn.themes[id].toggle()}
@@ -65,31 +85,24 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     grid-auto-rows: max-content;
-    gap: 1rem;
+    gap: 1em;
   }
 
   .theme-container {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    row-gap: 0.5rem;
-    padding: 0.5rem;
+    row-gap: 0.5em;
+    padding: 0.5em;
     background-color: var(--pop-bg-normal);
   }
 
   .theme-id {
-    overflow: scroll;
-    font-size: 1.25rem;
-    line-height: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.25em;
+    font-size: 1.25em;
+    line-height: 1.5em;
     user-select: text;
-  }
-  .theme-id::-webkit-scrollbar {
-    display: none;
-  }
-
-  .theme-meta {
-    padding-block-start: 0.5rem;
-    border-block-start: 0.125rem solid var(--pop-fg-normal);
-    font-size: 1.25rem;
   }
   .theme-validity {
     position: relative;
@@ -105,40 +118,16 @@
     color: var(--pop-gray);
   }
 
+  .theme-description {
+    padding-block-start: 0.5em;
+    border-block-start: 0.125rem solid var(--pop-fg-normal);
+    font-size: 1.25em;
+  }
+
   .theme-validity > :global(svg) {
     display: inline-block;
     vertical-align: middle;
     margin-inline-end: 0.125em;
-  }
-
-  /* TODO: Use a tooltip component instead of this */
-  .theme-validity[data-error]::before,
-  .theme-validity[data-error]::after {
-    position: absolute;
-    bottom: calc(100% + 0.5rem);
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .theme-validity[data-error]::after {
-    width: max-content;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.125rem;
-    color: var(--pop-tooltip-fg);
-    background-color: var(--pop-tooltip-bg);
-  }
-  .theme-validity[data-error]:hover::after {
-    content: attr(data-error);
-  }
-  .theme-validity[data-error]::before {
-    left: calc(50% + 0.5rem);
-    margin-bottom: -1rem;
-    width: 0;
-    height: 0;
-    border: 0.5rem solid transparent;
-    border-top-color: var(--pop-tooltip-bg);
-  }
-  .theme-validity[data-error]:hover::before {
-    content: '';
   }
 
   .theme-toggle {

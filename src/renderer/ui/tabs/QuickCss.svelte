@@ -19,15 +19,10 @@
 <script lang="ts">
   import { debounce } from 'ts-debounce';
   // TODO: Get rid of the type imports somehow
-  import MonacoEditor, {
-    type actions,
-    type commands,
-  } from '@components/QuickCss/MonacoEditor.svelte';
+  import MonacoEditor, { type actions, type commands } from '@components/QuickCss/MonacoEditor.svelte';
   import Sidebar, { fileStatus } from '@components/QuickCss/Sidebar.svelte';
 
-  const defaultText = 'Select a file to edit';
-
-  let editorContent: string = defaultText;
+  let editorContent: string;
 
   selectedFile.subscribe((file) => {
     if (!file) return;
@@ -56,15 +51,11 @@
   ];
 
   function handleChange() {
-    if (!$selectedFile) return;
-
     $fileStatus[$selectedFile.location] ??= {};
     $fileStatus[$selectedFile.location].unsaved = true;
   }
 
   function save() {
-    if (!$selectedFile) return;
-
     $fileStatus[$selectedFile.location].unsaved = false;
     PopcornNative.updateQuickCssFile($selectedFile.location, editorContent);
   }
@@ -76,22 +67,25 @@
   {#key $rerenderStore}
     <Sidebar on:resize={debounce(recalculateSize, 50)} />
   {/key}
-  <div class="status-bar">
-    <span class="selected-file">{$selectedFile?.name ?? defaultText}</span>
-    {#if $status.type}
-      <div class="status" data-type={$status.type ?? undefined}>
-        <div class="status-message">{$status.message}</div>
-      </div>
-    {/if}
-  </div>
-  <!-- TODO: Don't show Monaco when no file is selected -->
-  <MonacoEditor
-    on:change={handleChange}
-    bind:content={editorContent}
-    bind:recalculateSize
-    {actions}
-    {commands}
-  />
+  {#if $selectedFile}
+    <div class="status-bar">
+      <span class="selected-file">{$selectedFile.location}</span>
+      {#if $status.type}
+        <div class="status" data-type={$status.type}>
+          <div class="status-message">{$status.message}</div>
+        </div>
+      {/if}
+    </div>
+    <MonacoEditor
+      on:change={handleChange}
+      bind:content={editorContent}
+      bind:recalculateSize
+      {actions}
+      {commands}
+    />
+  {:else}
+    <span class="no-file-selected">Select a file to edit</span>
+  {/if}
 </div>
 
 <style>

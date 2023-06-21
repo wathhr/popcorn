@@ -6,6 +6,8 @@ const Logger = new LoggerModule('Themes');
 
 export class Theme {
   private static readonly link = PopcornNative.isSplash ? 'popcorn://splash-theme/' : 'popcorn://theme/';
+
+  public description: string;
   public id: string;
   public json: string;
   #element: HTMLLinkElement;
@@ -13,6 +15,7 @@ export class Theme {
   constructor(id: string, themeData: SimpleTheme) {
     autoBind(this);
 
+    this.description = themeData.description;
     this.id = id;
     this.json = themeData.json;
     this.#enabled = themeData.enabled;

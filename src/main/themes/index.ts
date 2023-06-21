@@ -30,11 +30,14 @@ export function updateTheme(json: string) {
   const meta: Meta = require(json);
   const modifiedMeta: Meta = { ...meta };
   for (const key in meta) {
-    // TODO: Disallow ../
     if (pathKeys.includes(key)) {
       if (isAbsolute(meta[key])) {
         Logger.error(`"${key}" must be a relative path. (${meta[key]})`);
-        continue;
+        return;
+      }
+      if (meta[key].startsWith('../')) {
+        Logger.error(`"${key}" must not point to a parent directory. (${meta[key]})`);
+        return;
       }
       const location: string = modifiedMeta[key] = resolve(json, '..', meta[key]);
 

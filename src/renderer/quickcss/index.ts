@@ -13,7 +13,7 @@ export default class QuickCss {
   }
 
   populateQuickCss() {
-    const { imports, contents } = compileQuickCss(Popcorn.quickCss);
+    const { imports, contents } = compileQuickCss(window.Popcorn.quickCss);
 
     const importStyle = this.styleElements.get('imports');
     if (!importStyle) {
@@ -46,7 +46,7 @@ export default class QuickCss {
     PopcornNative.onQuickCssChange((updated) => {
       if (config.verbose) Logger.debug('QuickCSS Updated');
 
-      Popcorn.quickCss = updated;
+      window.Popcorn.quickCss = updated;
 
       rerenderSidebar();
       this.populateQuickCss();

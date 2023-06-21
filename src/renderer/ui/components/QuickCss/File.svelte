@@ -1,3 +1,5 @@
+<!-- TODO: When you click the file, the parent is selected -->
+
 <script lang="ts">
   import { fileStatus } from '@components/QuickCss/Sidebar.svelte';
   import { selectedFile } from '@ui/tabs/QuickCss.svelte';

@@ -9,12 +9,14 @@ declare type Config = {
 };
 
 declare type Meta = {
+  description?: string;
   id: string;
   main: string;
   splash?: string;
 };
 
 declare type SimpleTheme = {
+  description?: string;
   enabled: boolean;
   id: string;
   json: string;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import 'svooltip/styles.css';
   import { onMount } from 'svelte/internal';
   import { config } from '..';
   import TabView from './components/TabView.svelte';
@@ -49,6 +50,7 @@
 
 <dialog bind:this={dialog} class="PopcornUI-dialog">
   <TabView {tabs} />
+  <div id="PopcornUI-layers"></div>
 </dialog>
 
 <style>
