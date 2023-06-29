@@ -5,6 +5,8 @@ import * as esbuild from 'esbuild';
 import sveltePlugin from 'esbuild-svelte';
 import preprocess from 'svelte-preprocess';
 
+/** @typedef {import('esbuild')} esbuild */
+
 const options = {
   minify: { type: 'boolean' },
   types: { type: 'string' },
@@ -18,11 +20,13 @@ const {
   },
 } = parseArgs({ options });
 
+/** @type {('main' | 'preload' | 'renderer')[]} */
 const actualTypes = [];
 
 const validTypes = ['main', 'preload', 'renderer'];
-for (const i in types.split(',')) {
-  const type = types.split(',')[i];
+const typesArray = types.split(',');
+for (const i in typesArray) {
+  const type = typesArray[i];
   if (types === 'all') {
     actualTypes.push(...validTypes);
     break;
@@ -37,12 +41,14 @@ if (!actualTypes) {
   process.exit(1);
 }
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const root = join(__dirname, '..');
 
+/** @type {esbuild.BuildOptions[]} */
 const builds = [];
 for (const type of actualTypes) {
-  /** @type {import('esbuild').BuildOptions} */
+  /** @type {esbuild.BuildOptions} */
   const options = {
     entryPoints: [
       {
@@ -53,7 +59,7 @@ for (const type of actualTypes) {
     platform: 'node',
     bundle: true,
     format: type === 'renderer' ? 'esm' : 'cjs',
-    minify: minify,
+    minify,
     write: true,
     outdir: 'dist',
     sourcemap: minify ? false : 'inline',
@@ -69,7 +75,7 @@ for (const type of actualTypes) {
         sveltePlugin({
           preprocess: preprocess(),
           compilerOptions: {
-            cssHash: ({ hash, css }) => `PopcornUI-${hash(css)}`,
+            cssHash: ({ css, hash }) => `PopcornUI-${hash(css)}`,
             dev: !minify,
           },
         }),
@@ -83,14 +89,12 @@ for (const type of actualTypes) {
 
 builds.map(async (context) => {
   if (watch) return (await esbuild.context(context)).watch();
-  return esbuild.build(context);
+  return await esbuild.build(context);
 });
 
 process.on('SIGINT', () => {
   console.log('Stopping...');
-  builds.map(async (build) => {
-    return await build.dispose();
-  });
+  builds.map(async (build) => await build.dispose());
 
   process.exit(0);
 });
