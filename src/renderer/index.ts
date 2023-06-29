@@ -47,6 +47,10 @@ const renderer = new class Renderer {
     this.Themes.start();
     this.QuickCss = new QuickCss();
     this.QuickCss.start();
+
+    if (!globalThis.PopcornInjected) Object.assign(globalThis, {
+      PopcornInjected: true,
+    });
   }
 
   stop() {
@@ -64,7 +68,3 @@ export default renderer;
 
 import './ipc';
 if (NODE_ENV === 'development' && !globalThis.PopcornInjected) new (await import('./devserver')).default(renderer);
-
-if (!globalThis.PopcornInjected) Object.assign(globalThis, {
-  PopcornInjected: true,
-});
