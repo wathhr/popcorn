@@ -1,4 +1,6 @@
 {
+  "license": "GPL-3.0-or-later",
+  "private": true,
   "scripts": {
     "lint": "eslint .",
     "devserver": "node scripts/devserver.mjs",
