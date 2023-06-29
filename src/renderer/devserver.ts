@@ -11,6 +11,8 @@ function parse(text: string) {
   }
 }
 
+type renderer = typeof import('.').default;
+
 interface Message {
   type: 'hello' | 'renderer.js' | 'renderer.css' | 'main.js' | 'preload.js';
   data?: any;
@@ -19,7 +21,7 @@ interface Message {
 export default class WebServer {
   wss: WebSocket;
 
-  constructor(port = 7331) {
+  constructor(private renderer: renderer, port = 7331) {
     const ws = this.wss = new WebSocket(`ws://localhost:${port}`);
 
     autoBind(this);
@@ -38,12 +40,14 @@ export default class WebServer {
 
       case 'renderer.js': {
         Logger.info('Reloading renderer.js');
+        this.renderer.stop();
         document.getElementById('popcorn-core')?.remove();
 
         const script = document.createElement('script');
         script.id = 'popcorn-core';
         script.type = 'module';
-        script.textContent = json.data.content + ';\nrenderer_default.stop();\nrenderer_default.start();';
+        // This breaks if the code is minified because the renderer_default name gets minified
+        script.textContent = json.data.content + ';\nrenderer_default.start();';
 
         document.head.prepend(script);
       } break;
@@ -56,8 +60,12 @@ export default class WebServer {
         style.textContent = json.data.content;
       } break;
 
-      case 'main.js':
-      case 'preload.js': break;
+      case 'preload.js': {
+        Logger.info('Reloading preload.js');
+        location.reload();
+      } break;
+
+      case 'main.js': break;
 
       default: {
         Logger.info('Received unknown message:', json);

@@ -9,9 +9,7 @@ declare global {
   }
 
   interface globalThis {
-    PopcornUI: UI;
-    PopcornThemes: Themes;
-    PopcornQuickCss: QuickCss;
+    readonly PopcornInjected: boolean;
   }
 }
 
@@ -22,8 +20,12 @@ export const comments = {
 };
 
 const renderer = new class Renderer {
+  UI: UI;
+  Themes: Themes;
+  QuickCss: QuickCss;
+
   async start() {
-    if (!document.getElementById('popcorn-styles')) {
+    if (!globalThis.PopcornInjected) {
       const style = document.createElement('style');
       style.id = 'popcorn-styles';
       style.textContent = await PopcornNative.getStyles();
@@ -40,17 +42,17 @@ const renderer = new class Renderer {
     };
     window.Popcorn = Popcorn;
 
-    globalThis.UI = new UI({ target: document.body });
-    globalThis.Themes = new Themes();
-    globalThis.Themes.start();
-    globalThis.QuickCss = new QuickCss();
-    globalThis.QuickCss.start();
+    this.UI = new UI({ target: document.body });
+    this.Themes = new Themes();
+    this.Themes.start();
+    this.QuickCss = new QuickCss();
+    this.QuickCss.start();
   }
 
   stop() {
-    globalThis.UI.$destroy();
-    globalThis.Themes.stop();
-    globalThis.QuickCss.stop();
+    this.UI.$destroy();
+    this.Themes.stop();
+    this.QuickCss.stop();
 
     comments.start.remove();
     comments.end.remove();
@@ -61,4 +63,8 @@ const renderer = new class Renderer {
 export default renderer;
 
 import './ipc';
-if (NODE_ENV === 'development') new (await import('./devserver')).default();
+if (NODE_ENV === 'development' && !globalThis.PopcornInjected) new (await import('./devserver')).default(renderer);
+
+if (!globalThis.PopcornInjected) Object.assign(globalThis, {
+  PopcornInjected: true,
+});

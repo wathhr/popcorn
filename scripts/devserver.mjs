@@ -44,7 +44,7 @@ class DevServer {
     const json = parse(message.toString());
     if (!json) return;
 
-    switch (json?.type) {
+    switch (json.type) {
       case 'hello': {
         log('Connected');
         clearTimeout(this.connectionTimeout);
