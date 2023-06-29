@@ -1,4 +1,4 @@
-import { comments, config } from '..';
+import { comments } from '..';
 import { rerenderSidebar, selectedFolder } from '@ui/tabs/QuickCss.svelte';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('QuickCSS');
@@ -20,7 +20,7 @@ export default class QuickCss {
       const importStyle = document.createElement('style');
       importStyle.id = 'popcorn-quickcss-imports';
       importStyle.textContent = imports;
-      importStyle.dataset.popcorn = 'true';
+      importStyle.setAttribute('data-popcorn', 'quickcss');
       comments.end.after(importStyle);
 
       this.styleElements.set('imports', importStyle);
@@ -33,7 +33,7 @@ export default class QuickCss {
       const contentStyle = document.createElement('style');
       contentStyle.id = 'popcorn-quickcss-contents';
       contentStyle.textContent = contents;
-      contentStyle.dataset.popcorn = 'true';
+      contentStyle.setAttribute('data-popcorn', 'quickcss');
       comments.end.after(contentStyle);
 
       this.styleElements.set('contents', contentStyle);
@@ -44,13 +44,19 @@ export default class QuickCss {
 
   watchQuickCss() {
     PopcornNative.onQuickCssChange((updated) => {
-      if (config.verbose) Logger.debug('QuickCSS Updated');
+      if (PopcornNative.config.verbose) Logger.debug('QuickCSS Updated');
 
       window.Popcorn.quickCss = updated;
 
       rerenderSidebar();
       this.populateQuickCss();
     });
+  }
+
+  stop() {
+    for (const style of this.styleElements.values()) {
+      style.remove();
+    }
   }
 }
 

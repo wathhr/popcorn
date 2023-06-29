@@ -7,6 +7,7 @@ export const prefixes = {
 export const IPC = prefixValues({
   // Misc
   getConfig: 'GET_CONFIG',
+  getStyles: 'GET_STYLES',
   statusMessage: 'STATUS_MESSAGE',
   getWindowData: 'GET_WINDOW_DATA',
   log: 'LOG',

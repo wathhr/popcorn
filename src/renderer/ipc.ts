@@ -1,5 +1,4 @@
 import { get } from 'svelte/store';
-import { config } from '.';
 import { getQuickCssNode } from './quickcss';
 import { status, selectedFile, selectedFolder } from '@ui/tabs/QuickCss.svelte';
 import { MESSAGES, prefixes } from '@common/constants';
@@ -7,7 +6,7 @@ import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('IPC');
 
 PopcornNative.onStatusMessage((message) => {
-  if (config.verbose) Logger.debug(message);
+  if (PopcornNative.config.verbose) Logger.debug(message);
 
   if (message.type.startsWith(prefixes.quickCss)) handleQuickCssMessages(message);
 });

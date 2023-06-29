@@ -42,4 +42,4 @@ export default config;
 
 if (config.verbose) Logger.debug(config);
 
-ipcMain.handle(IPC.getConfig, () => config);
+ipcMain.on(IPC.getConfig, (event) => event.returnValue = config);

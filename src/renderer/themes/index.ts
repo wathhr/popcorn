@@ -1,6 +1,6 @@
 import autoBind from 'auto-bind';
 import { rerenderTheme } from '@ui/tabs/Themes.svelte';
-import { comments, config, shouldValidate } from '..';
+import { comments, shouldValidate } from '..';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Themes');
 
@@ -45,7 +45,7 @@ export class Theme {
     link.rel = 'stylesheet';
     link.id = this.id;
     link.href = Theme.link + this.id;
-    link.dataset.popcorn = 'true';
+    link.setAttribute('data-popcorn', 'theme');
     comments.end.before(link);
 
     Logger.log(`"${this.id}" enabled.`);
@@ -89,7 +89,7 @@ export class Theme {
 
     PopcornNative.validateCSS(content)
       .then((result) => {
-        if (config.verbose) Logger.debug(`Validated "${this.id}".`, result);
+        if (PopcornNative.config.verbose) Logger.debug(`Validated "${this.id}".`, result);
 
         this.valid = result.valid;
         this.errors = result.errors;
@@ -110,6 +110,13 @@ export default class Themes {
     PopcornNative.onThemeChange(({ id }) => {
       window.Popcorn.themes[id].update();
     });
+  }
+
+  stop() {
+    const elements = document.head.querySelectorAll<HTMLLinkElement>('link[data-popcorn="theme"]');
+    for (const el of elements) {
+      el.remove();
+    }
   }
 }
 

@@ -3,11 +3,10 @@ import { IPC } from '@constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Preload');
 
-const config: Promise<Config> = ipcRenderer.invoke(IPC.getConfig);
-
 const PopcornNative: PopcornNative = {
   // Misc
-  config: config,
+  config: ipcRenderer.sendSync(IPC.getConfig),
+  getStyles: () => ipcRenderer.invoke(IPC.getStyles),
   onStatusMessage: (listener) => ipcRenderer.on(IPC.statusMessage, (_, message) => listener(message)),
   isSplash: isSplash(),
 

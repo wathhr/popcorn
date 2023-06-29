@@ -36,7 +36,6 @@
           icon: VscChromeClose,
           text: 'Invalid',
         };
-      case 'unknown':
       default:
         return {
           icon: RiEditorQuestionMark,

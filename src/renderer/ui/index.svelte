@@ -1,7 +1,6 @@
 <script lang="ts">
   import 'svooltip/styles.css';
-  import { onMount } from 'svelte/internal';
-  import { config } from '..';
+  import { onDestroy, onMount } from 'svelte/internal';
   import TabView from './components/TabView.svelte';
   import ThemesTab from './tabs/Themes.svelte';
   import QuickCssTab from './tabs/QuickCss.svelte';
@@ -18,22 +17,25 @@
     document.documentElement.dataset.popcornUiOpen = isOpened.toString();
   }
 
-  onMount(() => {
-    const context = createContext({ autoEnable: true });
-    context.register(config.hotkey, (event: KeyboardEvent) => {
+  // TODO: Find a better way to do this
+  const context = createContext({ autoEnable: true });
+  const hotkeyCallback = (event: KeyboardEvent) => {
+    event.stopImmediatePropagation();
+    event.stopPropagation();
+    event.preventDefault();
+    toggleUI();
+  };
+  const escapeCallback = (event: KeyboardEvent) => {
+    if (isOpened) {
       event.stopImmediatePropagation();
       event.stopPropagation();
       event.preventDefault();
       toggleUI();
-    });
-    context.register('escape', (event: KeyboardEvent) => {
-      if (isOpened) {
-        event.stopImmediatePropagation();
-        event.stopPropagation();
-        event.preventDefault();
-        toggleUI();
-      }
-    });
+    }
+  };
+  onMount(() => {
+    context.register(PopcornNative.config.hotkey, hotkeyCallback);
+    context.register('escape', escapeCallback);
   });
 
   const tabs = [
@@ -46,11 +48,16 @@
       component: QuickCssTab,
     },
   ];
+
+  onDestroy(() => {
+    context.unregister(PopcornNative.config.hotkey, hotkeyCallback);
+    context.unregister('escape', escapeCallback);
+  });
 </script>
 
 <dialog bind:this={dialog} class="PopcornUI-dialog">
   <TabView {tabs} />
-  <div id="PopcornUI-layers"></div>
+  <div id="PopcornUI-layers" />
 </dialog>
 
 <style>
