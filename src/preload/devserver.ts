@@ -1,4 +1,5 @@
 import autoBind from 'auto-bind';
+import { RENDERER } from '@common/constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Dev Server');
 
@@ -11,8 +12,6 @@ function parse(text: string) {
   }
 }
 
-type renderer = typeof import('.').default;
-
 interface Message {
   type: 'hello' | 'renderer.js' | 'renderer.css' | 'main.js' | 'preload.js';
   data?: any;
@@ -21,14 +20,14 @@ interface Message {
 export default class WebServer {
   wss: WebSocket;
 
-  constructor(private renderer: renderer, port = 7331) {
+  constructor(port = 7331) {
     const ws = this.wss = new WebSocket(`ws://localhost:${port}`);
 
     autoBind(this);
     ws.onmessage = this.handleMessage;
   }
 
-  handleMessage(message: MessageEvent<string>) {
+  private handleMessage(message: MessageEvent<string>) {
     const json: Message = parse(message.data);
     if (!json) return;
 
@@ -40,7 +39,7 @@ export default class WebServer {
 
       case 'renderer.js': {
         Logger.info('Reloading renderer.js');
-        this.renderer.stop();
+        window.postMessage(RENDERER.stop, '*');
         document.getElementById('popcorn-core')?.remove();
 
         const script = document.createElement('script');

@@ -1,7 +1,6 @@
 export const prefixes = {
   main: 'POPCORN_',
-  quickCss: 'QUICKCSS_',
-  themes: 'THEMES_',
+  quickCss: 'QUICKCSS_'
 };
 
 export const IPC = prefixValues({
@@ -34,6 +33,10 @@ export const MESSAGES = {
     updated: 'UPDATED',
   }, prefixes.quickCss),
 };
+
+export const RENDERER = prefixValues({
+  stop: 'STOP',
+}, prefixes.main);
 
 function prefixValues<T extends Record<string, string>>(object: T, prefix: string) {
   const result = {} as Record<keyof T, string>;

@@ -1,4 +1,4 @@
-declare type PopcornNative = {
+type PopcornNative = {
   // Misc
   config: Config;
   getStyles(): Promise<string>;

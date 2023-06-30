@@ -1,6 +1,7 @@
 import Themes, { populateThemes } from './themes';
 import QuickCss from './quickcss';
 import UI from '@ui/index.svelte';
+import { RENDERER } from '@common/constants';
 
 declare global {
   interface Window {
@@ -19,20 +20,25 @@ export const comments = {
   end: document.createComment(' endsection '),
 };
 
+const messageHandler = (event: MessageEvent) => event.source === window && event.data === RENDERER.stop && renderer.stop();
+
 const renderer = new class Renderer {
   UI: UI;
   Themes: Themes;
   QuickCss: QuickCss;
 
+  constructor() {
+    if (NODE_ENV === 'development') window.addEventListener('message', messageHandler);
+  }
+
   async start() {
+    document.head.append(comments.start, comments.end);
     if (!globalThis.PopcornInjected) {
       const style = document.createElement('style');
       style.id = 'popcorn-styles';
       style.textContent = await PopcornNative.getStyles();
-      document.head.prepend(style);
+      comments.start.after(style);
     }
-
-    document.head.append(comments.start, comments.end);
 
     const themes = await PopcornNative.getThemes();
     const quickCss = await PopcornNative.getQuickCss();
@@ -58,6 +64,7 @@ const renderer = new class Renderer {
     this.Themes.stop();
     this.QuickCss.stop();
 
+    window.removeEventListener('message', messageHandler);
     comments.start.remove();
     comments.end.remove();
     delete window.Popcorn;
@@ -67,4 +74,3 @@ const renderer = new class Renderer {
 export default renderer;
 
 import './ipc';
-if (NODE_ENV === 'development' && !globalThis.PopcornInjected) new (await import('./devserver')).default(renderer);
