@@ -10,7 +10,7 @@
 </script>
 
 <script lang="ts">
-  import { tooltip } from 'svooltip';
+  import { tooltip } from '@walter-org/svelte-float';
   import Icon from 'svelte-icons-pack/Icon.svelte';
   import RiEditorQuestionMark from 'svelte-icons-pack/ri/RiEditorQuestionMark';
   import VscCheck from 'svelte-icons-pack/vsc/VscCheck';
@@ -82,7 +82,7 @@
 <style>
   .themes-wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 0.5fr));
     grid-auto-rows: max-content;
     gap: 1em;
   }
@@ -102,6 +102,7 @@
     font-size: 1.25em;
     line-height: 1.5em;
     user-select: text;
+    overflow-x: hidden;
   }
   .theme-validity {
     position: relative;
@@ -118,9 +119,13 @@
   }
 
   .theme-description {
+    display: -webkit-box;
+    -webkit-box-orient: inline-axis;
     padding-block-start: 0.5em;
     border-block-start: 0.125rem solid var(--pop-fg-normal);
     font-size: 1.25em;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 
   .theme-validity > :global(svg) {

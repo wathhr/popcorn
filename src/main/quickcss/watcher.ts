@@ -2,7 +2,7 @@ import chokidar from 'chokidar';
 import { debounce } from 'ts-debounce';
 import { BrowserWindow } from 'electron';
 import config from '../config';
-import { IPC } from '@constants';
+import { IPC } from '@common/constants';
 import { quickCss, updateQuickCss } from '.';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Watcher > QuickCSS', 'ansi');

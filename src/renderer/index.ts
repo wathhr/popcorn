@@ -60,13 +60,15 @@ const renderer = new class Renderer {
   }
 
   stop() {
-    this.UI.$destroy();
-    this.Themes.stop();
-    this.QuickCss.stop();
+    this.UI?.$destroy();
+    this.Themes?.stop();
+    this.QuickCss?.stop();
 
-    window.removeEventListener('message', messageHandler);
+    // TODO: Don't remove the comments
     comments.start.remove();
     comments.end.remove();
+
+    window.removeEventListener('message', messageHandler);
     delete window.Popcorn;
   }
 };

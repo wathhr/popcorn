@@ -6,7 +6,6 @@
     "paths": {
       "@common/*": [
         "src/common/*",
-        "src/renderer/utils/*"
       ],
       "@components/*": [
         "src/renderer/ui/components/*"
@@ -16,6 +15,9 @@
       ],
       "@ui/*": [
         "src/renderer/ui/*"
+      ],
+      "@utils/*": [
+        "src/renderer/utils/*"
       ]
     },
   }

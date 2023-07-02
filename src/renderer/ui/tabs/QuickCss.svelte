@@ -18,7 +18,6 @@
 
 <script lang="ts">
   import { debounce } from 'ts-debounce';
-  // TODO: Get rid of the type imports somehow
   import MonacoEditor, { type actions, type commands } from '@components/QuickCss/MonacoEditor.svelte';
   import Sidebar, { fileStatus } from '@components/QuickCss/Sidebar.svelte';
 

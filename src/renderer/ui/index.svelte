@@ -1,10 +1,11 @@
 <script lang="ts">
-  import 'svooltip/styles.css';
   import { onDestroy, onMount } from 'svelte/internal';
   import TabView from './components/TabView.svelte';
   import ThemesTab from './tabs/Themes.svelte';
   import QuickCssTab from './tabs/QuickCss.svelte';
-  import { createContext } from '../utils/hotkeys';
+  import { createContext } from '@utils/hotkeys';
+
+  import '@walter-org/svelte-float/styles';
 
   let dialog: HTMLDialogElement;
 

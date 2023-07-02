@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import { join } from 'path';
 import { ipcMain } from 'electron';
 import config from '../config';
-import { IPC } from '@constants';
+import { IPC } from '@common/constants';
 import { root } from '../utils';
 import { themes } from '.';
 import LoggerModule from '@common/logger';

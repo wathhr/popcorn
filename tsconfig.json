@@ -12,9 +12,6 @@
       "@common/*": [
         "src/common/*"
       ],
-      "@constants": [
-        "src/common/constants"
-      ],
     },
   },
   "include": [

@@ -1,15 +1,13 @@
 import { IPC } from '@common/constants';
 
 export class LoggerModule {
-  private module: string;
   private output: string;
 
-  constructor(name: string, type = 'console') {
-    this.module = name;
-    this.output = this.#parseOutput(type);
+  constructor(private module: string, type = 'console') {
+    this.output = LoggerModule.parseOutput(type);
   }
 
-  #parseOutput(output: string) {
+  private static parseOutput(output: string) {
     switch (output) {
       case 'ansi':
       case 'terminal':
@@ -19,7 +17,7 @@ export class LoggerModule {
     }
   }
 
-  #parseType(type: string) {
+  private static parseType(type: string) {
     switch (type) {
       case 'info':
       case 'warn':
@@ -31,7 +29,7 @@ export class LoggerModule {
     }
   }
 
-  #parseColor(type: string) {
+  private static parseColor(type: string) {
     switch (type) {
       case 'debug':
         return {
@@ -61,17 +59,17 @@ export class LoggerModule {
     }
   }
 
-  #ansiColor(color: Array<number>, message: string) {
+  private static ansiColor(color: Array<number>, message: string) {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${message}\x1b[0m`;
   }
 
   async #log(type: string, message: any[]) {
-    type = this.#parseType(type);
-    const logColor = this.#parseColor(type);
+    type = LoggerModule.parseType(type);
+    const logColor = LoggerModule.parseColor(type);
 
     const banner =
       this.output === 'ansi'
-        ? [`[${this.#ansiColor(logColor.arr, 'Popcorn')} > ${this.module}]`]
+        ? [`[${LoggerModule.ansiColor(logColor.arr, 'Popcorn')} > ${this.module}]`]
         : [`[%cPopcorn%c > ${this.module}]`, `color: ${logColor.str};`, ''];
 
     console[type](...banner, ...message);

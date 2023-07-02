@@ -3,7 +3,7 @@ import { debounce } from 'ts-debounce';
 import { themes, updateTheme } from '.';
 import { sendToAll } from '../utils';
 import config from '../config';
-import { IPC } from '@constants';
+import { IPC } from '@common/constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Watcher > Themes', 'ansi');
 

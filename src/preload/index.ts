@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { IPC } from '@constants';
+import { IPC } from '@common/constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Preload');
 

@@ -1,6 +1,6 @@
 import { join } from 'path';
 
 export const root = join(__dirname, '..');
-export { hasValue } from './hasValue';
-export { resolvePath } from './resolvePath';
-export { sendToAll } from './sendToAll';
+export * from './hasValue';
+export * from './resolvePath';
+export * from './sendToAll';

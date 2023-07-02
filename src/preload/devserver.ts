@@ -25,6 +25,7 @@ export default class WebServer {
 
     autoBind(this);
     ws.onmessage = this.handleMessage;
+    ws.onclose = () => Logger.info('Disconnected');
   }
 
   private handleMessage(message: MessageEvent<string>) {

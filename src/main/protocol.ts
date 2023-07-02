@@ -27,6 +27,7 @@ app.on('ready', () => {
         const theme = themes[url.pathname.slice(1)];
         filePath = resolve(theme.json, '..', theme.main);
       } break;
+
       case 'splash-theme': {
         const theme = themes[url.pathname.slice(1)];
         if (!theme.splash) return false;

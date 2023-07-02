@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import { join } from 'path';
 import { ipcMain } from 'electron';
 import config from '../config';
-import { IPC, MESSAGES } from '@constants';
+import { IPC, MESSAGES } from '@common/constants';
 import { quickCss, updateQuickCss } from '.';
 import { start, stop } from './watcher';
 import { hasValue, sendToAll } from '../utils';
