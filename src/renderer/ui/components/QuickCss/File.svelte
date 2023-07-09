@@ -3,9 +3,8 @@
 <script lang="ts">
   import { fileStatus } from '@components/QuickCss/Sidebar.svelte';
   import { selectedFile } from '@ui/tabs/QuickCss.svelte';
-  import Icon from 'svelte-icons-pack/Icon.svelte';
-  import FaBrandsCss3 from 'svelte-icons-pack/fa/FaBrandsCss3';
-  import VscCircleFill from 'svelte-icons-pack/vsc/VscCircleFill';
+  import CssFile from 'phosphor-svelte/lib/FileCss';
+  import Circle from 'phosphor-svelte/lib/Circle';
 
   export let file: QuickCssFile;
   export let rename = false;
@@ -48,7 +47,7 @@
   on:dblclick={toggleRename}
   on:keydown|self|stopPropagation={handleKeyPress}
 >
-  <Icon color="currentColor" src={FaBrandsCss3} />
+  <CssFile weight="bold" />
   {#if rename}
     <input
       class="rename-input"
@@ -65,6 +64,6 @@
     <span class="item-name">{file.name}</span>
   {/if}
   {#if $fileStatus?.[file.location]?.unsaved}
-    <Icon color="currentColor" src={VscCircleFill} />
+    <Circle weight="fill" />
   {/if}
 </button>

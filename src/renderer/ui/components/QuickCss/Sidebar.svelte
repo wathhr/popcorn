@@ -8,10 +8,9 @@
 <script lang="ts">
   import { onMount } from 'svelte/internal';
   import { createEventDispatcher } from 'svelte';
-  import Icon from 'svelte-icons-pack/Icon.svelte';
-  import VscNewFile from 'svelte-icons-pack/vsc/VscNewFile';
-  import VscNewFolder from 'svelte-icons-pack/vsc/VscNewFolder';
-  import VscRemove from 'svelte-icons-pack/vsc/VscRemove';
+  import NewFile from 'phosphor-svelte/lib/FilePlus';
+  import NewFolder from 'phosphor-svelte/lib/FolderPlus';
+  import Trash from 'phosphor-svelte/lib/Trash';
   import { latestSelection, selectedFolder } from '@ui/tabs/QuickCss.svelte';
   import Folder from './Folder.svelte';
 
@@ -49,7 +48,7 @@
       on:click={handleDelete}
       on:submit={handleDelete}
     >
-      <Icon color="currentColor" src={VscRemove} />
+      <Trash weight="bold" />
     </button>
     <span class="selected-file">{$latestSelection.name}</span>
 
@@ -59,7 +58,7 @@
       on:click={handleNewFile}
       on:submit={handleNewFile}
     >
-      <Icon color="currentColor" src={VscNewFile} />
+      <NewFile weight="bold" />
     </button>
     <button
       class="action"
@@ -67,7 +66,7 @@
       on:click={handleNewFolder}
       on:submit={handleNewFolder}
     >
-      <Icon color="currentColor" src={VscNewFolder} />
+      <NewFolder weight="bold" />
     </button>
   </div>
   <Folder folder={window.Popcorn.quickCss} />

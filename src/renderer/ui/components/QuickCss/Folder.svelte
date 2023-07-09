@@ -1,8 +1,7 @@
 <script lang="ts">
   import { selectedFolder } from '@ui/tabs/QuickCss.svelte';
-  import Icon from 'svelte-icons-pack/Icon.svelte';
-  import AiFillFolderOpen from 'svelte-icons-pack/ai/AiFillFolderOpen';
-  import AiFillFolder from 'svelte-icons-pack/ai/AiFillFolder';
+  import Folder from 'phosphor-svelte/lib/Folder';
+  import FolderOpen from 'phosphor-svelte/lib/FolderOpen';
   import File from './File.svelte';
 
   export let folder: QuickCssFolder;
@@ -50,9 +49,9 @@
   on:keydown|self|stopPropagation={handleKeyPress}
 >
   {#if opened}
-    <Icon color="currentColor" src={AiFillFolderOpen} />
+    <FolderOpen weight="bold" />
   {:else}
-    <Icon color="currentColor" src={AiFillFolder} />
+    <Folder weight="bold" />
   {/if}
   {#if rename}
     <input

@@ -11,10 +11,9 @@
 
 <script lang="ts">
   import { tooltip } from '@walter-org/svelte-float';
-  import Icon from 'svelte-icons-pack/Icon.svelte';
-  import RiEditorQuestionMark from 'svelte-icons-pack/ri/RiEditorQuestionMark';
-  import VscCheck from 'svelte-icons-pack/vsc/VscCheck';
-  import VscChromeClose from 'svelte-icons-pack/vsc/VscChromeClose';
+  import QuestionMark from 'phosphor-svelte/lib/Question';
+  import Check from 'phosphor-svelte/lib/CheckCircle';
+  import Close from 'phosphor-svelte/lib/XCircle';
   import { shouldValidate } from 'src/renderer';
 
   function createTooltipContent(errors: cssValidatorErrors) {
@@ -22,23 +21,23 @@
   }
 
   function getValidityData(validity: Theme['valid']): {
-    icon: typeof RiEditorQuestionMark;
+    icon: typeof Check;
     text: string;
   } {
     switch (validity) {
       case true:
         return {
-          icon: VscCheck,
+          icon: Check,
           text: 'Valid',
         };
       case false:
         return {
-          icon: VscChromeClose,
+          icon: Close,
           text: 'Invalid',
         };
       default:
         return {
-          icon: RiEditorQuestionMark,
+          icon: QuestionMark,
           text: 'Validity Unknown',
         };
     }
@@ -62,7 +61,7 @@
                 target: '#PopcornUI-layers',
               }}
             >
-              <Icon color="currentColor" src={icon} />
+              <svelte:component this={icon} weight="bold" />
             </div>
           {/if}
         </h1>
