@@ -5,7 +5,7 @@ import { sendToAll } from '../utils';
 import config from '../config';
 import { IPC } from '@common/constants';
 import LoggerModule from '@common/logger';
-const Logger = new LoggerModule('Watcher > Themes', 'ansi');
+const Logger = new LoggerModule('Main > Watcher > Themes', 'ansi');
 
 const watcher = chokidar.watch([], {
   persistent: true,

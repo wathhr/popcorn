@@ -2,7 +2,7 @@ import fs from 'fs';
 import { basename, join, relative } from 'path';
 import config from '../config';
 import LoggerModule from '@common/logger';
-const Logger = new LoggerModule('QuickCSS', 'ansi');
+const Logger = new LoggerModule('Main > QuickCSS', 'ansi');
 
 function getQuickCss(): QuickCssFolder {
   function createTree(directoryPath: string, regex = /./): QuickCssFolder {

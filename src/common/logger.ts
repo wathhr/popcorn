@@ -2,12 +2,28 @@ import { IPC } from '@common/constants';
 
 export class LoggerModule {
   private output: string;
+  private logArchive: { type: string; message: any[]; }[];
 
-  constructor(private module: string, type = 'console') {
-    this.output = LoggerModule.parseOutput(type);
+  constructor(private module: string, type: 'ansi' | 'console' = 'console') {
+    this.output = LoggerModule.getOutput(type);
+
+    // Send all logs from the main process to the renderer process when initialized
+    if (this.output === 'ansi') {
+      this.logArchive = [];
+
+      (async () => {
+        const { app } = await import('electron');
+
+        app.on('web-contents-created', (_, webContents) => {
+          for (const log of this.logArchive) {
+            webContents.send(IPC.log, log.type, ...log.message);
+          }
+        });
+      })();
+    }
   }
 
-  private static parseOutput(output: string) {
+  private static getOutput(output: string) {
     switch (output) {
       case 'ansi':
       case 'terminal':
@@ -17,19 +33,7 @@ export class LoggerModule {
     }
   }
 
-  private static parseType(type: string) {
-    switch (type) {
-      case 'info':
-      case 'warn':
-      case 'error':
-      case 'debug':
-        return type;
-      default:
-        return 'log';
-    }
-  }
-
-  private static parseColor(type: string) {
+  private static getColor(type: string) {
     switch (type) {
       case 'debug':
         return {
@@ -59,13 +63,12 @@ export class LoggerModule {
     }
   }
 
-  private static ansiColor(color: Array<number>, message: string) {
+  private static ansiColor(color: number[], message: string) {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${message}\x1b[0m`;
   }
 
   async #log(type: string, message: any[]) {
-    type = LoggerModule.parseType(type);
-    const logColor = LoggerModule.parseColor(type);
+    const logColor = LoggerModule.getColor(type);
 
     const banner =
       this.output === 'ansi'
@@ -77,6 +80,7 @@ export class LoggerModule {
     // TODO: Don't send everything
     if (this.output === 'ansi') {
       const { BrowserWindow } = await import('electron');
+      this.logArchive.push({ type, message });
 
       BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(IPC.log, type, ...message));
     }

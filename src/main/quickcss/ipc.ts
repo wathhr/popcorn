@@ -7,7 +7,7 @@ import { quickCss, updateQuickCss } from '.';
 import { start, stop } from './watcher';
 import { hasValue, sendToAll } from '../utils';
 import LoggerModule from '@common/logger';
-const Logger = new LoggerModule('IPC > QuickCSS', 'ansi');
+const Logger = new LoggerModule('Main > IPC > QuickCSS', 'ansi');
 
 ipcMain.handle(IPC.getQuickCss, () => quickCss);
 

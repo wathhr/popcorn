@@ -6,7 +6,7 @@ import { IPC } from '@common/constants';
 import { root } from '../utils';
 import { themes } from '.';
 import LoggerModule from '@common/logger';
-const Logger = new LoggerModule('IPC', 'ansi');
+const Logger = new LoggerModule('Main > IPC > Themes', 'ansi');
 
 ipcMain.handle(IPC.getThemes, () => themes);
 

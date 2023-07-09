@@ -5,7 +5,7 @@ import config from '../config';
 import { IPC } from '@common/constants';
 import { quickCss, updateQuickCss } from '.';
 import LoggerModule from '@common/logger';
-const Logger = new LoggerModule('Watcher > QuickCSS', 'ansi');
+const Logger = new LoggerModule('Main > Watcher > QuickCSS', 'ansi');
 
 const opts = {
   persistent: true,
