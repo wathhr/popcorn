@@ -27,36 +27,33 @@ const renderer = new class Renderer {
   Themes: Themes;
   QuickCss: QuickCss;
 
-  constructor() {
-    if (NODE_ENV === 'development') window.addEventListener('message', messageHandler);
+  async init() {
+    Object.assign(window, {
+      PopcornInjected: true,
+    });
+
+    const style = document.createElement('style');
+    style.id = 'popcorn-styles';
+    style.textContent = await PopcornNative.getStyles();
+    comments.start.after(style);
   }
 
   async start() {
-    document.head.append(comments.start, comments.end);
-    if (!globalThis.PopcornInjected) {
-      const style = document.createElement('style');
-      style.id = 'popcorn-styles';
-      style.textContent = await PopcornNative.getStyles();
-      comments.start.after(style);
-    }
+    document.head.prepend(comments.start, comments.end);
+    if (!globalThis.PopcornInjected) await this.init();
 
     const themes = await PopcornNative.getThemes();
     const quickCss = await PopcornNative.getQuickCss();
-    const Popcorn = {
+    window.Popcorn = {
       themes: populateThemes(themes),
       quickCss,
     };
-    window.Popcorn = Popcorn;
 
     this.UI = new UI({ target: document.body });
     this.Themes = new Themes();
     this.Themes.start();
     this.QuickCss = new QuickCss();
     this.QuickCss.start();
-
-    if (!globalThis.PopcornInjected) Object.assign(globalThis, {
-      PopcornInjected: true,
-    });
   }
 
   stop() {
@@ -64,7 +61,6 @@ const renderer = new class Renderer {
     this.Themes?.stop();
     this.QuickCss?.stop();
 
-    // TODO: Don't remove the comments
     comments.start.remove();
     comments.end.remove();
 

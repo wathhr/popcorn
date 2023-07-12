@@ -63,7 +63,4 @@ function isSplash() {
   return false;
 }
 
-async function initDevServer() {
-  return new (await import('./devserver')).default;
-}
-if (NODE_ENV === 'development') initDevServer();
+if (NODE_ENV === 'development') (async () => new (await import('./devserver')).default)();

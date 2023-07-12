@@ -3,18 +3,18 @@ import { RENDERER } from '@common/constants';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Dev Server');
 
-function parse(text: string) {
+interface Message {
+  type: 'hello' | 'renderer.js' | 'renderer.css' | 'main.js' | 'preload.js';
+  data?: any;
+}
+
+function parse(text: string): Message | null {
   try {
     return JSON.parse(text);
   } catch (_) {
     Logger.error('Invalid JSON:', text);
     return null;
   }
-}
-
-interface Message {
-  type: 'hello' | 'renderer.js' | 'renderer.css' | 'main.js' | 'preload.js';
-  data?: any;
 }
 
 export default class WebServer {
@@ -61,7 +61,6 @@ export default class WebServer {
       } break;
 
       case 'preload.js': {
-        Logger.info('Reloading preload.js');
         location.reload();
       } break;
 
@@ -69,7 +68,7 @@ export default class WebServer {
 
       default: {
         Logger.info('Received unknown message:', json);
-      }
+      } break;
     }
   }
 

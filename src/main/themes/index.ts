@@ -1,8 +1,8 @@
-import { resolve, isAbsolute } from 'path';
 import fg from 'fast-glob';
 import config from '../config';
 import { root } from '../utils';
 import { resolvePath } from '../utils';
+import { handleMeta } from './metaHandler';
 import { watchThemeFile } from './watcher';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Main > Themes', 'ansi');
@@ -22,43 +22,20 @@ for (const json of themeJsons) {
 }
 
 export function updateTheme(json: string) {
-  const pathKeys = [
-    'main',
-    'splash',
-  ];
+  const meta = handleMeta(json);
+  if (!meta) return;
 
-  const meta: Meta = require(json);
-  const modifiedMeta: Meta = { ...meta };
-  for (const key in meta) {
-    if (pathKeys.includes(key)) {
-      if (isAbsolute(meta[key])) {
-        Logger.error(`"${key}" must be a relative path. (${meta[key]})`);
-        return;
-      }
-      if (meta[key].startsWith('../')) {
-        Logger.error(`"${key}" must not point to a parent directory. (${meta[key]})`);
-        return;
-      }
-      const location: string = modifiedMeta[key] = resolve(json, '..', meta[key]);
-
-      const fileExtension = location.split('.').pop();
-      if (fileExtension !== 'css')
-        Logger.warn(`Unsupported file extension "${fileExtension}". (${location})`);
-    }
-  }
   const enabled = config.enabled[meta.id] ?? false;
-
-  const theme: SimpleTheme = {
+  themes[meta.id] = {
     enabled,
     json,
-    ...modifiedMeta,
+    ...meta,
   };
-  themes[meta.id] = theme;
 
   if (enabled) {
     watchThemeFile(json);
-    watchThemeFile(modifiedMeta.main);
-    if (meta?.splash) watchThemeFile(modifiedMeta.splash);
+    watchThemeFile(meta.main);
+    if (meta.splash) watchThemeFile(meta.splash);
   }
 }
 

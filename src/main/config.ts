@@ -38,8 +38,8 @@ config.quickCssDir = isAbsolute(config.quickCssDir)
   ? config.quickCssDir
   : join(root, config.quickCssDir);
 
+Object.freeze(config);
 export default config;
 
-if (config.verbose) Logger.debug(config);
-
+if (config.verbose) Logger.debug('Processed config:', config);
 ipcMain.on(IPC.getConfig, (event) => event.returnValue = config);

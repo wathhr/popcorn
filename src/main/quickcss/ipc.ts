@@ -1,3 +1,5 @@
+// TODO: Maybe use try-catch instead
+
 import fs from 'fs/promises';
 import { join } from 'path';
 import { ipcMain } from 'electron';
@@ -12,8 +14,6 @@ const Logger = new LoggerModule('Main > IPC > QuickCSS', 'ansi');
 ipcMain.handle(IPC.getQuickCss, () => quickCss);
 
 ipcMain.on(IPC.createQuickCssNode, (event, location: string, type: 'file' | 'folder') => {
-  if (config.verbose) Logger.debug('Received node creation message from', event.sender.getTitle());
-
   let i = 0;
   let name: string;
   while (!name) {
@@ -45,8 +45,6 @@ ipcMain.on(IPC.createQuickCssNode, (event, location: string, type: 'file' | 'fol
 });
 
 ipcMain.on(IPC.deleteQuickCssNode, async (event, location: string) => {
-  if (config.verbose) Logger.debug('Received QuickCSS file remove message from', event.sender.getTitle());
-
   if (!hasValue(quickCss, 'location', location)) {
     Logger.error(`${location} isn't a valid QuickCSS node.`);
     return;
@@ -82,8 +80,6 @@ ipcMain.on(IPC.deleteQuickCssNode, async (event, location: string) => {
 });
 
 ipcMain.on(IPC.renameQuickCssNode, (event, location: string, newName: string) => {
-  if (config.verbose) Logger.debug('Received rename message from', event.sender.getTitle());
-
   const newLocation = join(location, '..', newName);
   const actualLocation = join(config.quickCssDir, location);
   const actualNewLocation = join(config.quickCssDir, newLocation);
@@ -116,8 +112,6 @@ ipcMain.on(IPC.renameQuickCssNode, (event, location: string, newName: string) =>
 });
 
 ipcMain.on(IPC.updateQuickCssFile, (event, location: string, content: string) => {
-  if (config.verbose) Logger.debug('Received QuickCSS file save message from', event.sender.getTitle());
-
   if (!hasValue(quickCss, 'location', location)) {
     Logger.error(`${location} isn't a valid QuickCSS file.`);
     return;
