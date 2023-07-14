@@ -2,6 +2,7 @@ import chokidar from 'chokidar';
 import { debounce } from 'ts-debounce';
 import { themes, updateTheme } from '.';
 import { sendToAll } from '../utils';
+import { themeFileKeys } from './constants';
 import config from '../config';
 import { IPC } from '@common/constants';
 import LoggerModule from '@common/logger';
@@ -14,14 +15,9 @@ const watcher = chokidar.watch([], {
   depth: 1,
 });
 
-const possibleKeys = [
-  'json',
-  'main',
-  'splash',
-];
 watcher.on('change', debounce((path) => {
   const id = Object.keys(themes).find((id) => {
-    for (const key of possibleKeys) {
+    for (const key of themeFileKeys) {
       if (themes[id][key] === path) return true;
     }
   });
