@@ -2,7 +2,7 @@ import fg from 'fast-glob';
 import config from '../config';
 import { root } from '../utils';
 import { resolvePath } from '../utils';
-import { handleMeta } from './metaHandler';
+import { initMeta, updateMeta } from './metaHandler';
 import { watchThemeFile } from './watcher';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Main > Themes', 'ansi');
@@ -18,11 +18,26 @@ Logger.log('Detected themes:', themeJsons);
 export const themes = {} as { [id: string]: SimpleTheme };
 for (const json of themeJsons) {
   if (!json.endsWith('.json')) continue;
-  updateTheme(json);
+
+  const meta = initMeta(json);
+  if (!meta) continue;
+
+  const enabled = config.enabled[meta.id] ?? false;
+  themes[meta.id] = {
+    enabled,
+    json,
+    ...meta,
+  };
+
+  if (enabled) {
+    watchThemeFile(json);
+    watchThemeFile(meta.main);
+    if (meta.splash) watchThemeFile(meta.splash);
+  }
 }
 
 export function updateTheme(json: string) {
-  const meta = handleMeta(json);
+  const meta = updateMeta(json);
   if (!meta) return;
 
   const enabled = config.enabled[meta.id] ?? false;

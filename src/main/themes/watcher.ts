@@ -19,26 +19,23 @@ const possibleKeys = [
   'main',
   'splash',
 ];
-watcher.on(
-  'change',
-  debounce((path) => {
-    const id = Object.keys(themes).find((id) => {
-      for (const key of possibleKeys) {
-        if (themes[id][key] === path) return true;
-      }
-    });
-
-    if (!id) {
-      Logger.warn(`Didn't find a theme associated with "${path}".`);
-      return;
+watcher.on('change', debounce((path) => {
+  const id = Object.keys(themes).find((id) => {
+    for (const key of possibleKeys) {
+      if (themes[id][key] === path) return true;
     }
+  });
 
-    updateTheme(themes[id].json);
+  if (!id) {
+    Logger.warn(`Didn't find a theme associated with "${path}".`);
+    return;
+  }
 
-    if (config.verbose) Logger.debug(`Theme changed: ${id}`);
-    sendToAll(IPC.onThemeChange, { id: id, theme: themes[id] });
-  }, 100)
-);
+  updateTheme(themes[id].json);
+
+  if (config.verbose) Logger.debug(`Theme changed: ${id}`);
+  sendToAll(IPC.onThemeChange, { id: id, theme: themes[id] });
+}, 100));
 
 export function watchThemeFile(theme: string) {
   watcher.add(theme);

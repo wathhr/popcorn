@@ -4,8 +4,8 @@ const Logger = new LoggerModule('Main > Themes > Validator', 'ansi');
 
 const cachedIds = new Map<string, string>();
 
-export function handleMeta(location: string): Meta | null {
-  const meta = require(location);
+export function initMeta(location: string): Meta | null {
+  const meta: Meta = require(location);
   const result = { ...meta };
 
   for (const k in meta) {
@@ -45,4 +45,15 @@ export function handleMeta(location: string): Meta | null {
   }
 
   return result;
+}
+
+export function updateMeta(location: string): Meta | null {
+  const meta: Meta = require(location);
+
+  if (cachedIds.has(meta.id)) {
+    cachedIds.delete(meta.id);
+    return initMeta(location);
+  } else {
+    Logger.error(`No theme with id "${meta.id}" found (${location})`);
+  }
 }
