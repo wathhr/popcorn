@@ -20,5 +20,10 @@
         "src/renderer/utils/*"
       ]
     },
-  }
+  },
+  "include": [
+    "../../globals.d.ts",
+    "../preload/*.d.ts",
+    "./**/*.ts",
+  ]
 }

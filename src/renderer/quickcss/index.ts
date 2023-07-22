@@ -6,7 +6,7 @@ const Logger = new LoggerModule('QuickCSS');
 export default class QuickCss {
   private styleElements = new Map<'imports' | 'contents', HTMLStyleElement>();
 
-  start() {
+  constructor() {
     this.populateQuickCss();
     this.watchQuickCss();
     selectedFolder.set(window.Popcorn.quickCss);

@@ -1,15 +1,14 @@
-import Themes, { populateThemes } from './themes';
+import IPC from './ipc';
 import QuickCss from './quickcss';
+import Themes, { populateThemes } from './themes';
 import UI from '@ui/index.svelte';
-import { RENDERER } from '@common/constants';
 
 declare global {
+  const PopcornNative: PopcornNative;
+
   interface Window {
     Popcorn: Popcorn;
     PopcornNative: PopcornNative;
-  }
-
-  interface globalThis {
     readonly PopcornInjected: boolean;
   }
 }
@@ -20,12 +19,11 @@ export const comments = {
   end: document.createComment(' endsection '),
 };
 
-const messageHandler = (event: MessageEvent) => event.source === window && event.data === RENDERER.stop && renderer.stop();
-
-const renderer = new class Renderer {
-  UI: UI;
-  Themes: Themes;
-  QuickCss: QuickCss;
+const renderer = new class Renderer implements Renderer {
+  private IPC: IPC;
+  private QuickCss: QuickCss;
+  private Themes: Themes;
+  private UI: UI;
 
   async init() {
     Object.assign(window, {
@@ -40,7 +38,7 @@ const renderer = new class Renderer {
 
   async start() {
     document.head.prepend(comments.start, comments.end);
-    if (!globalThis.PopcornInjected) await this.init();
+    if (!window.PopcornInjected) await this.init();
 
     const themes = await PopcornNative.getThemes();
     const quickCss = await PopcornNative.getQuickCss();
@@ -49,26 +47,23 @@ const renderer = new class Renderer {
       quickCss,
     };
 
-    this.UI = new UI({ target: document.body });
-    this.Themes = new Themes();
-    this.Themes.start();
+    this.IPC = new IPC();
     this.QuickCss = new QuickCss();
-    this.QuickCss.start();
+    this.Themes = new Themes();
+    this.UI = new UI({ target: document.body });
   }
 
   stop() {
-    this.UI?.$destroy();
-    this.Themes?.stop();
+    this.IPC?.stop();
     this.QuickCss?.stop();
+    this.Themes?.stop();
+    this.UI?.$destroy();
 
     comments.start.remove();
     comments.end.remove();
 
-    window.removeEventListener('message', messageHandler);
     delete window.Popcorn;
   }
 };
 
 export default renderer;
-
-import './ipc';

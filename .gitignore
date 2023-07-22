@@ -7,8 +7,6 @@ pnpm-lock.yaml
 yarn.lock
 
 # Private
-.idea/
-**/todo*
 themes/*
 quickcss/*
 config.json

@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte/internal';
+  import { onMount } from 'svelte';
   import { createEventDispatcher } from 'svelte';
   import NewFile from 'phosphor-svelte/lib/FilePlus';
   import NewFolder from 'phosphor-svelte/lib/FolderPlus';

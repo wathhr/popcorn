@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte/internal';
+  import { onDestroy, onMount } from 'svelte';
   import TabView from './components/TabView.svelte';
   import ThemesTab from './tabs/Themes.svelte';
   import QuickCssTab from './tabs/QuickCss.svelte';
@@ -18,7 +18,6 @@
     document.documentElement.dataset.popcornUiOpen = isOpened.toString();
   }
 
-  // TODO: Find a better way to do this
   const context = createContext({ autoEnable: true });
   const hotkeyCallback = (event: KeyboardEvent) => {
     event.stopImmediatePropagation();

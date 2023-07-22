@@ -1,6 +1,6 @@
 declare const NODE_ENV: 'development' | 'production';
 
-declare type Config = {
+type Config = {
   hotkey: string;
   quickCssDir: string;
   themeFiles: string[];
@@ -8,14 +8,14 @@ declare type Config = {
   verbose?: boolean;
 };
 
-declare type Meta = {
+type Meta = {
   description?: string;
   id: string;
   main: string;
   splash?: string;
 };
 
-declare type SimpleTheme = {
+type SimpleTheme = {
   description?: string;
   enabled: boolean;
   id: string;
@@ -24,19 +24,19 @@ declare type SimpleTheme = {
   splash?: string;
 };
 
-declare type QuickCssFolder = {
+type QuickCssFolder = {
   name: string;
   location: string;
   files: (QuickCssFile | QuickCssFolder)[];
 };
 
-declare type QuickCssFile = {
+type QuickCssFile = {
   name: string;
   location: string;
   content: string;
 };
 
-declare type StatusMessage = {
+type StatusMessage = {
   type: string;
   success: boolean;
   data?: any

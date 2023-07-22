@@ -4,7 +4,7 @@ import { comments, shouldValidate } from '..';
 import LoggerModule from '@common/logger';
 const Logger = new LoggerModule('Themes');
 
-export class Theme {
+export class Theme implements Theme {
   private static readonly link = PopcornNative.isSplash ? 'popcorn://splash-theme/' : 'popcorn://theme/';
 
   public description: string;
@@ -102,7 +102,7 @@ export class Theme {
 }
 
 export default class Themes {
-  start() {
+  constructor() {
     this.watchThemes();
   }
 

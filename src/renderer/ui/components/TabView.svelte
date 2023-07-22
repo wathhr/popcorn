@@ -1,7 +1,7 @@
 <!-- TODO: Add UUIDs to each tab -->
 <script lang="ts">
   import { SvelteComponent } from 'svelte';
-  export let tabs: { name: string; component: typeof SvelteComponent }[];
+  export let tabs: { name: string; component: new (...args: any[]) => SvelteComponent }[];
 
   let selectedTab = tabs?.[0]?.name;
   const loadedTabs: string[] = [selectedTab];

@@ -1,5 +1,4 @@
 import chokidar from 'chokidar';
-import { debounce } from 'ts-debounce';
 import { themes, updateTheme } from '.';
 import { sendToAll } from '../utils';
 import { themeFileKeys } from './constants';
@@ -15,7 +14,7 @@ const watcher = chokidar.watch([], {
   depth: 1,
 });
 
-watcher.on('change', debounce((path) => {
+watcher.on('change', (path) => {
   const id = Object.keys(themes).find((id) => {
     for (const key of themeFileKeys) {
       if (themes[id][key] === path) return true;
@@ -31,7 +30,7 @@ watcher.on('change', debounce((path) => {
 
   if (config.verbose) Logger.debug(`Theme changed: ${id}`);
   sendToAll(IPC.onThemeChange, { id: id, theme: themes[id] });
-}, 100));
+});
 
 export function watchThemeFile(theme: string) {
   watcher.add(theme);

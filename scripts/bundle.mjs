@@ -56,9 +56,9 @@ for (const type of actualTypes) {
         out: type,
       },
     ],
-    platform: 'node',
-    bundle: true,
+    platform: type === 'renderer' ? 'browser' : 'node',
     format: type === 'renderer' ? 'esm' : 'cjs',
+    bundle: true,
     minify,
     write: true,
     outdir: 'dist',
@@ -76,7 +76,7 @@ for (const type of actualTypes) {
           preprocess: preprocess(),
           compilerOptions: {
             cssHash: ({ css, hash }) => `PopcornUI-${hash(css)}`,
-            dev: !minify,
+            discloseVersion: false
           },
         }),
       ],

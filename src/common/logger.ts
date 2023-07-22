@@ -7,6 +7,7 @@ export class LoggerModule {
   constructor(private module: string, type: 'ansi' | 'console' = 'console') {
     this.output = LoggerModule.getOutput(type);
 
+    // TODO: Create a logger specifically for main and move this there
     // Send all logs from the main process to the renderer process when initialized
     if (this.output === 'ansi') {
       this.logArchive = [];
@@ -77,7 +78,7 @@ export class LoggerModule {
 
     console[type](...banner, ...message);
 
-    // TODO: Don't send everything
+    // TODO: Create a logger specifically for main and move this there
     if (this.output === 'ansi') {
       const { BrowserWindow } = await import('electron');
       this.logArchive.push({ type, message });

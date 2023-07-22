@@ -16,7 +16,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount } from 'svelte/internal';
+  import { onMount, onDestroy } from 'svelte';
   import { createEventDispatcher } from 'svelte';
   import { debounce } from 'ts-debounce';
   import loader from '@monaco-editor/loader';
@@ -81,11 +81,6 @@
       content = newContent;
       dispatch('change', content);
     });
-
-    return () => {
-      editor.dispose();
-      loaded = false;
-    };
   });
 
   // TODO: Fix this monster
@@ -108,6 +103,11 @@
       });
     });
   }
+
+  onDestroy(() => {
+    editor.dispose();
+    loaded = false;
+  });
 </script>
 
 <svelte:window on:resize={debounce(recalculateSize, 50)} />

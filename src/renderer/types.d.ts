@@ -1,25 +1,38 @@
-/// <reference types="user-agent-data-types" />
 /// <reference types="svelte" />
 
-declare const PopcornNative: PopcornNative;
-declare const Popcorn: Popcorn;
-
-declare type Popcorn = {
+type Popcorn = {
   themes: { [id: string]: Theme };
   quickCss: QuickCssFolder;
 };
 
-declare type Theme = import('./themes').Theme;
+type Renderer = {
+  init(): void;
+  start(): void;
+  stop(): void;
+};
 
-type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (...args: any) => Promise<infer R> ? R : any
+type Theme = {
+  description: string;
+  id: string;
+  json: string;
+  enabled: boolean;
 
-declare type cssValidatorErrors = AsyncReturnType<typeof PopcornNative.validateCSS>['errors'];
+  enable(save?: boolean): void;
+  disable(save?: boolean): void;
+  toggle(save?: boolean): void;
+  update(): Promise<void>;
 
-declare type QuickCssUIStatus = {
+  valid: boolean | 'unknown';
+  errors: cssValidatorErrors;
+}
+
+type cssValidatorErrors = Awaited<ReturnType<PopcornNative['validateCSS']>>['errors'];
+
+type QuickCssUIStatus = {
   type?: 'success' | 'error' | 'warning' | 'info';
   message?: string;
 };
 
-declare type QuickCssUIFileStatus = {
+type QuickCssUIFileStatus = {
   unsaved?: boolean;
 };
