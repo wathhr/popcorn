@@ -16,4 +16,4 @@
 
 ## Miscellaneous
 - [ ] Switch to strict TS
-- [ ] Add ts check commands
+- [x] Add ts check commands

@@ -12,12 +12,28 @@ const PopcornNative: PopcornNative = {
 
   // Themes
   getThemes: () => ipcRenderer.invoke(IPC.getThemes),
-  onThemeChange: (listener) => ipcRenderer.on(IPC.onThemeChange, (_, change) => listener(change)),
+  onThemeChange(listener) {
+    const safeListener = (_, change) => listener(change);
+    ipcRenderer.on(IPC.onThemeChange, safeListener);
+    return () => {
+      Logger.log('Stopping theme listener');
+      ipcRenderer.removeListener(IPC.onThemeChange, safeListener);
+    };
+  },
+
   saveThemeState: (id, state) => ipcRenderer.send(IPC.saveThemeState, id, state),
 
   // QuickCSS
   getQuickCss: () => ipcRenderer.invoke(IPC.getQuickCss),
-  onQuickCssChange: (listener) => ipcRenderer.on(IPC.onQuickCssChange, (_, updated) => listener(updated)),
+  onQuickCssChange(listener) {
+    const safeListener = (_, updated) => listener(updated);
+    ipcRenderer.on(IPC.onQuickCssChange, safeListener);
+    return () => {
+      Logger.log('Stopping QuickCSS listener');
+      ipcRenderer.removeListener(IPC.onQuickCssChange, safeListener);
+    };
+  },
+
   createQuickCssNode: (location, type) => ipcRenderer.send(IPC.createQuickCssNode, location, type),
   deleteQuickCssNode: (location) => ipcRenderer.send(IPC.deleteQuickCssNode, location),
   renameQuickCssNode: (location, newLocation) => ipcRenderer.send(IPC.renameQuickCssNode, location, newLocation),

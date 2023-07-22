@@ -14,10 +14,11 @@ export function handleQuickCssMessages(message: StatusMessage) {
 
   switch (message.type) {
     case MESSAGES.quickCss.created: {
-      const { type, location }: { type: 'file' | 'folder'; location: string } = message.data;
-      const node = getQuickCssNode(location);
-      if (type === 'file') selectedFile.set(node as QuickCssFile);
-      else selectedFolder.set(node as QuickCssFolder);
+      // TODO: This is a race condition that almost always fails, run this after QuickCss gets updated
+      // const { type, location }: { type: 'file' | 'folder'; location: string } = message.data;
+      // const node = getQuickCssNode(location);
+      // if (type === 'file') selectedFile.set(node as QuickCssFile);
+      // else selectedFolder.set(node as QuickCssFolder);
 
       var statusMessage = message.success
         ? `Created ${location} successfully.`

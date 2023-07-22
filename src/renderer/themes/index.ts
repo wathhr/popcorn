@@ -1,4 +1,5 @@
 import autoBind from 'auto-bind';
+import { debounce } from 'ts-debounce';
 import { rerenderTheme } from '@ui/tabs/Themes.svelte';
 import { comments, shouldValidate } from '..';
 import LoggerModule from '@common/logger';
@@ -106,13 +107,15 @@ export default class Themes {
     this.watchThemes();
   }
 
+  #removeListener: () => void;
   watchThemes() {
-    PopcornNative.onThemeChange(({ id }) => {
+    this.#removeListener = PopcornNative.onThemeChange(debounce(({ id }) => {
       window.Popcorn.themes[id].update();
-    });
+    }, 100));
   }
 
   stop() {
+    this.#removeListener();
     const elements = document.head.querySelectorAll<HTMLLinkElement>('link[data-popcorn="theme"]');
     for (const el of elements) {
       el.remove();

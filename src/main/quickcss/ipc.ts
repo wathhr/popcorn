@@ -1,5 +1,3 @@
-// TODO: Maybe use try-catch instead
-
 import fs from 'fs/promises';
 import { join } from 'path';
 import { ipcMain } from 'electron';
@@ -14,11 +12,11 @@ const Logger = new LoggerModule('Main > IPC > QuickCSS', 'ansi');
 ipcMain.handle(IPC.getQuickCss, () => quickCss);
 
 ipcMain.on(IPC.createQuickCssNode, (event, location: string, type: 'file' | 'folder') => {
-  let i = 0;
+  let i = 1;
   let name: string;
   while (!name) {
-    const possibleName = type + (i ? '-' + i++ : '') + (type === 'folder' ? '' : '.css');
-    hasValue(quickCss, 'location', join(location, possibleName)) || (name = possibleName);
+    const possibleName = type + (i ? ` (${++i})` : '') + (type === 'folder' ? '' : '.css');
+    if (!hasValue(quickCss, 'location', join(location, possibleName))) name = possibleName;
   }
 
   const actualLocation = join(config.quickCssDir, location, name);
@@ -38,7 +36,7 @@ ipcMain.on(IPC.createQuickCssNode, (event, location: string, type: 'file' | 'fol
         success,
         data: {
           type,
-          location: name
+          location: join(location, name)
         }
       });
     });

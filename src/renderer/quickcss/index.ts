@@ -1,3 +1,4 @@
+import { debounce } from 'ts-debounce';
 import { comments } from '..';
 import { rerenderSidebar, selectedFolder } from '@ui/tabs/QuickCss.svelte';
 import LoggerModule from '@common/logger';
@@ -42,18 +43,20 @@ export default class QuickCss {
     }
   }
 
+  #removeListener: () => void;
   watchQuickCss() {
-    PopcornNative.onQuickCssChange((updated) => {
+    this.#removeListener = PopcornNative.onQuickCssChange(debounce((updated) => {
       if (PopcornNative.config.verbose) Logger.debug('QuickCSS Updated');
 
       window.Popcorn.quickCss = updated;
 
       rerenderSidebar();
       this.populateQuickCss();
-    });
+    }, 100));
   }
 
   stop() {
+    this.#removeListener();
     for (const style of this.styleElements.values()) {
       style.remove();
     }
@@ -83,7 +86,7 @@ function compileQuickCss(folder: QuickCssFolder) {
   return { imports, contents };
 }
 
-export function getQuickCssNode(location: string, node: QuickCssFolder = window.Popcorn.quickCss): QuickCssFile | QuickCssFolder {
+export function getQuickCssNode(location: string, node: QuickCssFolder = window.Popcorn.quickCss): QuickCssFile | QuickCssFolder | null {
   if (node.location === location) return node;
 
   for (const child of node.files) {

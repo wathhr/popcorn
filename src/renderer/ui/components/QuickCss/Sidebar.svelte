@@ -1,8 +1,6 @@
 <script context="module" lang="ts">
   import { writable } from 'svelte/store';
-  export const fileStatus = writable<{ [location: string]: QuickCssUIFileStatus }>(
-    {}
-  );
+  export const fileStatus = writable<{ [location: string]: QuickCssUIFileStatus }>({});
 </script>
 
 <script lang="ts">
