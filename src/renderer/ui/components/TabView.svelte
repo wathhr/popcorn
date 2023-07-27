@@ -62,6 +62,14 @@
     color: var(--pop-active);
   }
 
+  .tab-wrapper {
+    max-height: 100%;
+    overflow: overlay;
+  }
+  .tab-wrapper::-webkit-scrollbar {
+    width: 0;
+  }
+
   .tab-wrapper[data-selected='false'] {
     display: none;
   }
