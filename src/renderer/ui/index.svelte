@@ -97,7 +97,7 @@
     block-size: clamp(12rem + 10vh, 40vh, 60vh);
     padding: 1rem;
     color: var(--pop-fg-normal);
-    background-color: #383838;
+    background-color: hsl(0, 0%, 22%);
   }
   .PopcornUI-dialog[open] {
     display: grid;
@@ -109,6 +109,6 @@
   }
   .PopcornUI-dialog + :global(.backdrop),
   .PopcornUI-dialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.45);
+    background-color: hsl(0 0 0 / 0.45);
   }
 </style>

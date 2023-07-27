@@ -73,7 +73,7 @@ function isSplash() {
     if (window[varName]) return true;
   }
 
-  const { windowOptions } = ipcRenderer.sendSync(IPC.getWindowData);
+  const { windowOptions } = ipcRenderer.sendSync('KERNEL_WINDOW_DATA');
   if (!windowOptions.webPreferences.nativeWindowOpen) return true;
 
   return false;

@@ -30,8 +30,6 @@
     selectedNode.set(file);
   });
   selectedFolder.subscribe((folder) => {
-    if (!folder) return;
-
     selectedNode.set(folder);
   });
 
