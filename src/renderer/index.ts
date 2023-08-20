@@ -37,7 +37,7 @@ const renderer = new class Renderer implements Renderer {
   }
 
   async start() {
-    document.head.prepend(comments.start, comments.end);
+    document.body.append(comments.start, comments.end); // appending to the body for a higher chance to overwrite the default styles
     if (!window.PopcornInjected) await this.init();
 
     const themes = await PopcornNative.getThemes();
