@@ -1,18 +1,25 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "downlevelIteration": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "target": "esnext",
-    "outDir": "./dist",
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@common/*": [
-        "src/common/*"
-      ],
-    },
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "module": "ESNext",
+    "target": "ESNext",
+    "lib": [
+      "ESNext"
+    ]
   }
 }

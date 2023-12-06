@@ -1,3 +1,4 @@
+#!/bin/usr/env node
 // @ts-check
 
 import fs from 'fs';

@@ -1,17 +1,21 @@
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-import { parseArgs } from 'util';
+#!/bin/usr/env node
+// @ts-check
+
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 import * as esbuild from 'esbuild';
 import sveltePlugin from 'esbuild-svelte';
 import preprocess from 'svelte-preprocess';
 
-/** @typedef {import('esbuild')} esbuild */
-
+/** @type {import('node:util').ParseArgsConfig['options']} */
 const options = {
   minify: { type: 'boolean' },
   types: { type: 'string' },
   watch: { type: 'boolean' },
 };
+
+/** @type {{ values: { minify?: boolean, types?: string, watch?: boolean } }} */
 const {
   values: {
     minify = process.env.NODE_ENV === 'production',
@@ -20,10 +24,10 @@ const {
   },
 } = parseArgs({ options });
 
-/** @type {('main' | 'preload' | 'renderer')[]} */
+/** @type {string[]} */
 const actualTypes = [];
 
-const validTypes = ['main', 'preload', 'renderer'];
+const validTypes = /** @type {const} */ (['main', 'preload', 'renderer']);
 const typesArray = types.split(',');
 for (const i in typesArray) {
   const type = typesArray[i];
@@ -32,6 +36,7 @@ for (const i in typesArray) {
     break;
   }
 
+  // @ts-expect-error `Argument of type 'string' is not assignable to parameter of type '"main" | "preload" | "renderer"'.ts(2345)` ????
   if (!validTypes.includes(type)) console.warn(`Invalid type: ${type}`);
   else actualTypes.push(type);
 }
@@ -87,13 +92,14 @@ for (const type of actualTypes) {
   builds.push(options);
 }
 
-builds.map(async (context) => {
+await Promise.all(builds.map(async (context) => {
   if (watch) return (await esbuild.context(context)).watch();
   return await esbuild.build(context);
-});
+}));
 
 process.on('SIGINT', () => {
   console.log('Stopping...');
+  // @ts-expect-error this is not typesafe but it really doesn't matter
   builds.map(async (build) => await build.dispose());
 
   process.exit(0);
