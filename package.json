@@ -1,45 +1,41 @@
 {
   "license": "GPL-3.0-or-later",
   "private": true,
-  "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "types": "node scripts/types.js",
+    "types": "node scripts/types.mjs",
     "check:all": "run-s check:!(all)",
     "check:main": "tsc --noEmit --project ./src/main/tsconfig.json",
     "check:preload": "tsc --noEmit --project ./src/preload/tsconfig.json",
     "check:renderer": "svelte-check --workspace ./src/renderer --tsconfig ./tsconfig.json",
-    "devserver": "node scripts/devserver.js",
-    "bundle": "node scripts/bundle.js",
-    "build:all": "cross-env NODE_ENV=production node scripts/bundle.js --types=all --minify",
-    "build:main": "cross-env NODE_ENV=production node scripts/bundle.js --types=main --minify",
-    "build:preload": "cross-env NODE_ENV=production node scripts/bundle.js --types=preload --minify",
-    "build:renderer": "cross-env NODE_ENV=production node scripts/bundle.js --types=renderer --minify",
-    "watch:all": "cross-env NODE_ENV=development node scripts/bundle.js --types=all --watch",
-    "watch:main": "cross-env NODE_ENV=development node scripts/bundle.js --types=main --watch",
-    "watch:preload": "cross-env NODE_ENV=development node scripts/bundle.js --types=preload --watch",
-    "watch:renderer": "cross-env NODE_ENV=development node scripts/bundle.js --types=renderer --watch"
+    "devserver": "node scripts/devserver.mjs",
+    "build": "node scripts/build.mjs",
+    "build:browser": "cross-env NODE_ENV=production BROWSER=true node scripts/build.mjs --types=all --minify",
+    "build:kernel": "cross-env NODE_ENV=production node scripts/build.mjs --types=all --minify",
+    "watch:browser": "cross-env NODE_ENV=development BROWSER=true node scripts/build.mjs --types=all --watch",
+    "watch:kernel": "cross-env NODE_ENV=development node scripts/build.mjs --types=all --watch"
   },
   "devDependencies": {
-    "@types/node": "^20.4.2",
-    "@types/ws": "^8.5.5",
-    "@typescript-eslint/eslint-plugin": "^6.1.0",
-    "@typescript-eslint/parser": "^6.1.0",
+    "@types/node": "^20.10.3",
+    "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.18.15",
+    "deepmerge": "^4.3.1",
+    "esbuild": "^0.19.8",
     "esbuild-svelte": "^0.7.4",
-    "eslint": "^8.45.0",
+    "eslint": "^8.55.0",
     "npm-run-all": "^4.1.5",
-    "svelte-check": "^3.4.6",
-    "typescript": "^5.1.6",
-    "ws": "^8.13.0"
+    "svelte-check": "^3.6.2",
+    "typescript": "^5.3.2",
+    "ws": "^8.14.2"
   },
   "dependencies": {
     "auto-bind": "^5.0.1",
     "chokidar": "^3.5.3",
-    "fast-glob": "^3.3.0",
-    "svelte": "^4.1.1",
-    "svelte-preprocess": "^5.0.4"
+    "fast-glob": "^3.3.2",
+    "svelte": "^4.2.8",
+    "svelte-preprocess": "^5.1.1"
   },
   "optionalDependencies": {
     "w3c-css-validator": "^1.3.1"

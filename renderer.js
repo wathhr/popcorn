@@ -1,1 +1,2 @@
-export { default } from './dist/renderer.js';
+import './dist/renderer.js';
+export * from './dist/renderer.js';
