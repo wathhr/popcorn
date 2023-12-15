@@ -1,4 +1,5 @@
 types/
+dist/
 
 # NPM related
 node_modules/

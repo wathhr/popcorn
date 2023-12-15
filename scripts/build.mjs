@@ -63,6 +63,12 @@ for (const type of types) {
 
   /** @type {esbuild.BuildOptions} */
   const options = {
+    entryPoints: [
+      {
+        in: join(root, `src/${type}/index.ts`),
+        out: type,
+      },
+    ],
     bundle: true,
     minify,
     write: true,
