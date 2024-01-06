@@ -1,5 +1,7 @@
+import { createLogger } from '~/common';
+
 export class DomManager {
-  private shared = {
+  private static shared = {
     comments: {
       start: document.createComment(' section:Popcorn '),
       end: document.createComment(' endsection '),
@@ -7,28 +9,31 @@ export class DomManager {
     managedElements: [] as HTMLElement[],
   };
 
+  logger: createLogger;
+
   constructor(private name: string) {
-    if (window.PopcornShared.DOM) this.shared = window.PopcornShared.DOM;
+    if (window.PopcornShared.DOM) DomManager.shared = window.PopcornShared.DOM;
     else {
-      Object.assign(window.PopcornShared, { DOM: this.shared });
-      document.head.append(this.shared.comments.start, this.shared.comments.end);
+      Object.assign(window.PopcornShared, { DOM: DomManager.shared });
+      document.head.append(DomManager.shared.comments.start, DomManager.shared.comments.end);
     }
+
+    this.logger = new createLogger(`DOM > ${name}`);
   }
 
   addElement(element: HTMLElement, position: 'start' | 'end' = 'end') {
     /* eslint-disable prefer-rest-params */
-    if (DEBUG) console.log(this.name, 'addElement', arguments);
+    this.logger.debug(this.name, 'addElement', arguments);
 
     if (position === 'start') {
-      this.shared.managedElements.unshift(element);
-      this.shared.comments.start.after(element);
+      DomManager.shared.managedElements.unshift(element);
+      DomManager.shared.comments.start.after(element);
     } else {
-      this.shared.managedElements.push(element);
-      this.shared.comments.end.before(element);
+      DomManager.shared.managedElements.push(element);
+      DomManager.shared.comments.end.before(element);
     }
   }
 }
 
 export default DomManager;
-
-export type Shared = typeof DomManager.prototype['shared'];
+export type Shared = typeof DomManager['shared'];

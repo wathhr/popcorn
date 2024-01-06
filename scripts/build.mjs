@@ -33,7 +33,7 @@ const options = {
 /** @type {{ values: { minify?: boolean, types?: string[], watch?: boolean } }} */
 const {
   values: {
-    minify = process.env.NODE_ENV === 'production',
+    minify = process.env.NODE_ENV !== 'development',
     types = ['all'],
     watch = false,
   },
@@ -82,7 +82,7 @@ for (const type of types) {
     sourcemap: minify ? false : 'inline',
     define: {
       NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
-      DEBUG: `"${process.env.NODE_ENV === 'development'}"`,
+      DEBUG: `${process.env.NODE_ENV === 'development'}`,
     },
     logLevel: 'info',
   };

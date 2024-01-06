@@ -4,7 +4,8 @@ class Logger {
   constructor(private name?: string) {}
 
   #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: any[]) {
-    if (NODE_ENV === 'production' && level === 'debug') return;
+    // TODO: Move this to the `debug` function below, currently esbuild warns that it's either always true or false
+    if (level === 'debug' && !DEBUG) return;
 
     const banner = [
       (this.name
@@ -29,4 +30,7 @@ class Logger {
   error = (...msg: any[]) => this.#log('error', ...msg);
 }
 
-export { Logger as createLogger };
+export {
+  Logger as createLogger,
+  Logger as default,
+};
