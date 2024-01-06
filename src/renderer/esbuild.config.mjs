@@ -1,3 +1,4 @@
+#!/bin/usr/env false
 // @ts-check
 
 import preprocess from 'svelte-preprocess';

@@ -1,1 +1,15 @@
-console.log('i loved the part where he said "it\'s preloadin\' time" and then preloaded all over the place');
+import { createLogger } from './common';
+import DomManager from './dom-manager';
+import { PopcornShared } from './types';
+
+const Logger = new createLogger();
+
+window.PopcornShared ??= {};
+declare global {
+  interface Window {
+    PopcornShared: Partial<PopcornShared>,
+  }
+}
+
+Logger.log('Starting...');
+new DomManager('Main').addElement(document.createElement('style'), 'start');

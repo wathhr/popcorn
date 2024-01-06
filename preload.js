@@ -1,1 +1,1 @@
-module.exports = require('./dist/preload.js');
+module.exports = require('./dist/preload');

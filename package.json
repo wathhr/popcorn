@@ -13,31 +13,35 @@
     "build:browser": "cross-env NODE_ENV=production BROWSER=true node scripts/build.mjs --types=all --minify",
     "build:kernel": "cross-env NODE_ENV=production node scripts/build.mjs --types=all --minify",
     "watch:browser": "cross-env NODE_ENV=development BROWSER=true node scripts/build.mjs --types=all --watch",
-    "watch:kernel": "cross-env NODE_ENV=development node scripts/build.mjs --types=all --watch"
+    "watch:kernel": "cross-env NODE_ENV=development node scripts/build.mjs --types=all --watch",
+    "start:firefox": "web-ext run --source-dir ./browser/ --browser-console",
+    "start:chrome": "web-ext run --source-dir ./browser/ -t chromium"
   },
   "devDependencies": {
-    "@types/node": "^20.10.3",
+    "@types/chrome": "^0.0.254",
+    "@types/node": "^20.10.6",
     "@types/ws": "^8.5.10",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
     "cross-env": "^7.0.3",
     "deepmerge": "^4.3.1",
-    "esbuild": "^0.19.8",
-    "esbuild-svelte": "^0.7.4",
-    "eslint": "^8.55.0",
+    "esbuild": "^0.19.11",
+    "esbuild-svelte": "^0.8.0",
+    "eslint": "^8.56.0",
     "npm-run-all": "^4.1.5",
     "svelte-check": "^3.6.2",
-    "typescript": "^5.3.2",
-    "ws": "^8.14.2"
+    "typescript": "^5.3.3",
+    "web-ext": "^7.9.0",
+    "ws": "^8.16.0"
   },
   "dependencies": {
     "auto-bind": "^5.0.1",
     "chokidar": "^3.5.3",
     "fast-glob": "^3.3.2",
     "svelte": "^4.2.8",
-    "svelte-preprocess": "^5.1.1"
+    "svelte-preprocess": "^5.1.3"
   },
   "optionalDependencies": {
-    "w3c-css-validator": "^1.3.1"
+    "w3c-css-validator": "^1.3.2"
   }
 }

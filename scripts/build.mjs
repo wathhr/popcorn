@@ -2,12 +2,11 @@
 // @ts-check
 
 import { dirname, join } from 'node:path';
+import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { readdir } from 'node:fs/promises';
 import * as esbuild from 'esbuild';
 import deepmerge from 'deepmerge';
-import { existsSync } from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,10 +39,11 @@ const {
   },
 } = parseArgs({ options });
 
-const validTypes = (await readdir(src)).filter((item) => existsSync(join(src, item, 'index.ts')));
-if (types.includes('all')) void (types.length = 0) ?? types.push(...validTypes); // trolley
-// in-place filter
-else types.splice(0, types.length, ...types.filter((type) => {
+const validTypes = readdirSync(src).filter((item) => existsSync(join(src, item, 'esbuild.config.mjs')));
+if (types.includes('all')) {
+  types.length = 0;
+  types.push(...validTypes);
+} else types.splice(0, types.length, ...types.filter((type) => { // in-place filter
   const result = validTypes.includes(type);
   if (!result) console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}`);
   return result;
@@ -54,48 +54,52 @@ if (!types) {
   process.exit(1);
 }
 
-/** @type {esbuild.BuildContext[]} */
+/** @type {esbuild.BuildOptions[]} */
 const builds = [];
 for (const type of types) {
   /** @type {esbuild.BuildOptions} */
-  const typeOptions = (await import(`../src/${type}/esbuild.config.mjs`).catch(() => ({ default: {} }))).default; // horrid
-  delete typeOptions.entryPoints;
+  const typeOptions = (await import(`../src/${type}/esbuild.config.mjs`)).default;
+
+  // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
+  typeOptions.entryPoints = ((e) => {
+    switch (true) {
+      case Array.isArray(e): return e.map(
+        /** @param {Exclude<esbuild.BuildOptions['entryPoints'], Record<string, string> | undefined>[number]} entry */
+        (entry) => typeof entry === 'string' ? join(src, type, entry) : { in: join(src, type, entry.in), out: entry.out }
+      );
+
+      case typeof e === 'object': return Object.fromEntries(Object.entries(e).map(([key, value]) => [join(src, type, key), join(src, type, value)]));
+      default: return [join(src, type, 'index.ts')];
+    }
+  })(typeOptions.entryPoints);
 
   /** @type {esbuild.BuildOptions} */
   const options = {
-    entryPoints: [
-      {
-        in: join(root, `src/${type}/index.ts`),
-        out: type,
-      },
-    ],
     bundle: true,
     minify,
     write: true,
-    outdir: 'dist',
+    outdir: join(root, 'dist', type),
     sourcemap: minify ? false : 'inline',
     define: {
-      'NODE_ENV': process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
+      NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
+      DEBUG: `"${process.env.NODE_ENV === 'development'}"`,
     },
-    external: [
-      'electron',
-      join(root, 'config.json'),
-    ],
     logLevel: 'info',
   };
 
-  builds.push(await esbuild.context(deepmerge(options, typeOptions)));
+  builds.push(deepmerge(typeOptions, options));
 }
 
-if (watch) await Promise.all(builds.map(async (context) => context.watch()));
+if (watch) await Promise.all(builds.map(async (context) => esbuild.context(context).then(c => c.watch())));
 else for (const context of builds) {
-  await context.rebuild();
-  await context.dispose();
+  await esbuild.build(context);
 }
 
 process.on('SIGINT', () => {
   console.log('Stopping...');
-  builds.map(async (build) => await build.dispose());
+  builds.map(async (build) => {
+    if ('dispose' in build) await /** @type {esbuild.BuildContext} */ (build).dispose();
+  });
 
   process.exit(0);
 });
