@@ -12,9 +12,5 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
-    "types": [
-      "./globals.d.ts"
-    ]
   }
 }
