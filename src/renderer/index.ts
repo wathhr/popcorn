@@ -1,5 +1,4 @@
 import { createLogger } from './common';
-import DomManager from './dom-manager';
 import { PopcornShared } from './types';
 
 const Logger = new createLogger();
@@ -12,4 +11,3 @@ declare global {
 }
 
 Logger.log('Starting...');
-new DomManager('Main').addElement(document.createElement('style'), 'start');
