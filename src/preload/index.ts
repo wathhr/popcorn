@@ -31,3 +31,5 @@ const PopcornAPI: API = {
 };
 
 contextBridge.exposeInMainWorld('PopcornAPI', PopcornAPI);
+
+if (NODE_ENV === 'development') (async () => new (await import('./devserver')).WebServer)();

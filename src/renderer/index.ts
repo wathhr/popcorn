@@ -10,4 +10,10 @@ declare global {
   }
 }
 
-Logger.log('Starting...');
+Logger.info('Starting...');
+const ipc = import('./modules/ipc');
+
+export async function softStop() {
+  (await ipc).softStop();
+  Logger.info('Stopping...');
+}

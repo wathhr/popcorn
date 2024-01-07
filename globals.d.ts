@@ -1,7 +1,17 @@
 declare const NODE_ENV: 'development' | 'production';
 declare const DEBUG: boolean;
 
-type ThemeManifest = {
+type Config = Partial<{
+  hotkey: string,
+  quickCssDir: string,
+  themeDirs: string[],
+  enabled: Record<Theme['id'], boolean>,
+  verbose: boolean,
+}>;
+
+type RequiredConfig = Required<Config>;
+
+type Theme = {
   /**
    * A unique identifier for the theme
    * @example "author.theme-name"
@@ -29,16 +39,9 @@ type ThemeManifest = {
   }>,
 };
 
-type Theme = {
-  id: ThemeManifest['id'],
-  meta: Omit<ThemeManifest, 'id' | 'main'>,
-  css: string,
-};
-
-type Themes = Record<Theme['id'], Theme>;
-
 type API = {
-  getThemes(): Promise<Themes> | null,
+  getThemes(): Promise<Theme[]> | null,
   getTheme(id: Theme['id']): Promise<Theme> | null,
   getURLs(): Promise<string[]> | null,
+  getConfig(): Promise<RequiredConfig>,
 };

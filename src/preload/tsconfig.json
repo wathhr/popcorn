@@ -12,6 +12,20 @@
     "types": [
       "../../types/electron.d.ts",
       "../../globals.d.ts",
+      "../../types/kernel.d.ts",
     ],
+
+    "paths": {
+      "~/": ["."],
+      "~/*": ["./*"],
+      "#common": [
+        "../common",
+        "./common",
+      ],
+      "#common/*": [
+        "../common/*",
+        "./common/*",
+      ],
+    },
   }
 }

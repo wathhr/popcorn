@@ -1,19 +1,20 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // {
-    //   "label": "Start Devserver",
-    //   "type": "shell",
-    //   "command": "npm run devserver",
-    //   "group": "none",
-    //   "presentation": {
-    //     "reveal": "silent",
-    //     "panel": "new"
-    //   },
-    //   "runOptions": {
-    //     "runOn": "folderOpen",
-    //   }
-    // },
+    {
+      "label": "Start Devserver",
+      "type": "shell",
+      "command": "npm run devserver",
+      "group": "none",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "new",
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+      },
+      "problemMatcher": [],
+    },
     {
       "label": "Start Build",
       "type": "shell",
@@ -21,7 +22,7 @@
       "group": "none",
       "presentation": {
         "reveal": "silent",
-        "panel": "new"
+        "panel": "new",
       },
       "runOptions": {
         "runOn": "folderOpen",

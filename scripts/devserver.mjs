@@ -1,11 +1,13 @@
 #!/bin/usr/env node
 // @ts-check
 
+/** @typedef {import('../src/preload/devserver.ts').Message} Message */
+
 import fs from 'fs';
-import { basename, dirname, join } from 'path';
+import { dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
-import chokidar from 'chokidar';
+import Watcher from 'watcher';
 
 /** @param {any[]} args */
 const log = (...args) => console.log('[Dev Server]', ...args);
@@ -62,8 +64,8 @@ class DevServer {
   }
 
   /**
-   * @param {string} type
-   * @param {any} [data]
+   * @param {Message['type']} type
+   * @param {Message['data']} [data]
    */
   send(type, data) {
     if (!this.connection) {
@@ -82,10 +84,12 @@ const devServer = new DevServer();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-chokidar.watch(join(__dirname, '../dist')).on('change', (path) => {
-  const fileName = basename(path);
-  log('Caught change for', fileName);
-  devServer.send(fileName, {
+const dist = join(__dirname, '../dist');
+
+new Watcher(dist, { recursive: true }).on('change', (path) => {
+  const relPath = relative(dist, path).replace('\\', '/');
+  log('Caught change for', relPath);
+  devServer.send(relPath, {
     content: fs.readFileSync(path, 'utf-8'),
   });
 });

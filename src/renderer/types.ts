@@ -1,3 +1,3 @@
 export type PopcornShared = Partial<{
-  readonly DOM: import('./dom-manager').Shared;
+  readonly DOM: import('./common/dom-manager').Shared;
 }>;

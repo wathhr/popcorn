@@ -1,10 +1,12 @@
 import { createLogger } from '~/common';
 
 export class DomManager {
-  private static shared = {
+  static shared = {
     comments: {
-      start: document.createComment(' section:Popcorn '),
-      end: document.createComment(' endsection '),
+      start: document.createComment(' start:Popcorn '),
+      end: document.createComment(' end:Popcorn '),
+      extra: {} as { [name: string]: { start: Comment, end: Comment },
+      },
     },
     managedElements: [] as HTMLElement[],
   };
@@ -19,6 +21,16 @@ export class DomManager {
     }
 
     this.logger = new createLogger(`DOM > ${name}`);
+
+    if (!(name in DomManager.shared.comments.extra)) {
+      const comments = DomManager.shared.comments.extra[name] = {
+        start: document.createComment(` start:${name} `),
+        end: document.createComment(` end:${name} `),
+      };
+
+      DomManager.shared.comments.end.before(comments.start, comments.end);
+    }
+
   }
 
   addElement(element: HTMLElement, position: 'start' | 'end' = 'end') {
@@ -27,13 +39,12 @@ export class DomManager {
 
     if (position === 'start') {
       DomManager.shared.managedElements.unshift(element);
-      DomManager.shared.comments.start.after(element);
+      DomManager.shared.comments.extra[this.name]!.start.after(element);
     } else {
       DomManager.shared.managedElements.push(element);
-      DomManager.shared.comments.end.before(element);
+      DomManager.shared.comments.extra[this.name]!.end.before(element);
     }
   }
 }
 
-export default DomManager;
 export type Shared = typeof DomManager['shared'];

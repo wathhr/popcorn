@@ -1,4 +1,5 @@
-types/
+types/*
+!types/kernel.d.ts
 dist/
 
 # NPM related
