@@ -43,51 +43,54 @@ const validTypes = readdirSync(src).filter((item) => existsSync(join(src, item, 
 if (types.includes('all')) {
   types.length = 0;
   types.push(...validTypes);
-} else types.splice(0, types.length, ...types.filter((type) => { // in-place filter
-  const result = validTypes.includes(type);
-  if (!result) console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}`);
-  return result;
-}));
-
-if (!types) {
-  console.warn('No types specified');
-  process.exit(1);
 }
+
+if (!types) throw new Error('No types specified');
 
 /** @type {esbuild.BuildOptions[]} */
 const builds = [];
 for (const type of types) {
-  /** @type {esbuild.BuildOptions} */
-  const typeOptions = (await import(`../src/${type}/esbuild.config.mjs`)).default;
+  if (!validTypes.includes(type)) {
+    console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
+    continue;
+  }
 
-  // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
-  typeOptions.entryPoints = ((e) => {
-    switch (true) {
-      case Array.isArray(e): return e.map(
-        /** @param {Exclude<esbuild.BuildOptions['entryPoints'], Record<string, string> | undefined>[number]} entry */
-        (entry) => typeof entry === 'string' ? join(src, type, entry) : { in: join(src, type, entry.in), out: entry.out }
-      );
+  /** @type {esbuild.BuildOptions | esbuild.BuildOptions[]} */
+  const defaultImport = (await import(`../src/${type}/esbuild.config.mjs`)).default;
+  const typeOptions = Array.isArray(defaultImport) ? defaultImport : [defaultImport];
 
-      case typeof e === 'object': return Object.fromEntries(Object.entries(e).map(([key, value]) => [join(src, type, key), join(src, type, value)]));
-      default: return [join(src, type, 'index.ts')];
-    }
-  })(typeOptions.entryPoints);
+  for (const i in typeOptions) {
+    const typeOption = typeOptions[i];
 
-  /** @type {esbuild.BuildOptions} */
-  const options = {
-    bundle: true,
-    minify,
-    write: true,
-    outdir: join(root, 'dist', type),
-    sourcemap: minify ? false : 'inline',
-    define: {
-      NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
-      DEBUG: `${process.env.NODE_ENV === 'development'}`,
-    },
-    logLevel: 'info',
-  };
+    // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
+    typeOption.entryPoints = ((e) => {
+      switch (true) {
+        case Array.isArray(e): return e.map(
+          /** @param {Exclude<esbuild.BuildOptions['entryPoints'], Record<string, string> | undefined>[number]} entry */
+          (entry) => typeof entry === 'string' ? join(src, type, entry) : { in: join(src, type, entry.in), out: entry.out }
+        );
 
-  builds.push(deepmerge(typeOptions, options));
+        case typeof e === 'object': return Object.fromEntries(Object.entries(e).map(([key, value]) => [join(src, type, key), join(src, type, value)]));
+        default: return [join(src, type, 'index.ts')];
+      }
+    })(typeOption.entryPoints);
+
+    /** @type {esbuild.BuildOptions} */
+    const baseOptions = {
+      bundle: true,
+      minify,
+      write: true,
+      outdir: join(root, 'dist', type),
+      sourcemap: minify ? false : 'inline',
+      define: {
+        NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
+        DEBUG: `${process.env.NODE_ENV === 'development'}`,
+      },
+      logLevel: 'info',
+    };
+
+    builds.push(deepmerge(typeOption, baseOptions));
+  }
 }
 
 if (watch) await Promise.all(builds.map(async (context) => esbuild.context(context).then(c => c.watch())));
