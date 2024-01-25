@@ -1,12 +1,16 @@
 #!/bin/usr/env node
 // @ts-check
 
-import { dirname, join } from 'node:path';
+import { createRequire } from 'node:module';
+import { dirname, join, relative } from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import * as esbuild from 'esbuild';
 import deepmerge from 'deepmerge';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,7 +41,7 @@ const {
     types = ['all'],
     watch = false,
   },
-} = parseArgs({ options });
+} = parseArgs({ options, strict: false });
 
 const validTypes = readdirSync(src).filter((item) => existsSync(join(src, item, 'esbuild.config.mjs')));
 if (types.includes('all')) {
@@ -45,33 +49,59 @@ if (types.includes('all')) {
   types.push(...validTypes);
 }
 
-if (!types) throw new Error('No types specified');
+if (types.length === 0) throw new Error('No types specified');
+
+const dependencyMemo = new Set();
 
 /** @type {esbuild.BuildOptions[]} */
 const builds = [];
-for (const type of types) {
+while (types.length > 0) {
+  const type = /** @type {string} */ (types.shift());
+
   if (!validTypes.includes(type)) {
     console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
     continue;
   }
 
-  /** @type {esbuild.BuildOptions | esbuild.BuildOptions[]} */
-  const defaultImport = (await import(`../src/${type}/esbuild.config.mjs`)).default;
-  const typeOptions = Array.isArray(defaultImport) ? defaultImport : [defaultImport];
+  /** @type {{ default: esbuild.BuildOptions | esbuild.BuildOptions[], dependencies?: string[] }} */
+  const config = await import(`../src/${type}/esbuild.config.mjs`);
+  if (config.dependencies && !dependencyMemo.has(type)) {
+    types.push(...config.dependencies, type);
+    dependencyMemo.add(type);
+    continue;
+  }
+
+  const typeOptions = Array.isArray(config.default) ? config.default : [config.default];
+
 
   for (const i in typeOptions) {
     const typeOption = typeOptions[i];
 
     // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
     typeOption.entryPoints = ((e) => {
+      /** @type {import('path').join} */
+      const relJoin = (...path) => relative(__dirname, join(...path));
+
       switch (true) {
         case Array.isArray(e): return e.map(
           /** @param {Exclude<esbuild.BuildOptions['entryPoints'], Record<string, string> | undefined>[number]} entry */
-          (entry) => typeof entry === 'string' ? join(src, type, entry) : { in: join(src, type, entry.in), out: entry.out }
+          (entry) => {
+            if (typeof entry === 'string') return relJoin(src, type, entry);
+            else return {
+              in: relJoin(src, type, entry.in),
+              out: entry.out,
+            };
+          },
         );
 
-        case typeof e === 'object': return Object.fromEntries(Object.entries(e).map(([key, value]) => [join(src, type, key), join(src, type, value)]));
-        default: return [join(src, type, 'index.ts')];
+        case typeof e === 'object': return Object.fromEntries(
+          Object.entries(e).map(([key, value]) => [
+            relJoin(src, type, key),
+            relJoin(src, type, value),
+          ]),
+        );
+
+        default: return [relJoin(src, type, 'index.ts')];
       }
     })(typeOption.entryPoints);
 
@@ -85,7 +115,9 @@ for (const type of types) {
       define: {
         NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
         DEBUG: `${process.env.NODE_ENV === 'development'}`,
+        PKG: `${JSON.stringify(pkg)}`,
       },
+      color: true,
       logLevel: 'info',
     };
 

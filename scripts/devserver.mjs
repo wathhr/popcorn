@@ -7,7 +7,7 @@ import fs from 'fs';
 import { dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
-import Watcher from 'watcher';
+import chokidar from 'chokidar';
 
 /** @param {any[]} args */
 const log = (...args) => console.log('[Dev Server]', ...args);
@@ -68,10 +68,7 @@ class DevServer {
    * @param {Message['data']} [data]
    */
   send(type, data) {
-    if (!this.connection) {
-      log('Not connected');
-      return;
-    }
+    if (!this.connection) return log('Not connected');
 
     this.connection.send(JSON.stringify({
       type,
@@ -86,7 +83,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const dist = join(__dirname, '../dist');
 
-new Watcher(dist, { recursive: true }).on('change', (path) => {
+chokidar.watch(dist).on('change', (path) => {
   const relPath = relative(dist, path).replace('\\', '/');
   log('Caught change for', relPath);
   devServer.send(relPath, {

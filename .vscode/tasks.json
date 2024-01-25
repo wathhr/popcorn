@@ -15,19 +15,5 @@
       },
       "problemMatcher": [],
     },
-    {
-      "label": "Start Build",
-      "type": "shell",
-      "command": "npm run watch:kernel",
-      "group": "none",
-      "presentation": {
-        "reveal": "silent",
-        "panel": "new",
-      },
-      "runOptions": {
-        "runOn": "folderOpen",
-      },
-      "problemMatcher": [],
-    }
   ]
 }

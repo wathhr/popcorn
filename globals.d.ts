@@ -1,5 +1,6 @@
 declare const NODE_ENV: 'development' | 'production';
 declare const DEBUG: boolean;
+declare const PKG: typeof import('./package.json');
 
 type Config = Partial<{
   hotkey: string,

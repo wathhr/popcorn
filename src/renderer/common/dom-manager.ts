@@ -1,4 +1,4 @@
-import { createLogger } from '~/common';
+import { createLogger } from '#/common';
 
 export class DomManager {
   static shared = {
@@ -30,7 +30,6 @@ export class DomManager {
 
       DomManager.shared.comments.end.before(comments.start, comments.end);
     }
-
   }
 
   addElement(element: HTMLElement, position: 'start' | 'end' = 'end') {

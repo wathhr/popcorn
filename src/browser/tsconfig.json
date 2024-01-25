@@ -10,7 +10,8 @@
     ],
 
     "types": [
-      "../../globals.d.ts"
+      "../../globals.d.ts",
+      "@types/chrome",
     ]
   }
 }

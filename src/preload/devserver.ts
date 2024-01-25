@@ -1,7 +1,7 @@
 import autoBind from 'auto-bind';
 import { RENDERER } from '#common';
 import { createLogger } from '../renderer/common/';
-import { id } from '../../index.json' assert { type: 'json' };
+import manifest from '../../index.json' assert { type: 'json' };
 
 const Logger = new createLogger('DevServer');
 
@@ -45,7 +45,7 @@ export class WebServer {
       case 'renderer/index.js': {
         Logger.info('Reloading the renderer script');
         window.postMessage(RENDERER.softStop, '*');
-        await import(`${kernel.importProtocol}://${kernel.packages.getPackages()[id]!.path}`);
+        await import(`${kernel.importProtocol}://${kernel.packages.getPackages()[manifest.id]!.path}`);
       } break;
 
         // case 'renderer.css': {
