@@ -1,5 +1,4 @@
-types/*
-!types/kernel.d.ts
+types/electron.d.ts
 dist/
 
 # NPM related

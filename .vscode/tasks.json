@@ -3,8 +3,8 @@
   "tasks": [
     {
       "label": "Start Devserver",
-      "type": "shell",
-      "command": "npm run devserver",
+      "type": "npm",
+      "script": "devserver",
       "group": "none",
       "presentation": {
         "reveal": "silent",

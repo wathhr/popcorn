@@ -10,7 +10,9 @@
     ],
 
     "types": [
-      "../../globals.d.ts"
+      "../../types/electron.d.ts",
+      "../../types/globals.d.ts",
+      "@types/node",
     ]
   }
 }

@@ -1,10 +1,14 @@
 import { contextBridge } from 'electron';
+import { SemVer } from 'semver';
+import parse from 'semver/functions/parse';
 
 const PopcornAPI: API = {
   async getTheme(_id) {
     return {
-      css: 'body { background-color: red; }',
       id: 'test.test',
+      version: parse('1.0.0') as SemVer,
+      css: 'body { background-color: red; }',
+      main: 'troll',
       meta: {
         description: 'Test theme',
         name: 'Test theme',
@@ -18,18 +22,28 @@ const PopcornAPI: API = {
   },
 
   async getThemes() {
-    return {
-      'test.test': await PopcornAPI.getTheme('test.test')!,
-    };
+    return [
+      await PopcornAPI.getTheme('test.test')!,
+    ];
   },
 
   async getURLs() {
     return [
       'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
     ];
-  }
+  },
+
+  async getConfig() {
+    return {
+      enabled: { 'test.test': true },
+      hotkey: 'ctrl+shift+p',
+      quickCssDir: 'troll',
+      themeDirs: [],
+      verbose: true,
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld('PopcornAPI', PopcornAPI);
 
-if (NODE_ENV === 'development') (async () => new (await import('./devserver')).WebServer)();
+if (NODE_ENV === 'development') import('./devserver');

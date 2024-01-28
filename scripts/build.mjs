@@ -43,39 +43,32 @@ const {
   },
 } = parseArgs({ options, strict: false });
 
+if (types.length === 0) throw new Error('No types specified');
+
 const validTypes = readdirSync(src).filter((item) => existsSync(join(src, item, 'esbuild.config.mjs')));
+// TODO: Find a more elegant way to do this
 if (types.includes('all')) {
   types.length = 0;
   types.push(...validTypes);
+} else if (types.includes('kernel')) {
+  types.length = 0;
+  types.push('main', 'preload', 'renderer');
 }
 
-if (types.length === 0) throw new Error('No types specified');
-
-const dependencyMemo = new Set();
-
+// TODO: Implement dependencies
 /** @type {esbuild.BuildOptions[]} */
 const builds = [];
-while (types.length > 0) {
-  const type = /** @type {string} */ (types.shift());
-
-  if (!validTypes.includes(type)) {
-    console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
-    continue;
-  }
-
+for (const type of types) {
   /** @type {{ default: esbuild.BuildOptions | esbuild.BuildOptions[], dependencies?: string[] }} */
   const config = await import(`../src/${type}/esbuild.config.mjs`);
-  if (config.dependencies && !dependencyMemo.has(type)) {
-    types.push(...config.dependencies, type);
-    dependencyMemo.add(type);
-    continue;
-  }
-
   const typeOptions = Array.isArray(config.default) ? config.default : [config.default];
-
 
   for (const i in typeOptions) {
     const typeOption = typeOptions[i];
+    if (!validTypes.includes(type)) {
+      console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
+      continue;
+    }
 
     // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
     typeOption.entryPoints = ((e) => {
@@ -125,16 +118,33 @@ while (types.length > 0) {
   }
 }
 
-if (watch) await Promise.all(builds.map(async (context) => esbuild.context(context).then(c => c.watch())));
-else for (const context of builds) {
-  await esbuild.build(context);
+async function runAll(watch = false) {
+  if (watch) await Promise.all(builds.map((context) => esbuild.context(context).then(c => c.watch())));
+  else for (const context of builds) {
+    // TODO: Use `ctx.rebuild` instead of this for more consistent logging
+    await esbuild.build(context);
+  }
 }
 
-process.on('SIGINT', () => {
-  console.log('Stopping...');
-  builds.map(async (build) => {
-    if ('dispose' in build) await /** @type {esbuild.BuildContext} */ (build).dispose();
-  });
+await runAll(watch);
 
-  process.exit(0);
-});
+if (watch) {
+  const readline = await import('node:readline');
+  readline.emitKeypressEvents(process.stdin);
+  if (process.stdin.isTTY) process.stdin.setRawMode(true);
+  console.log('Press r to rebuild, ctrl+c to stop');
+
+  process.stdin.on('keypress', async (_, key) => {
+    if (!key) return;
+
+    if (key.name === 'r') await runAll();
+    else if (key.ctrl && key.name === 'c') {
+      console.log('Stopping...');
+      builds.forEach(async (build) => {
+        if ('dispose' in build) await /** @type {esbuild.BuildContext} */ (build).dispose();
+      });
+
+      process.exit(0);
+    }
+  });
+}

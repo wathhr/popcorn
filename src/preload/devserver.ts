@@ -21,7 +21,7 @@ function parse(text: string) {
   }
 }
 
-export class WebServer {
+class DevServer {
   wss: WebSocket;
 
   constructor(port = 7331) {
@@ -69,3 +69,5 @@ export class WebServer {
     }));
   }
 }
+
+new DevServer();

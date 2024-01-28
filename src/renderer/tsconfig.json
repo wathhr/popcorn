@@ -10,7 +10,7 @@
       "ESNext",
     ],
     "types": [
-      "../../globals.d.ts",
+      "../../types/globals.d.ts",
       "./globals.d.ts",
       "../../types/kernel.d.ts",
     ],

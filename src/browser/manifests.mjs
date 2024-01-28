@@ -1,9 +1,8 @@
-import { createRequire } from 'module';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+#!/bin/usr/env false
+// @ts-check
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { createRequire } from 'module';
+
 const require = createRequire(import.meta.url);
 const pkg = require('../../package.json');
 
@@ -21,17 +20,17 @@ export const manifest = {
     ...commonManifest,
 
     action: {
-      default_popup: 'popup/index.html',
+      default_popup: './popup/index.html',
     },
     background: {
-      service_worker: 'background.js',
+      service_worker: './background/index.ts',
     },
     content_scripts: [
       {
-        matches: ['*://*/*'],
+        matches: ['<all_urls>'],
         js: [
-          'browser-polyfill.js',
-          'content/index.ts',
+          './browser-polyfill.js',
+          './content/index.ts',
         ],
       },
     ],
@@ -42,21 +41,21 @@ export const manifest = {
     ...commonManifest,
 
     browser_action: {
-      default_popup: 'popup/index.html',
+      default_popup: './popup/index.html',
     },
     background: {
       persistent: true,
       scripts: [
-        'browser-polyfill.js',
-        'background/index.ts',
+        './browser-polyfill.js',
+        './background/index.ts',
       ],
     },
 
     content_scripts: [{
-      matches: ['*://*/*'],
+      matches: ['<all_urls>'],
       js: [
-        'browser-polyfill.js',
-        'content/index.ts',
+        './browser-polyfill.js',
+        './content/index.ts',
       ],
     }],
   },

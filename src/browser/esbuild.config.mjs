@@ -74,7 +74,7 @@ function writeFilePlugin(files) {
           })();
 
           // TODO: Use this for logging https://esbuild.github.io/api/#format-messages
-          await fs.writeFile(join(out, name), string.replace(/\.ts(?=[\s'',]|$)/g, '.js'))
+          await fs.writeFile(join(out, name), string.replace(/\.ts(?=[\s"',]|$)/g, '.js'))
             .then(() => console.log(`✔ Wrote ${name} (${toByteSize('a'.repeat(1024))})`))
             .catch((e) => console.error(`✘ Failed to write ${name}:`, e));
         }
