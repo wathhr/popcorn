@@ -23,6 +23,9 @@ export default {
   ],
   platform: 'browser',
   format: 'iife',
+  define: {
+    isBrowser: 'true',
+  },
   plugins: [
     clearOutPlugin(),
     // TODO: Use loader approach instead of this so it can also watch

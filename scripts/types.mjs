@@ -1,8 +1,8 @@
 #!/bin/usr/env node
 // @ts-check
 
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const list = [
   {

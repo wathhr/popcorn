@@ -27,12 +27,12 @@
     "check:renderer": "svelte-check --workspace ./src/renderer --tsconfig ./tsconfig.json",
     "devserver": "node scripts/devserver.mjs",
     "build": "node scripts/build.mjs",
-    "build:browser": "cross-env NODE_ENV=production BROWSER=true node scripts/build.mjs -t browser --minify",
+    "build:browser": "cross-env NODE_ENV=production node scripts/build.mjs -t browser --minify",
     "build:kernel": "cross-env NODE_ENV=production node scripts/build.mjs -t kernel --minify",
-    "watch:browser": "cross-env NODE_ENV=development BROWSER=true node scripts/build.mjs -t browser --watch",
+    "watch:browser": "cross-env NODE_ENV=development node scripts/build.mjs -t browser --watch",
     "watch:kernel": "cross-env NODE_ENV=development node scripts/build.mjs -t kernel --watch",
-    "start:firefox": "web-ext run --source-dir ./dist/browser/ --browser-console",
-    "start:chrome": "web-ext run --source-dir ./dist/browser/ -t chromium --browser-console"
+    "start:firefox": "web-ext run --source-dir ./dist/browser/ --browser-console --devtools",
+    "start:chrome": "web-ext run --source-dir ./dist/browser/ -t chromium --browser-console --devtools"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.256",

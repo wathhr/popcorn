@@ -6,6 +6,6 @@ export default {
   platform: 'browser',
   format: 'esm',
   define: {
-    isBrowser: String(process.env.BROWSER === 'true'),
+    isBrowser: 'false',
   },
 };

@@ -3,9 +3,9 @@
 
 /** @typedef {import('../src/preload/devserver.ts').Message} Message */
 
-import fs from 'fs';
-import { dirname, join, relative } from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs/promises';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
 import chokidar from 'chokidar';
 
@@ -16,13 +16,12 @@ const log = (...args) => console.log('[Dev Server]', ...args);
 function parse(text) {
   try {
     return JSON.parse(text);
-  } catch (_) {
+  } catch {
     log('Invalid JSON:', text);
     return null;
   }
 }
 
-/** @param {number} [port=7331] */
 class DevServer {
   constructor(port = 7331) {
     log('Starting on ws://localhost:' + port);
@@ -83,10 +82,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const dist = join(__dirname, '../dist');
 
-chokidar.watch(dist).on('change', (path) => {
-  const relPath = relative(dist, path).replace('\\', '/');
+chokidar.watch(dist).on('change', async (path) => {
+  const relPath = relative(dist, path).replace(/\\/g, '/');
   log('Caught change for', relPath);
   devServer.send(relPath, {
-    content: fs.readFileSync(path, 'utf-8'),
+    content: await fs.readFile(path, 'utf-8'),
   });
 });

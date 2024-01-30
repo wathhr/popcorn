@@ -1,17 +1,31 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
     "target": "ESNext",
 
     "lib": [
+      "DOM",
       "ESNext",
     ],
-
     "types": [
       "../../types/globals.d.ts",
+      "./globals.d.ts",
+      "../../types/kernel.d.ts",
       "@types/chrome",
-    ]
+    ],
+
+    "paths": {
+      "#/": ["."],
+      "#/*": ["./*"],
+      "#common": [
+        "../common",
+        "./common",
+      ],
+      "#common/*": [
+        "../common/*",
+        "./common/*",
+      ],
+    },
   }
 }
