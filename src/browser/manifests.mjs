@@ -13,7 +13,7 @@ const commonManifest = /** @type {const} @satisfies {Partial<chrome.runtime.Mani
   homepage_url: 'https://github.com/wathhr/popcorn',
 });
 
-/** @type {Record<`v${number}`, chrome.runtime.Manifest>} */
+/** @type {Record<`v${2|3}`, chrome.runtime.Manifest>} */
 export const manifest = {
   v3: {
     manifest_version: 3,
@@ -28,10 +28,7 @@ export const manifest = {
     content_scripts: [
       {
         matches: ['<all_urls>'],
-        js: [
-          './browser-polyfill.js',
-          './content/index.ts',
-        ],
+        js: ['./content/index.ts'],
       },
     ],
   },
@@ -45,18 +42,11 @@ export const manifest = {
     },
     background: {
       persistent: true,
-      scripts: [
-        './browser-polyfill.js',
-        './background/index.ts',
-      ],
+      scripts: ['./background/index.ts'],
     },
-
     content_scripts: [{
       matches: ['<all_urls>'],
-      js: [
-        './browser-polyfill.js',
-        './content/index.ts',
-      ],
+      js: ['./content/index.ts'],
     }],
   },
 };

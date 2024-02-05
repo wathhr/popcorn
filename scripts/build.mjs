@@ -7,7 +7,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import * as esbuild from 'esbuild';
-import deepmerge from 'deepmerge';
+import { merge } from 'ts-deepmerge';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
@@ -55,16 +55,16 @@ if (types.includes('all')) {
   types.push('main', 'preload', 'renderer');
 }
 
-// TODO: Implement dependencies
 /** @type {esbuild.BuildOptions[]} */
 const builds = [];
 for (const type of types) {
-  /** @type {{ default: esbuild.BuildOptions | esbuild.BuildOptions[], dependencies?: string[] }} */
+  /** @type {{ default: esbuild.BuildOptions | esbuild.BuildOptions[] }} */
   const config = await import(`../src/${type}/esbuild.config.mjs`);
   const typeOptions = Array.isArray(config.default) ? config.default : [config.default];
 
   for (const i in typeOptions) {
     const typeOption = typeOptions[i];
+    if (!typeOption) continue;
     if (!validTypes.includes(type)) {
       console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
       continue;
@@ -73,7 +73,7 @@ for (const type of types) {
     // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
     typeOption.entryPoints = ((e) => {
       /** @type {import('path').join} */
-      const relJoin = (...path) => relative(__dirname, join(...path));
+      const relJoin = (...path) => relative(process.cwd(), join(...path));
 
       switch (true) {
         case Array.isArray(e): return e.map(
@@ -114,7 +114,7 @@ for (const type of types) {
       logLevel: 'info',
     };
 
-    builds.push(deepmerge(typeOption, baseOptions));
+    builds.push(merge(typeOption, baseOptions));
   }
 }
 

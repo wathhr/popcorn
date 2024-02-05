@@ -1,5 +1,5 @@
 # Popcorn
 A Kernel package for injecting themes into your client
 
-> **IMPORTANT**
+> [!IMPORTANT]
 > nothing works yet:tm:
