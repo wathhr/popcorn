@@ -27,13 +27,13 @@ export default {
     isBrowser: 'true',
   },
   plugins: [
-    clearOutDirPlugin(),
+    clearOutputDir(),
     customFiles(),
   ],
 };
 
 /** @returns {import('esbuild').Plugin} */
-function clearOutDirPlugin() {
+function clearOutputDir() {
   return {
     name: 'Clear outDir',
     setup(build) {
@@ -51,13 +51,14 @@ function clearOutDirPlugin() {
  */
 function customFiles() {
   return {
-    name: 'Write files',
+    name: 'Custom files',
     setup(build) {
       const regex = /\.ts(?=[\s"',]|$)/g;
 
       let i = 0;
       build.onLoad({ filter: /manifest\.json/ }, async () => {
         const manifestFile = join(__dirname, './manifests.mjs');
+        /** @type {import('./manifests.mjs')} */
         const { manifest } = await import('file://' + manifestFile + `?${i++}`); // my fucking god what i have to do for hot reloading
 
         return {

@@ -6,14 +6,12 @@
   - https://github.com/openstyles/usercss-meta
 
 ## Extension
-- [ ] Implement
+- [χ] Implement
 
 ## Misc
 - [ ] Use BiomeJS instead of eslint
 - [x] Allow for multiple entry points when building
   - [x] Allow arrays in `esbuild.config.mjs` default exports
-- [ ] Fix peer dependency with `web-ext`
-- [ ] Add intelisense to file exports, like in SvelteKit
 - [ ] Figure out a better way to add kernel-types, currently they are manually written
 
 ## IPC

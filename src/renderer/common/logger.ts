@@ -1,10 +1,14 @@
 import { colors } from '#common';
 
 class Logger {
-  constructor(private name?: string) {}
+  private name: string;
+  constructor(...name: string[]) {
+    if (name.length === 0) name = ['Popcorn'];
+    else if (name.length === 1) name = name[0]!.split(/\s*>\s*/);
+    this.name = name.join(' > ');
+  }
 
   #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: any[]) {
-    // TODO: Move this to the `debug` function below, currently esbuild warns that it's either always true or false
     if (level === 'debug' && !DEBUG) return;
 
     const banner = [

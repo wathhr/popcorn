@@ -13,7 +13,7 @@ declare global {
 Logger.info('Starting...');
 const ipc = import('./modules/ipc');
 
-export async function softStop() {
-  (await ipc).softStop();
+export async function stop() {
+  (await ipc).stop();
   Logger.info('Stopping...');
 }

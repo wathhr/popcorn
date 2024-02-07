@@ -42,7 +42,6 @@
     "@types/ws": "^8.5.10",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "auto-bind": "^5.0.1",
     "chokidar": "^3.5.3",
     "cross-env": "^7.0.3",
     "esbuild": "^0.19.12",

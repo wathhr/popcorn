@@ -20,7 +20,7 @@ export class DomManager {
       document.head.append(DomManager.shared.comments.start, DomManager.shared.comments.end);
     }
 
-    this.logger = new createLogger(`DOM > ${name}`);
+    this.logger = new createLogger('DOM', name);
 
     if (!(name in DomManager.shared.comments.extra)) {
       const comments = DomManager.shared.comments.extra[name] = {

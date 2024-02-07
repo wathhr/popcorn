@@ -1,4 +1,3 @@
-import autoBind from 'auto-bind';
 import { RENDERER } from '#common';
 import { createLogger } from '../renderer/common/';
 import manifest from '../../index.json' assert { type: 'json' };
@@ -27,8 +26,7 @@ class DevServer {
   constructor(port = 7331) {
     const ws = this.wss = new WebSocket(`ws://localhost:${port}`);
 
-    autoBind(this);
-    ws.onmessage = this.handleMessage;
+    ws.onmessage = this.handleMessage.bind(this);
     ws.onclose = () => Logger.info('Disconnected');
   }
 
@@ -44,7 +42,7 @@ class DevServer {
 
       case 'renderer/index.js': {
         Logger.info('Reloading the renderer script');
-        window.postMessage(RENDERER.softStop, '*');
+        window.postMessage(RENDERER.stop, '*');
         await import(`${kernel.importProtocol}://${kernel.packages.getPackages()[manifest.id]!.path}`);
       } break;
 

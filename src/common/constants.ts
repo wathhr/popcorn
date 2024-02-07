@@ -3,7 +3,6 @@ export const PREFIXES = {
 } as const;
 
 export const RENDERER = prefixValues({
-  softStop: 'SOFT_STOP',
   stop: 'STOP',
 } as const);
 

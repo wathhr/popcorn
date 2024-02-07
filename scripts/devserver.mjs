@@ -34,6 +34,7 @@ class DevServer {
 
       ws.on('message', this.handleMessage.bind(this));
 
+      clearTimeout(this.connectionTimeout);
       this.connectionTimeout = setTimeout(() => {
         log('Did not receive response from client');
         ws.close();
