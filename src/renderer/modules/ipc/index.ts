@@ -1,12 +1,12 @@
-import { RENDERER, PREFIXES } from '#common';
+import { ipc } from '#common/constants';
 import * as renderer from '../..';
 
 const messageHandler = (event: MessageEvent) => {
-  if (!(event.source === window && event.data.startsWith(PREFIXES.main))) return;
+  if (!(event.source === window && event.data.startsWith(ipc()))) return;
 
   event.stopPropagation();
   switch (event.data) {
-    case RENDERER.stop: renderer.stop();
+    case ipc('stop'): renderer.stop();
   }
 };
 

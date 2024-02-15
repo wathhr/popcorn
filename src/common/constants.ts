@@ -1,21 +1,9 @@
-export const PREFIXES = {
-  main: 'POPCORN_',
-} as const;
+type IpcValues =
+  keyof API |
+  keyof MainAPI |
+  string & Record<never, never>; // any string but still keep auto-completion
 
-export const RENDERER = prefixValues({
-  stop: 'STOP',
-} as const);
-
-function prefixValues<
-  T extends Record<string, string>,
-  U extends string = typeof PREFIXES.main,
->(object: T, prefix = PREFIXES.main as U) {
-  const result = Object.fromEntries(Object.entries(object).map(([key, value]) => [key, prefix + value]));
-
-  return result as {
-    [K in keyof T]: `${U}${T[K]}`
-  };
-}
+export const ipc = <T extends IpcValues>(name?: T) => `POPCORN_${(name ?? '').replace(/([A-Z])/g, '_$1').toUpperCase()}` as EventName<T>;
 
 type Color = {
   str: string,

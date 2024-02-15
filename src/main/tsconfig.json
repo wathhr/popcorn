@@ -13,6 +13,21 @@
       "../../types/electron.d.ts",
       "../../types/globals.d.ts",
       "@types/node",
-    ]
+    ],
+
+    "paths": {
+      "~/": ["../../"],
+      "~/*": ["../../*"],
+      "#/": ["."],
+      "#/*": ["./*"],
+      "#common": [
+        "../common",
+        "./common",
+      ],
+      "#common/*": [
+        "../common/*",
+        "./common/*",
+      ],
+    },
   }
 }
