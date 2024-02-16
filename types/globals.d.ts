@@ -22,7 +22,6 @@ type API = {
   getTheme(id: Theme['id']): Promise<ThemeResponse> | undefined,
   getUrls(): Promise<string[]> | undefined,
   getConfig(): Promise<RequiredConfig>,
-  getConfigKey(key: keyof RequiredConfig): Promise<RequiredConfig>,
 };
 
 type MainAPI = {

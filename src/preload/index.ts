@@ -1,8 +1,15 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 import { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 
-const PopcornAPI: API = {
+type MapKeys<T> = {
+  [K in keyof T as `on${Capitalize<K & string>}`]: (handler: (
+    event: Electron.IpcRendererEvent,
+    ...args: ForceArr<T[K]>
+  ) => void) => () => void
+};
+
+const PopcornAPI: API & MapKeys<MainAPI> = {
   async getTheme(_id) {
     return {
       id: 'test.test',
@@ -27,7 +34,7 @@ const PopcornAPI: API = {
     ];
   },
 
-  async getURLs() {
+  async getUrls() {
     return [
       'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
     ];
@@ -42,6 +49,12 @@ const PopcornAPI: API = {
       verbose: true,
     };
   },
+
+  onSaveState(handler) {
+    console.log('trolley');
+
+    return () => ipcRenderer.off('POPCORN_SAVE_STATE', handler);
+  }
 };
 
 contextBridge.exposeInMainWorld('PopcornAPI', PopcornAPI);
