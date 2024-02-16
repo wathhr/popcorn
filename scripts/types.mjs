@@ -3,7 +3,7 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { applyPatch } from 'diff';
 
@@ -20,7 +20,7 @@ const list = [
   }
 ];
 
-// await mkdir('types');
+if (!existsSync(join(__dirname, 'types'))) await mkdir(join(__dirname, 'types'));
 
 for (const item of list) {
   try {
