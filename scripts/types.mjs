@@ -20,7 +20,7 @@ const list = [
   }
 ];
 
-if (!existsSync(join(__dirname, 'types'))) await mkdir(join(__dirname, 'types'));
+if (!existsSync(join(root, 'types'))) await mkdir(join(root, 'types'));
 
 for (const item of list) {
   try {
