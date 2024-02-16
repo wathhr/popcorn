@@ -7,6 +7,7 @@
 
 ## Extension
 - [χ] Implement
+- [ ] Add settings UI
 
 ## Misc
 - [ ] Use BiomeJS instead of eslint

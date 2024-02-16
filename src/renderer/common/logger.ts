@@ -12,7 +12,7 @@ class Logger {
     if (level === 'debug' && !DEBUG) return;
 
     const banner = [
-      (this.name
+      (this.name !== 'Popcorn'
         ? `🍿 %c Popcorn > ${this.name} %c`
         : '🍿 %c Popcorn %c'),
       [

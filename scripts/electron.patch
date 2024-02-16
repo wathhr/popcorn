@@ -1,0 +1,120 @@
+===================================================================
+--- electron.d.ts
++++ electron-patched.d.ts
+@@ -8,8 +8,14 @@
+ type DOMEvent = Event;
+ type GlobalResponse = Response;
+ type GlobalRequest = Request;
+ 
++///* Section: Patch
++type MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
++type MappedAPI = MapKeys<API>;
++type MappedMainAPI = MapKeys<MainAPI>;
++///* End section
++
+ declare namespace Electron {
+   const NodeEventEmitter: typeof import('events').EventEmitter;
+ 
+   type Accelerator = string;
+@@ -5780,37 +5786,57 @@
+      * Errors thrown through `handle` in the main process are not transparent as they
+      * are serialized and only the `message` property from the original error is
+      * provided to the renderer process. Please refer to #24427 for details.
+      */
+-    handle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
++    handle<K extends keyof MappedAPI>(
++      channel: K,
++      listener: MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainInvokeEvent, ...args: Args) => Ret | Awaited<Ret> | Promise<Awaited<Ret>>
++        : never
++    ): void,
+     /**
+      * Handles a single `invoke`able IPC message, then removes the listener. See
+      * `ipcMain.handle(channel, listener)`.
+      */
+-    handleOnce(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
++    handleOnce<K extends keyof MappedAPI>(
++      channel: K,
++      listener: MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainInvokeEvent, ...args: Args) => Ret | Awaited<Ret> | Promise<Awaited<Ret>>
++        : never
++    ): void,
+     /**
+      * Listens to `channel`, when a new message arrives `listener` would be called with
+      * `listener(event, args...)`.
+      */
+-    on(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
++    on<K extends keyof MappedAPI>(
++      channel: K,
++      listener: MappedAPI[K] extends (...args: infer Args) => any
++        ? (event: IpcMainEvent, ...args: Args) => void
++        : never
++    ): this,
+     /**
+      * Adds a one time `listener` function for the event. This `listener` is invoked
+      * only the next time a message is sent to `channel`, after which it is removed.
+      */
+-    once(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
++    once<K extends keyof MappedAPI>(
++      channel: K,
++      listener: MappedAPI[K] extends (...args: infer Args) => any
++        ? (event: IpcMainEvent, ...args: Args) => void
++        : never
++    ): this,
+     /**
+      * Removes listeners of the specified `channel`.
+      */
+-    removeAllListeners(channel?: string): this;
++    removeAllListeners(channel?: keyof MappedAPI): this,
+     /**
+      * Removes any handler for `channel`, if present.
+      */
+-    removeHandler(channel: string): void;
++    removeHandler(channel: keyof MappedAPI): void,
+     /**
+      * Removes the specified `listener` from the listener array for the specified
+      * `channel`.
+      */
+-    removeListener(channel: string, listener: (...args: any[]) => void): this;
++    removeListener(channel: keyof MappedAPI, listener: (...args: any[]) => void): this,
+   }
+ 
+   interface IpcMainEvent extends Event {
+ 
+@@ -5833,12 +5859,13 @@
+      * original message that you are currently handling.  You should use this method to
+      * "reply" to the sent message in order to guarantee the reply will go to the
+      * correct process and frame.
+      */
+-    reply: (channel: string, ...args: any[]) => void;
++    reply<K extends keyof MappedMainAPI>(channel: K, ...args: ForceArr<MappedMainAPI[K]>): void,
+     /**
+      * Set this to the value to be returned in a synchronous message
+      */
++    // TODO: Change the type of this appropriately
+     returnValue: any;
+     /**
+      * Returns the `webContents` that sent the message
+      */
+@@ -13324,9 +13351,9 @@
+      * :::
+      *
+      * For additional reading, refer to Electron's IPC guide.
+      */
+-    send(channel: string, ...args: any[]): void;
++    send<K extends keyof MappedMainAPI>(channel: K, ...args: ForceArr<MappedMainAPI[K]>): void;
+     /**
+      * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
+      * contents needs to be focused for `sendInputEvent()` to work.
+      */
+@@ -13852,9 +13879,9 @@
+      *
+      * The renderer process can handle the message by listening to `channel` with the
+      * `ipcRenderer` module.
+      */
+-    send(channel: string, ...args: any[]): void;
++    send<K extends keyof MappedMainAPI>(channel: K, ...args: ForceArr<MappedMainAPI[K]>): void;
+     /**
+      * A `WebFrameMain[]` collection containing the direct descendents of `frame`.
+      *
+      */
