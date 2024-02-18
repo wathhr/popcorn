@@ -3,11 +3,12 @@
 
 import { createRequire } from 'node:module';
 import { dirname, join, relative } from 'node:path';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import * as esbuild from 'esbuild';
 import { merge } from 'ts-deepmerge';
+import { DevServer } from './devserver.mjs';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
@@ -18,10 +19,10 @@ const root = join(__dirname, '..');
 const src = join(root, 'src');
 
 /** @type {import('node:util').ParseArgsConfig['options']} */
-const options = {
-  minify: {
+const options = /** @type {const} */ ({
+  dev: {
     type: 'boolean',
-    short: 'm',
+    short: 'd',
   },
   types: {
     type: 'string',
@@ -32,12 +33,12 @@ const options = {
     type: 'boolean',
     short: 'w',
   },
-};
+});
 
-/** @type {{ values: { minify?: boolean, types?: string[], watch?: boolean } }} */
+/** @type {{ values: { dev?: boolean, types?: string[], watch?: boolean } }} */
 const {
   values: {
-    minify = process.env.NODE_ENV !== 'development',
+    dev = process.env.NODE_ENV === 'development',
     types = ['all'],
     watch = false,
   },
@@ -54,6 +55,8 @@ if (types.includes('all')) {
   types.length = 0;
   types.push('main', 'preload', 'renderer');
 }
+
+const devServer = dev ? new DevServer() : undefined;
 
 /** @type {esbuild.BuildOptions[]} */
 const builds = [];
@@ -101,15 +104,37 @@ for (const type of types) {
     /** @type {esbuild.BuildOptions} */
     const baseOptions = {
       bundle: true,
-      minify,
-      write: true,
+      minify: !dev,
+      write: false,
       outdir: join(root, 'dist', type),
-      sourcemap: minify ? false : 'inline',
+      sourcemap: dev ? 'inline' : false,
       define: {
-        NODE_ENV: process.env.NODE_ENV === 'development' ? '"development"' : '"production"',
-        DEBUG: `${process.env.NODE_ENV === 'development'}`,
-        PKG: `${JSON.stringify(pkg)}`,
+        NODE_ENV: dev ? '"development"' : '"production"',
+        DEBUG: `${dev}`,
+        pkg: `${JSON.stringify(pkg)}`,
       },
+      plugins: [
+        {
+          name: 'Write and announce file outputs',
+          setup(build) {
+            build.onEnd(async (result) => {
+              result.outputFiles?.forEach(async (file) => {
+                const dir = join(file.path, '..');
+                if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+                writeFileSync(file.path, file.contents);
+
+                if (devServer?.connected) {
+                  const name = relative(join(root, 'dist'), file.path).replace(/\\/g, '/');
+
+                  devServer.send(name, {
+                    content: file.text,
+                  });
+                }
+              });
+            });
+          }
+        }
+      ],
       color: true,
       logLevel: 'info',
     };
@@ -143,6 +168,8 @@ if (watch) {
       builds.forEach(async (build) => {
         if ('dispose' in build) await /** @type {esbuild.BuildContext} */ (build).dispose();
       });
+
+      devServer?.stop?.();
 
       process.exit(0);
     }
