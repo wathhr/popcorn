@@ -3,6 +3,7 @@ import { TypeCompiler } from '@sinclair/typebox/compiler';
 
 export type Theme = Static<typeof Theme>;
 export const Theme = Type.Object({
+  $schema: Type.Optional(Type.String()),
   id: Type.TemplateLiteral([Type.String(), Type.Literal('.'), Type.String()], {
     description: 'A unique identifier for the theme',
     example: 'author.theme-name',

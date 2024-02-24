@@ -5,6 +5,7 @@ import { Theme } from './Theme.ts';
 export type Config = Static<typeof Config>;
 export const Config = Type.Partial(
   Type.Object({
+    $schema: Type.Optional(Type.String()),
     hotkey: Type.String({
       description: 'The hotkey for opening and closing the Popcorn modal',
       example: 'ctrl+p ctrl+s',
