@@ -14,7 +14,7 @@ deno.lock
 # Private
 ./themes/*
 ./quickcss/*
-./config.json
+config.json
 
 # Necessary
 !**/.gitkeep
