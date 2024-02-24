@@ -1,0 +1,11 @@
+{
+  "hotkey": "ctrl+shift+p",
+  "quickCssDir": "./quickcss",
+  "themeDirs": [
+    "./themes/*/index.json",
+    "%USERPROFILE%/discord/themes/*/index.json"
+  ],
+  "enabled": {
+    "wathhr.conflicting": true
+  }
+}

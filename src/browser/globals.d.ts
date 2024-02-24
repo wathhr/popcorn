@@ -1,2 +1,2 @@
 declare const isBrowser: boolean;
-declare var PopcornAPI: API;
+declare var PopcornAPI: RendererAPI;

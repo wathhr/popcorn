@@ -26,7 +26,7 @@ globalThis.PopcornAPI = {
     ];
   },
 
-  async getURLs() {
+  async getUrls() {
     return [
       'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
     ];
@@ -43,4 +43,4 @@ globalThis.PopcornAPI = {
   },
 };
 
-import('../../renderer');
+import('~/src/renderer');

@@ -1,3 +1,14 @@
 {
-  "svelte.enable-ts-plugin": true
+  "svelte.enable-ts-plugin": true,
+
+  // I need to specifiy every single file manually as the LSP does not support globs and
+  // excluding files disables the default Typescript LSP completely
+  "deno.enablePaths": [
+    "./scripts",
+    "./src/browser/esbuild.config.mts",
+    "./src/main/esbuild.config.mts",
+    "./src/preload/esbuild.config.mts",
+    "./src/renderer/esbuild.config.mts",
+    "./src/types/esbuild.config.mts",
+  ],
 }

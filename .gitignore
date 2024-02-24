@@ -1,16 +1,20 @@
-types/electron.d.ts
 dist/
 
-# NPM related
+# Vendor
+types/electron.d.ts
+
+# Package manager related
 node_modules/
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+bun.lockb
+deno.lock
 
 # Private
-themes/*
-quickcss/*
-config.json
+./themes/*
+./quickcss/*
+./config.json
 
 # Necessary
 !**/.gitkeep

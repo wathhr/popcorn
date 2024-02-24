@@ -1,20 +1,16 @@
 #!/bin/usr/env false
-// @ts-check
 
-import { createRequire } from 'module';
+import type chrome from 'npm:@types/chrome';
+import pkg from '../../package.json' with { type: 'json' };
 
-const require = createRequire(import.meta.url);
-const pkg = require('../../package.json');
-
-const commonManifest = /** @type {const} @satisfies {Partial<chrome.runtime.Manifest>} */ ({
+const commonManifest = {
   name: pkg.name[0].toUpperCase() + pkg.name.slice(1),
   version: pkg.version,
   description: pkg.description,
-  homepage_url: 'https://github.com/wathhr/popcorn',
-});
+  homepage_url: `https://github.com/${pkg.author.name}/${pkg.name}`,
+} as const satisfies Partial<chrome.runtime.Manifest>;
 
-/** @type {Record<`v${2|3}`, chrome.runtime.Manifest>} */
-export const manifest = {
+export const manifest: Record<`v${2|3}`, chrome.runtime.Manifest> = {
   v3: {
     manifest_version: 3,
     ...commonManifest,

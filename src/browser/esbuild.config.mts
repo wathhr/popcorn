@@ -1,16 +1,13 @@
 #!/bin/usr/env false
-// @ts-check
 
-import fs from 'fs/promises';
-import { dirname, extname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { exists } from 'std/fs/exists.ts';
+import { extname } from 'std/path/extname.ts';
+import { join } from 'std/path/join.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = import.meta.dirname!;
 
-const version = process.argv.includes('--mv2') ? 'v2' : 'v3';
+const version = Deno.args.includes('--mv2') ? 'v2' : 'v3';
 
-/** @type {import('esbuild').BuildOptions} */
 export default {
   entryPoints: [
     './background/index.ts',
@@ -24,42 +21,37 @@ export default {
   platform: 'browser',
   format: 'iife',
   define: {
+    ...(await import('../renderer/esbuild.config.mts')).default.define,
     isBrowser: 'true',
   },
   plugins: [
     clearOutputDir(),
     customFiles(),
   ],
-};
+} satisfies import('esbuild').BuildOptions;
 
-/** @returns {import('esbuild').Plugin} */
-function clearOutputDir() {
+function clearOutputDir(): import('esbuild').Plugin {
   return {
     name: 'Clear outDir',
     setup(build) {
       build.onStart(async () => {
-        const out = /** @type {string} */ (build.initialOptions.outdir);
-        await fs.rm(out, { force: true, recursive: true });
-        await fs.mkdir(out, { recursive: true });
+        const out = build.initialOptions.outdir!;
+        if (await exists(out)) await Deno.remove(out, { recursive: true });
+        await Deno.mkdir(out, { recursive: true });
       });
     },
   };
 }
 
-/**
- * @returns {import('esbuild').Plugin}
- */
-function customFiles() {
+function customFiles(): import('esbuild').Plugin {
   return {
     name: 'Custom files',
     setup(build) {
       const regex = /\.ts(?=[\s"',]|$)/g;
 
-      let i = 0;
       build.onLoad({ filter: /manifest\.json/ }, async () => {
-        const manifestFile = join(__dirname, './manifests.mjs');
-        /** @type {import('./manifests.mjs')} */
-        const { manifest } = await import('file://' + manifestFile + `?${i++}`); // my fucking god what i have to do for hot reloading
+        const manifestFile = join(__dirname, './manifests.mts');
+        const { manifest } = await import('./manifests.mts');
 
         return {
           contents: JSON.stringify(manifest[version], null, 2).replace(regex, '.js'),
@@ -73,7 +65,7 @@ function customFiles() {
         if (loaders.includes(extname(path))) return;
 
         return {
-          contents: (await fs.readFile(path, 'utf-8')).replace(regex, '.js'),
+          contents: (await Deno.readTextFile(path)).replace(regex, '.js'),
           loader: 'copy',
           watchFiles: [path],
         };

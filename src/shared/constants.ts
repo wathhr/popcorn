@@ -1,13 +1,14 @@
 type IpcValues =
-  keyof API |
+  keyof RendererAPI |
   keyof MainAPI |
-  string & Record<never, never>; // any string but still keep auto-completion
+  `${Lowercase<string>}${string}` & Record<never, never>; // any string but still keep auto-completion
 
+/** @param name must be camelCase */
 export const ipc = <T extends IpcValues>(name?: T) => `POPCORN_${(name ?? '').replace(/([A-Z])/g, '_$1').toUpperCase()}` as EventName<T>;
 
-type Color = {
+export type Color = {
   str: string,
-  rgb: [number, number, number],
+  rgb: [NumRange<0, 256>, NumRange<0, 256>, NumRange<0, 256>],
 };
 
 export const colors = {

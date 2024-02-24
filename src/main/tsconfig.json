@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["./**/*.ts"],
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
     "target": "ESNext",
 
     "lib": [
@@ -10,24 +10,20 @@
     ],
 
     "types": [
+      "@types/node",
       "../../types/electron.d.ts",
       "../../types/globals.d.ts",
-      "@types/node",
     ],
 
     "paths": {
-      "~/": ["../../"],
+      "~": ["../.."],
       "~/*": ["../../*"],
-      "#/": ["."],
+      "#": ["."],
       "#/*": ["./*"],
-      "#common": [
-        "../common",
-        "./common",
-      ],
-      "#common/*": [
-        "../common/*",
-        "./common/*",
-      ],
+      "#shared": ["../shared"],
+      "#shared/*": ["../shared/*"],
+      "#types": ["../types"],
+      "#types/*": ["../types/*"],
     },
-  }
+  },
 }

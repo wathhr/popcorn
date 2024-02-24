@@ -1,16 +1,10 @@
+import { ipc } from '#shared';
 import { contextBridge, ipcRenderer } from 'electron';
 import { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 
-type MapKeys<T> = {
-  [K in keyof T as `on${Capitalize<K & string>}`]: (handler: (
-    event: Electron.IpcRendererEvent,
-    ...args: ForceArr<T[K]>
-  ) => void) => () => void
-};
-
-const PopcornAPI: API & MapKeys<MainAPI> = {
-  async getTheme(_id) {
+const PopcornAPI: ElectronAPI = {
+  async getTheme() {
     return {
       id: 'test.test',
       version: parse('1.0.0') as SemVer,
@@ -53,8 +47,8 @@ const PopcornAPI: API & MapKeys<MainAPI> = {
   onSaveState(handler) {
     console.log('trolley');
 
-    return () => ipcRenderer.off('POPCORN_SAVE_STATE', handler);
-  }
+    return () => ipcRenderer.off(ipc('saveState'), handler);
+  },
 };
 
 contextBridge.exposeInMainWorld('PopcornAPI', PopcornAPI);

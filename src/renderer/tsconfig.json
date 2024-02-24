@@ -1,5 +1,6 @@
 {
   "extends": "../../tsconfig.json",
+  "include": ["./**/*.ts", "../preload/devserver.ts"],
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -9,25 +10,22 @@
       "DOM",
       "ESNext",
     ],
+
     "types": [
-      "../../types/globals.d.ts",
       "./globals.d.ts",
+      "../../types/globals.d.ts",
       "../../types/kernel.d.ts",
     ],
 
     "paths": {
-      "~/": ["../../"],
+      "~": ["../.."],
       "~/*": ["../../*"],
-      "#/": ["."],
+      "#": ["."],
       "#/*": ["./*"],
-      "#common": [
-        "../common",
-        "./common",
-      ],
-      "#common/*": [
-        "../common/*",
-        "./common/*",
-      ],
+      "#shared": ["../shared"],
+      "#shared/*": ["../shared/*"],
+      "#types": ["../types"],
+      "#types/*": ["../types/*"],
     },
-  }
+  },
 }

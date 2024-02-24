@@ -1,14 +1,16 @@
 ===================================================================
 --- electron.d.ts
 +++ electron-patched.d.ts
-@@ -1,5 +1,5 @@
+@@ -1,15 +1,25 @@
 -// Type definitions for Electron 28.0.0
 +// Type definitions for Electron 28.0.0 (PATCHED)
  // Project: http://electronjs.org/
  // Definitions by: The Electron Team <https://github.com/electron/electron>
  // Definitions: https://github.com/electron/typescript-definitions
  
-@@ -8,8 +8,16 @@
+ /// <reference types="node" />
++/// <reference lib="DOM" />
+ 
  type DOMEvent = Event;
  type GlobalResponse = Response;
  type GlobalRequest = Request;
@@ -17,15 +19,16 @@
 +type $P<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
 +
 +type $MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
-+type $MappedAPI = $MapKeys<API>;
++type $MappedAPI = $MapKeys<RendererAPI>;
 +type $MappedMainAPI = $MapKeys<MainAPI>;
++type $ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
 +///* End section
 +
  declare namespace Electron {
    const NodeEventEmitter: typeof import('events').EventEmitter;
  
    type Accelerator = string;
-@@ -5780,37 +5789,57 @@
+@@ -5780,40 +5790,60 @@
       * Errors thrown through `handle` in the main process are not transparent as they
       * are serialized and only the `message` property from the original error is
       * provided to the renderer process. Please refer to #24427 for details.
@@ -34,7 +37,7 @@
 +    handle<K extends keyof $MappedAPI>(
 +      channel: K,
 +      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
-+        ? (event: IpcMainInvokeEvent, ...args: Args) => Ret | Awaited<Ret> | Promise<Awaited<Ret>>
++        ? (event: IpcMainInvokeEvent, ...args: Args) => $ReturnType<NonNullable<Ret>>
 +        : never,
 +    ): void;
      /**
@@ -45,7 +48,7 @@
 +    handleOnce<K extends keyof $MappedAPI>(
 +      channel: K,
 +      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
-+        ? (event: IpcMainInvokeEvent, ...args: Args) => Ret | Awaited<Ret> | Promise<Awaited<Ret>>
++        ? (event: IpcMainInvokeEvent, ...args: Args) => $ReturnType<NonNullable<Ret>>
 +        : never,
 +    ): void;
      /**
@@ -55,8 +58,8 @@
 -    on(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
 +    on<K extends keyof $MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => any
-+        ? (event: IpcMainEvent, ...args: Args) => void
++      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainEvent<Awaited<Ret>>, ...args: Args) => void
 +        : never,
 +    ): this;
      /**
@@ -66,8 +69,8 @@
 -    once(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
 +    once<K extends keyof $MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => any
-+        ? (event: IpcMainEvent, ...args: Args) => void
++      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainEvent<Awaited<Ret>>, ...args: Args) => void
 +        : never,
 +    ): this;
      /**
@@ -88,9 +91,13 @@
 +    removeListener(channel: keyof $MappedAPI, listener: (...args: any[]) => void): this;
    }
  
-   interface IpcMainEvent extends Event {
+-  interface IpcMainEvent extends Event {
++  interface IpcMainEvent<T = any> extends Event {
  
-@@ -5833,12 +5862,13 @@
+     // Docs: https://electronjs.org/docs/api/structures/ipc-main-event
+ 
+     /**
+@@ -5833,13 +5863,13 @@
       * original message that you are currently handling.  You should use this method to
       * "reply" to the sent message in order to guarantee the reply will go to the
       * correct process and frame.
@@ -100,11 +107,12 @@
      /**
       * Set this to the value to be returned in a synchronous message
       */
-+    // TODO: Change the type of this appropriately
-     returnValue: any;
+-    returnValue: any;
++    returnValue?: T;
      /**
       * Returns the `webContents` that sent the message
       */
+     sender: WebContents;
 @@ -5879,9 +5909,12 @@
  
      /**

@@ -1,5 +1,5 @@
-import { createLogger } from './common';
-import { PopcornShared } from './types';
+import { createLogger } from '#/common';
+import { PopcornShared } from '#/types';
 
 const Logger = new createLogger();
 

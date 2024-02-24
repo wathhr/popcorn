@@ -1,5 +1,5 @@
-import { ipc } from '#common/constants';
-import * as renderer from '../..';
+import { ipc } from '#shared/constants';
+import * as renderer from '#';
 
 const messageHandler = (event: MessageEvent) => {
   if (!(event.source === window && event.data.startsWith(ipc()))) return;
