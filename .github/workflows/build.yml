@@ -7,7 +7,7 @@ jobs:
     strategy:
       max-parallel: 6
       matrix:
-        build_type: [main, preload, renderer]
+        build_type: [main, preload, renderer, types]
         include:
           - build_type: browser
             extra_command: pnpm run lint:ext
@@ -16,9 +16,6 @@ jobs:
             id: browser MV2
             extra_params: --mv2
             extra_command: pnpm run lint:ext
-
-          - build_type: types
-            artifacts: dist/types/*
 
     name: Build ${{ matrix.id || matrix.build_type }}
     steps:
@@ -64,8 +61,7 @@ jobs:
       - if: matrix.extra_command
         run: ${{ matrix.extra_command }}
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          # name: ${{ matrix.id || matrix.build_type }}
-          path: ${{ matrix.artifacts || format('dist/{0}', matrix.build_type) }}
+          name: ${{ matrix.id || matrix.build_type }}
+          path: dist/${{ matrix.build_type }}
