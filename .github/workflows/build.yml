@@ -18,9 +18,7 @@ jobs:
             extra_command: pnpm run lint:ext
 
           - build_type: types
-            artifacts: |
-              dist/types/config.json
-              dist/types/theme.json
+            artifacts: dist/types/config.json
 
     name: Build ${{ matrix.id || matrix.build_type }}
     steps:
