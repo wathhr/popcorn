@@ -8,5 +8,5 @@
       "exclude": ["no-explicit-any"]
     }
   },
-  "nodeModulesDir": false
+  "nodeModulesDir": true
 }
