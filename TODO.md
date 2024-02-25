@@ -35,14 +35,14 @@
 - [ ] Figure out a better way to add kernel-types, currently they are manually written
 - [ ] Add macro support (https://github.com/unplugin/unplugin-macros) (specifically for constants)
 - [ ] Add a way to easily create patches
-- [ ] Support multiple connections on the dev server
+- [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
   - [ ] Do an actual rewrite instead of just replacing some basic stuff
 
 ## Misc
 - [ ] Use BiomeJS instead of eslint
 - [ ] Add github actions
-  - [ ] Linting
-  - [ ] Releases
+  - [x] Linting
+  - [x] Releases
   - [ ] Testing
 - [ ] Add documentation

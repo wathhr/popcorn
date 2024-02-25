@@ -1,6 +1,5 @@
 #!/bin/usr/env false
 
-import type chrome from 'npm:@types/chrome';
 import pkg from '../../package.json' with { type: 'json' };
 
 const commonManifest = {
@@ -27,6 +26,11 @@ export const manifest: Record<`v${2|3}`, chrome.runtime.Manifest> = {
         js: ['./content/index.ts'],
       },
     ],
+    browser_specific_settings: {
+      gecko: {
+        id: `${pkg.name}@${pkg.author.name}`,
+      },
+    },
   },
 
   v2: {
@@ -44,5 +48,11 @@ export const manifest: Record<`v${2|3}`, chrome.runtime.Manifest> = {
       matches: ['<all_urls>'],
       js: ['./content/index.ts'],
     }],
+    browser_specific_settings: {
+      gecko: {
+        id: `${pkg.name}@${pkg.author.name}`,
+        strict_min_version: '57.0',
+      },
+    },
   },
 };
