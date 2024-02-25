@@ -19,6 +19,8 @@ export const manifest: Record<`v${2|3}`, chrome.runtime.Manifest> = {
     },
     background: {
       service_worker: './background/index.ts',
+      // @ts-expect-error https://stackoverflow.com/a/75203925/14591737
+      scripts: ['./background/index.ts'],
     },
     content_scripts: [
       {

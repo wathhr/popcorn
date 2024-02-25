@@ -5,14 +5,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
+      max-parallel: 6
       matrix:
         build_type: [main, preload, renderer, types]
         include:
           - build_type: browser
             extra_command: pnpm run lint:ext
 
-    name: Build ${{ matrix.build_type }}
+          - build_type: browser --mv2
+            name: browser MV2
+            extra_command: pnpm run lint:ext
+
+    name: Build ${{ matrix.name || matrix.build_type }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -27,7 +31,7 @@ jobs:
         with:
           deno-version: v1.x.x
 
-      - name: Install pnpm
+      - name: Set up pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
@@ -39,7 +43,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - name: Setup pnpm cache
+      - name: Set up pnpm cache
         uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH  }}
@@ -53,6 +57,5 @@ jobs:
       - name: Build ${{ matrix.build_type }}
         run: pnpm run build ${{ matrix.build_type }}
 
-      - name: Run lint:ext (only for browser)
-        if: matrix.extra_command
+      - if: matrix.extra_command
         run: ${{ matrix.extra_command }}

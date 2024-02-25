@@ -91,7 +91,7 @@ export class DevServer {
   send<T extends keyof Message>(name = '*', type: T, data: Message[T]) {
     if (name === '*') {
       if (this.sockets.size === 0) {
-        this.log('No clients connected');
+        // this.log('No clients connected');
         return false;
       }
 
@@ -101,7 +101,7 @@ export class DevServer {
     }
 
     if (!this.sockets.has(name)) {
-      this.log(`[${name}]`, 'Not connected');
+      // this.log(`[${name}]`, 'Not connected');
       return false;
     }
 

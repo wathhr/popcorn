@@ -51,7 +51,7 @@ function customFiles(): import('esbuild').Plugin {
 
       build.onLoad({ filter: /manifest\.json/ }, async () => {
         const manifestFile = join(__dirname, './manifests.mts');
-        const { manifest } = await import('./manifests.mts');
+        const { manifest } = await import(`./manifests.mts?${Date.now()}`);
 
         return {
           contents: JSON.stringify(manifest[version], null, 2).replace(regex, '.js'),
