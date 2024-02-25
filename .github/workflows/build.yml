@@ -13,11 +13,11 @@ jobs:
             extra_command: pnpm run lint:ext
 
           - build_type: browser
-            name: browser MV2
+            id: browser MV2
             extra_params: --mv2
             extra_command: pnpm run lint:ext
 
-    name: Build ${{ matrix.name || matrix.build_type }}
+    name: Build ${{ matrix.id || matrix.build_type }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -63,5 +63,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.build_type }}
+          name: ${{ matrix.id || matrix.build_type }}
           path: dist/${{ matrix.build_type }}
