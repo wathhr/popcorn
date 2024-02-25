@@ -2,10 +2,10 @@ name: Lint
 on: [push, pull_request]
 
 jobs:
-  run-eslint:
+  lint:
     runs-on: ubuntu-latest
 
-    name: 'Run ESLint'
+    name: Run ESLint
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4

@@ -24,7 +24,7 @@
     "check:renderer": "tsc --noEmit --project ./src/renderer/tsconfig.json",
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",
     "build": "deno run --allow-env --allow-run --allow-read --allow-write --allow-net=registry.npmjs.org scripts/build.mts",
-    "watch": "deno run --allow-env --allow-run --allow-read --allow-write --allow-net=0.0.0.0:7331 scripts/build.mts --watch --dev",
+    "watch": "deno run --allow-env --allow-run --allow-read --allow-write --allow-net=registry.npmjs.org,0.0.0.0:7331 scripts/build.mts --watch --dev",
     "start:firefox": "web-ext run --source-dir ./dist/browser/ --browser-console --devtools",
     "start:chrome": "web-ext run --source-dir ./dist/browser/ -t chromium --browser-console --devtools"
   },

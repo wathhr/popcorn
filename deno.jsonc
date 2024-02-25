@@ -7,6 +7,5 @@
     "rules": {
       "exclude": ["no-explicit-any"]
     }
-  },
-  "nodeModulesDir": true
+  }
 }
