@@ -18,7 +18,9 @@ jobs:
             extra_command: pnpm run lint:ext
 
           - build_type: types
-            artifacts: dist/types/*
+            artifacts: |
+              dist/types/config.json
+              dist/types/theme.json
 
     name: Build ${{ matrix.id || matrix.build_type }}
     steps:
@@ -64,7 +66,8 @@ jobs:
       - if: matrix.extra_command
         run: ${{ matrix.extra_command }}
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.id || matrix.build_type }}
-          path: ${{ matrix.artifacts || 'dist/${{ matrix.build_type }}' }}
+          path: ${{ matrix.artifacts || format('dist/{0}', matrix.build_type) }}
