@@ -1,5 +1,17 @@
 name: Check
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - package.json
+      - scripts/types.mts
+      - src/**.[cm]?ts
+      - types/**.[cm]?ts
+  pull_request:
+    paths:
+      - package.json
+      - scripts/types.mts
+      - src/**.[cm]?ts
+      - types/**.[cm]?ts
 
 jobs:
   check:
@@ -50,6 +62,9 @@ jobs:
 
       - name: Download & Patch types
         run: pnpm run types
+
+      - name: Run ESLint
+        run: pnpm run lint
 
       - name: Run TypeChecks
         run: pnpm run check

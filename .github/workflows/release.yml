@@ -1,14 +1,26 @@
-name: Lint
-on: [push, pull_request]
+name: Release
+on:
+  push:
+    tags:
+      - v*.*.*
 
 jobs:
-  lint:
+  build:
     runs-on: ubuntu-latest
-
-    name: Run ESLint
+    name: Build & Release
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x.x
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -38,5 +50,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run ESLint
-        run: pnpm run lint
+      - name: Build
+        run: pnpm run build all
+
+      - name: Zip the builds
+        run: |
+          for dir in dist/*/; do
+            zip -r ${dir%/}.zip $dir
+            rm -rf $dir
+          done
+
+      - name: Create Release
+        run: gh release create "${{ github.ref_name }}" dist/* --latest --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

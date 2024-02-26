@@ -44,5 +44,7 @@
 - [ ] Add github actions
   - [x] Linting
   - [x] Releases
+    - [ ] Remove the need to add a tag, only use commit name
+    - [ ] Automatically update version in [`package.json`](./package.json) if required
   - [ ] Testing
 - [ ] Add documentation
