@@ -19,7 +19,7 @@ jobs:
     strategy:
       max-parallel: 6
       matrix:
-        build_type: [main, preload, renderer, types]
+        build_type: [electron, types]
         include:
           - build_type: browser
             extra_command: pnpm run lint:ext
