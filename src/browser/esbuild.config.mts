@@ -21,7 +21,7 @@ export default {
   platform: 'browser',
   format: 'iife',
   define: {
-    ...(await import('../renderer/esbuild.config.mts')).default.define,
+    ...(await import('../electron/renderer/esbuild.config.mts')).default.define,
     isBrowser: 'true',
   },
   plugins: [

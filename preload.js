@@ -1,1 +1,1 @@
-module.exports = require('./dist/preload');
+module.exports = require('./dist/electron/preload');

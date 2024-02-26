@@ -43,4 +43,4 @@ globalThis.PopcornAPI = {
   },
 };
 
-import('~/src/renderer');
+import('~/src/electron/renderer');

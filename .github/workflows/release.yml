@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - v*.*.*
+  workflow_dispatch:
 
 jobs:
   build:
@@ -60,7 +61,17 @@ jobs:
             rm -rf $dir
           done
 
+      - name: Get the version
+        id: version
+        run: echo "version=v$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
       - name: Create Release
-        run: gh release create "${{ github.ref_name }}" dist/* --latest --generate-notes
+        run: |
+          echo ${{ env.VERSION }}
+          if [ $(gh release list --json tagName --jq 'map(.tagName == "${{ env.VERSION }}") | any') == true ]; then
+            gh release delete "${{ env.VERSION }}" --cleanup-tag --yes
+          fi
+          gh release create ${{ env.VERSION }} dist/* --latest --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event_name == 'push' && github.ref_name || steps.version.outputs.version }}

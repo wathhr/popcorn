@@ -6,9 +6,10 @@
   "deno.enablePaths": [
     "./scripts",
     "./src/browser/esbuild.config.mts",
-    "./src/main/esbuild.config.mts",
-    "./src/preload/esbuild.config.mts",
-    "./src/renderer/esbuild.config.mts",
+    "./src/electron/esbuild.config.mts",
+    "./src/electron/main/esbuild.config.mts",
+    "./src/electron/preload/esbuild.config.mts",
+    "./src/electron/renderer/esbuild.config.mts",
     "./src/types/esbuild.config.mts",
   ],
 }

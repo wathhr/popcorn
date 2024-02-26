@@ -1,0 +1,29 @@
+{
+  "extends": "../../../tsconfig.json",
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ESNext",
+
+    "lib": [
+      "ESNext",
+    ],
+
+    "types": [
+      "@types/node",
+      "../../../types/electron.d.ts",
+      "../../../types/globals.d.ts",
+    ],
+
+    "paths": {
+      "~": ["../../.."],
+      "~/*": ["../../../*"],
+      "#": ["."],
+      "#/*": ["./*"],
+      "#shared": ["../../shared"],
+      "#shared/*": ["../../shared/*"],
+      "#types": ["../../types"],
+      "#types/*": ["../../types/*"],
+    },
+  },
+}

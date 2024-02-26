@@ -50,7 +50,10 @@ const devServer = dev ? new DevServer() : undefined;
 
 const builds: esbuild.BuildOptions[] = [];
 for (const type of types) {
-  const config = await import(`../src/${type}/esbuild.config.mts`) as { default: esbuild.BuildOptions | esbuild.BuildOptions[]; };
+  const config = await import(`../src/${type}/esbuild.config.mts`) as {
+    default: esbuild.BuildOptions | esbuild.BuildOptions[],
+    independent?: boolean,
+  };
   const typeOptions = Array.isArray(config.default) ? config.default : [config.default];
 
   for (const typeOption of typeOptions) {
@@ -93,7 +96,7 @@ for (const type of types) {
       minifySyntax: !dev,
       minifyIdentifiers: !dev,
       write: false,
-      outdir: join(root, 'dist', type),
+      outdir: join(root, 'dist', config.independent ? '' : type),
       sourcemap: dev ? 'inline' : false,
       define: {
         NODE_ENV: dev ? '"development"' : '"production"',

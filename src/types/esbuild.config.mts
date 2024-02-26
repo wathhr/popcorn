@@ -25,3 +25,5 @@ export default {
     },
   ],
 } satisfies import('esbuild').BuildOptions;
+
+export const independent = true;
