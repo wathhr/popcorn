@@ -22,14 +22,11 @@ jobs:
         build_type: [electron, types]
         include:
           - build_type: browser
-            extra_command: pnpm run lint:ext
+            extra_command: |
+              pnpm run lint:ext:mv2
+              pnpm run lint:ext:mv3
 
-          - build_type: browser
-            id: browser MV2
-            extra_params: --mv2
-            extra_command: pnpm run lint:ext
-
-    name: Build ${{ matrix.id || matrix.build_type }}
+    name: Build ${{ matrix.build_type }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -72,7 +69,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build ${{ matrix.build_type }} ${{ matrix.extra_params || '' }}
+      - name: Build ${{ matrix.build_type }}
         run: pnpm run build ${{ matrix.build_type }}
 
       - if: matrix.extra_command
@@ -80,5 +77,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.id || matrix.build_type }}
+          name: ${{ matrix.build_type }}
           path: dist/${{ matrix.build_type }}

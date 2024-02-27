@@ -16,7 +16,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:ext": "web-ext lint -s ./dist/browser",
+    "lint:ext:mv2": "web-ext lint -s ./dist/browser-MV2",
+    "lint:ext:mv3": "web-ext lint -s ./dist/browser-MV3",
     "types": "deno run --allow-net --allow-read --allow-write scripts/types.mts",
     "check": "run-s check:*",
     "check:main": "tsc --noEmit --project ./src/electron/main/tsconfig.json",

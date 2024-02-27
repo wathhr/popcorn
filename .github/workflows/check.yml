@@ -4,18 +4,20 @@ on:
     paths:
       - package.json
       - tsconfig.json
-      - ./**/tsconfig.json
+      - /**/tsconfig.json
       - scripts/types.mts
       - src/**.[cm]?ts
       - types/**.[cm]?ts
+      - src/browser/manifests.mts
   pull_request:
     paths:
       - package.json
       - tsconfig.json
-      - ./**/tsconfig.json
+      - /**/tsconfig.json
       - scripts/types.mts
       - src/**.ts
       - types/**.ts
+      - src/browser/manifests.mts
 
 jobs:
   check:
