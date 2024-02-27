@@ -96,7 +96,9 @@ for (const type of types) {
       minifySyntax: !dev,
       minifyIdentifiers: !dev,
       write: false,
-      outdir: join(root, 'dist', config.independent ? '' : type),
+      outdir: typeOption.outdir
+        ? join(root, 'dist', config.independent ? '' : typeOption.outdir)
+        : join(root, 'dist', config.independent ? '' : type),
       sourcemap: dev ? 'inline' : false,
       define: {
         NODE_ENV: dev ? '"development"' : '"production"',
