@@ -69,7 +69,7 @@ jobs:
         run: |
           echo ${{ env.VERSION }}
           if [ $(gh release list --json tagName --jq 'map(.tagName == "${{ env.VERSION }}") | any') == true ]; then
-            gh release delete "${{ env.VERSION }}" --cleanup-tag --yes
+            gh release delete "${{ env.VERSION }}" --yes
           fi
           gh release create ${{ env.VERSION }} dist/* --latest --generate-notes
         env:
