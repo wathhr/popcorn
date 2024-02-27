@@ -3,15 +3,19 @@ on:
   push:
     paths:
       - package.json
+      - tsconfig.json
+      - ./**/tsconfig.json
       - scripts/types.mts
       - src/**.[cm]?ts
       - types/**.[cm]?ts
   pull_request:
     paths:
       - package.json
+      - tsconfig.json
+      - ./**/tsconfig.json
       - scripts/types.mts
-      - src/**.[cm]?ts
-      - types/**.[cm]?ts
+      - src/**.ts
+      - types/**.ts
 
 jobs:
   check:
