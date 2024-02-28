@@ -23,6 +23,9 @@
   - [x] Creating listeners in the renderer
   - [x] Patch [`electron.d.ts`](./types/electron.d.ts) instead of exporting a different type
 - [ ] Add minimal electron application for easier testing
+  - https://github.com/Kiyozz/electron-esbuild
+  - [electron-builder](https://github.com/electron-userland/electron-builder) [docs](https://www.electron.build/api/electron-builder.html) [extra](https://github.com/enso-org/enso/blob/develop/app/ide-desktop/lib/client/electron-builder-config.ts)
+  - [electron-forge](https://github.com/electron/forge) [docs](https://js.electronforge.io/modules/_electron_forge_core.html)
 - [ ] Add auto-updater
 - [ ] Add testing framework
   - [ ] [Vitest](https://github.com/vitest-dev/vitest)
