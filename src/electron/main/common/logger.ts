@@ -1,5 +1,5 @@
 import supportsColor from 'supports-color';
-import { colors, type Color } from '#shared';
+import { type Color, colors } from '#shared';
 
 class Logger {
   private name: string;
@@ -10,12 +10,12 @@ class Logger {
   }
 
   private color(text: string, color: Color['rgb']) {
-    if (!(supportsColor.stdout && supportsColor.stdout.has16m)) return text;
+    if (!(supportsColor.stdout !== false && supportsColor.stdout.has16m)) return text;
 
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
-  #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: any[]) {
+  #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: Parameters<Console['log']>) {
     const banner = this.name !== 'Popcorn'
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
       : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
@@ -23,11 +23,11 @@ class Logger {
     console[level](banner, ...msg);
   }
 
-  log = (...msg: any[]) => this.#log('log', ...msg);
-  info = (...msg: any[]) => this.#log('info', ...msg);
-  debug = (...msg: any[]) => DEBUG && this.#log('debug', ...msg);
-  warn = (...msg: any[]) => this.#log('warn', ...msg);
-  error = (...msg: any[]) => this.#log('error', ...msg);
+  log: Console['log'] = (...msg) => this.#log('log', ...msg);
+  info: Console['info'] = (...msg) => this.#log('info', ...msg);
+  debug: Console['debug'] = (...msg) => DEBUG && this.#log('debug', ...msg);
+  warn: Console['warn'] = (...msg) => this.#log('warn', ...msg);
+  error: Console['error'] = (...msg) => this.#log('error', ...msg);
 }
 
 export {

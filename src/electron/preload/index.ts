@@ -1,7 +1,7 @@
-import { ipc } from '#shared';
 import { contextBridge, ipcRenderer } from 'electron';
 import { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
+import { ipc } from '#shared';
 
 const PopcornAPI: ElectronAPI = {
   async getTheme() {

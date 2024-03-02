@@ -1,8 +1,8 @@
 #!/bin/usr/env deno
 
-import { basename, join } from 'std/path/mod.ts';
-import { ensureDir } from 'std/fs/mod.ts';
 import { applyPatch } from 'npm:diff';
+import { ensureDir } from 'std/fs/mod.ts';
+import { basename, join } from 'std/path/mod.ts';
 
 const __dirname = import.meta.dirname!;
 const root = join(__dirname, '..');
@@ -20,7 +20,7 @@ const list: Item[] = [
   }
 ];
 
-await ensureDir(join(root, 'types'));
+await ensureDir(join(root, 'vendor'));
 
 for (const item of list) {
   const filename = basename(item.url);
@@ -38,7 +38,7 @@ for (const item of list) {
         return patched;
       })());
 
-    Deno.writeTextFile(join(root, 'types', item.filename ?? basename(filename)), data)
+    Deno.writeTextFile(join(root, 'vendor', item.filename ?? basename(filename)), data)
       .then(() => console.log(`✔ Successfully downloaded types for ${filename}!`));
   } catch (e) {
     console.error(`✘ Failed to download types for ${filename}:`, e);

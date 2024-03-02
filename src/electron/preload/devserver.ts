@@ -33,7 +33,7 @@ class DevServer {
     }
   }
 
-  private is<T extends keyof Message>(json: any, type: T): json is MessageResponse<T> {
+  private is<T extends keyof Message>(json: MessageResponse, type: T): json is MessageResponse<T> {
     return json.type === type;
   }
 

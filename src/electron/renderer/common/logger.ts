@@ -8,7 +8,7 @@ class Logger {
     this.name = name.join(' > ');
   }
 
-  #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: any[]) {
+  #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: Parameters<Console['log']>) {
     const banner = [
       (this.name !== 'Popcorn'
         ? `🍿 %c Popcorn > ${this.name} %c`
@@ -25,11 +25,11 @@ class Logger {
     console[level](...banner, ...msg);
   }
 
-  log = (...msg: any[]) => this.#log('log', ...msg);
-  info = (...msg: any[]) => this.#log('info', ...msg);
-  debug = (...msg: any[]) => DEBUG && this.#log('debug', ...msg);
-  warn = (...msg: any[]) => this.#log('warn', ...msg);
-  error = (...msg: any[]) => this.#log('error', ...msg);
+  log: Console['log'] = (...msg) => this.#log('log', ...msg);
+  info: Console['info'] = (...msg) => this.#log('info', ...msg);
+  debug: Console['debug'] = (...msg) => DEBUG && this.#log('debug', ...msg);
+  warn: Console['warn'] = (...msg) => this.#log('warn', ...msg);
+  error: Console['error'] = (...msg) => this.#log('error', ...msg);
 }
 
 export {

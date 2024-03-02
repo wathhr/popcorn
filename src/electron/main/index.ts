@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { existsSync, readJsonSync, writeJson } from 'fs-extra';
-import { root, createLogger } from '#/common';
+import { createLogger, root } from '#/common';
 import { ConfigChecker } from '#types';
 
 const Logger = new createLogger();

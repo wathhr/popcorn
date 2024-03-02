@@ -13,14 +13,14 @@ export class DevServer {
     }
   }
 
-  private log(...args: any[]) {
+  private log: Console['log'] = (...args) => {
     const [head, ...tail] = args;
     if (typeof head === 'string' && head.startsWith('[') && head.endsWith(']')) {
       return console.log(`[DevServer > ${head.slice(1, -1)}]`, ...tail);
     }
 
     return console.log('[DevServer]', ...args);
-  }
+  };
 
   constructor(port = 7331) {
     this.server = Deno.serve({
@@ -88,7 +88,7 @@ export class DevServer {
     };
   }
 
-  send<T extends keyof Message>(name = '*', type: T, data: Message[T]) {
+  send<T extends keyof Message>(name: string, type: T, data: Message[T]) {
     if (name === '*') {
       if (this.sockets.size === 0) {
         // this.log('No clients connected');

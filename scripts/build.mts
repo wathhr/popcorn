@@ -1,12 +1,12 @@
 #!/bin/usr/env deno
 
-import { join, relative } from 'std/path/mod.ts';
-import { exists, ensureDirSync } from 'std/fs/mod.ts';
+import * as esbuild from 'esbuild';
 import { parseArgs } from 'std/cli/mod.ts';
 import { deepMerge } from 'std/collections/mod.ts';
-import * as esbuild from 'esbuild';
-import { DevServer } from './devserver.mts';
+import { ensureDirSync, exists } from 'std/fs/mod.ts';
+import { join, relative } from 'std/path/mod.ts';
 import pkg from '../package.json' with { type: 'json' };
+import { DevServer } from './devserver.mts';
 
 const __dirname = import.meta.dirname!;
 const root = join(__dirname, '..');
@@ -71,7 +71,7 @@ for (const type of types) {
         case Array.isArray(e):
           return e.map((entry) => {
             if (typeof entry === 'string') return relJoin(src, type, entry);
-            else return {
+            return {
               in: relJoin(src, type, entry.in),
               out: entry.out,
             };

@@ -1,7 +1,5 @@
 dist/
-
-# Vendor
-types/electron.d.ts
+vendor/
 
 # Package manager related
 node_modules/

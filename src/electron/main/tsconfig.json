@@ -11,7 +11,7 @@
 
     "types": [
       "@types/node",
-      "../../../types/electron.d.ts",
+      "../../../vendor/electron.d.ts",
       "../../../types/globals.d.ts",
     ],
 

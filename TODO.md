@@ -21,7 +21,7 @@
 ## Electron
 - [x] Make a type-safe way to create IPC channels
   - [x] Creating listeners in the renderer
-  - [x] Patch [`electron.d.ts`](./types/electron.d.ts) instead of exporting a different type
+  - [x] Patch [`electron.d.ts`](./vendor/electron.d.ts) instead of exporting a different type
 - [ ] Add minimal electron application for easier testing
   - https://github.com/Kiyozz/electron-esbuild
   - [electron-builder](https://github.com/electron-userland/electron-builder) [docs](https://www.electron.build/api/electron-builder.html) [extra](https://github.com/enso-org/enso/blob/develop/app/ide-desktop/lib/client/electron-builder-config.ts)
@@ -43,7 +43,9 @@
   - [ ] Do an actual rewrite instead of just replacing some basic stuff
 
 ## Misc
-- [ ] Use BiomeJS instead of eslint
+- [ ] ~~Use BiomeJS instead of eslint~~
+  - [ ] Use the new eslint configuration
+    - https://github.com/jgchk/eslint-import-resolver-deno
 - [ ] Add github actions
   - [x] Linting
   - [x] Releases
