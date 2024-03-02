@@ -54,6 +54,12 @@
       "error",
       "always"
     ],
+    "no-trailing-spaces": [
+      "error",
+      {
+        "ignoreComments": true
+      }
+    ],
     "quotes": [
       "error",
       "single"
