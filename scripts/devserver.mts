@@ -30,7 +30,7 @@ export class DevServer {
         return new Response(null, { status: 500 });
       },
     }, (req) => {
-      if(req.headers.get('upgrade') !== 'websocket') return new Response(null, { status: 501 });
+      if (req.headers.get('upgrade') !== 'websocket') return new Response(null, { status: 501 });
 
       const { socket, response } = Deno.upgradeWebSocket(req);
 
@@ -112,7 +112,7 @@ export class DevServer {
   }
 
   stop() {
-    this.sockets.forEach((socket) => socket.close());
+    this.sockets.forEach(socket => socket.close());
     this.server.shutdown();
   }
 

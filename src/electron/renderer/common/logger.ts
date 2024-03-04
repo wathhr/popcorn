@@ -33,6 +33,6 @@ class Logger {
 }
 
 export {
-  Logger as createLogger,
+  Logger as CreateLogger,
   Logger as default,
 };

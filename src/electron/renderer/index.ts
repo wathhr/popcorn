@@ -1,7 +1,7 @@
-import { createLogger } from '#/common';
-import { PopcornShared } from '#/types';
+import { CreateLogger } from '#/common';
+import type { PopcornShared } from '#/types';
 
-const Logger = new createLogger();
+const Logger = new CreateLogger();
 
 window.PopcornShared ??= {};
 declare global {

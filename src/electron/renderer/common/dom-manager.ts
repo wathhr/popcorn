@@ -1,4 +1,4 @@
-import { createLogger } from '#/common';
+import { CreateLogger } from '#/common';
 
 export class DomManager {
   static shared = {
@@ -11,7 +11,7 @@ export class DomManager {
     managedElements: [] as HTMLElement[],
   };
 
-  logger: createLogger;
+  logger: CreateLogger;
 
   constructor(private name: string) {
     if (window.PopcornShared.DOM) DomManager.shared = window.PopcornShared.DOM;
@@ -20,7 +20,7 @@ export class DomManager {
       document.head.append(DomManager.shared.comments.start, DomManager.shared.comments.end);
     }
 
-    this.logger = new createLogger('DOM', name);
+    this.logger = new CreateLogger('DOM', name);
 
     if (!(name in DomManager.shared.comments.extra)) {
       const comments = DomManager.shared.comments.extra[name] = {

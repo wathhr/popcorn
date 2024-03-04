@@ -134,11 +134,11 @@ for (const type of types) {
       logLevel: 'info',
     };
 
-    builds.push(deepMerge(typeOption as { [key: string]: unknown; }, baseOptions as { [key: string]: unknown; })); // hatred
+    builds.push(deepMerge(typeOption as { [key: string]: unknown }, baseOptions as { [key: string]: unknown })); // hatred
   }
 }
 
-if (watch) await Promise.all(builds.map((context) => esbuild.context(context).then((c) => c.watch())));
+if (watch) await Promise.all(builds.map(context => esbuild.context(context).then(c => c.watch())));
 else for (const context of builds) {
   // TODO: Use `ctx.rebuild` instead of this for more consistent logging
   await esbuild.build(context);

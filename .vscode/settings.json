@@ -1,5 +1,6 @@
 {
   "svelte.enable-ts-plugin": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
 
   // I need to specifiy every single file manually as the LSP does not support globs and
   // excluding files disables the default Typescript LSP completely
@@ -11,5 +12,17 @@
     "./src/electron/preload/esbuild.config.mts",
     "./src/electron/renderer/esbuild.config.mts",
     "./src/types/esbuild.config.mts",
+  ],
+
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml"
   ],
 }

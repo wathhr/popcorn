@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { SemVer } from 'semver';
+import type { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 import { ipc } from '#shared';
 

@@ -2,10 +2,10 @@ const strictMemo = new Set<string>();
 const seedMemo = new Set<`${number}:${number}|${string}`>();
 
 export function generateId(options?: Partial<{
-  length: number;
-  seed: number;
-  unique: 'strict' | boolean;
-  chars: string;
+  length: number,
+  seed: number,
+  unique: 'strict' | boolean,
+  chars: string,
 }>) {
   const {
     length = 5,

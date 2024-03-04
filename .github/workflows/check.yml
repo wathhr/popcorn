@@ -9,6 +9,7 @@ on:
       - src/**.[cm]?ts
       - types/**.[cm]?ts
       - src/browser/manifests.mts
+      - eslint.config.mjs
   pull_request:
     paths:
       - package.json
@@ -18,6 +19,7 @@ on:
       - src/**.ts
       - types/**.ts
       - src/browser/manifests.mts
+      - eslint.config.mjs
 
 jobs:
   check:

@@ -1,4 +1,4 @@
-import { SemVer } from 'semver';
+import type { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 
 globalThis.PopcornAPI = {

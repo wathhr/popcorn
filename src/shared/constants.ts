@@ -6,10 +6,10 @@ type IpcValues =
 /** @param name must be camelCase */
 export const ipc = <T extends IpcValues>(name?: T) => `POPCORN_${(name ?? '').replace(/([A-Z])/g, '_$1').toUpperCase()}` as EventName<T>;
 
-export type Color = {
+export interface Color {
   str: string,
   rgb: [NumRange<0, 256>, NumRange<0, 256>, NumRange<0, 256>],
-};
+}
 
 export const colors = {
   brand: {

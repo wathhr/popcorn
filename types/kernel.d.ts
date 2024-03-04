@@ -1,22 +1,22 @@
 type ListenerCallback = (...data: any) => void;
 
-type PackageInfo = {
+interface PackageInfo {
   name: string,
   id: string,
   path: string,
   version?: string,
   dependencies?: string[],
   enabled?: boolean,
-};
+}
 
-type Packages = {
+interface Packages {
   [id: string]: PackageInfo,
-};
+}
 
-type Kernel = {
+interface Kernel {
   broadcast: {
     dispatch: ListenerCallback,
-    emit(id: string, ...args: any[]): void;
+    emit(id: string, ...args: any[]): void,
     on(id: string, callback: ListenerCallback): void,
     once(id: string, callback: ListenerCallback): void,
     off(id: string, callback: ListenerCallback): void,
@@ -35,6 +35,6 @@ type Kernel = {
   },
   sendFinished(): void,
   importProtocol: 'kernel',
-};
+}
 
 declare const kernel: Kernel;

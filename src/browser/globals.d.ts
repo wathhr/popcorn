@@ -1,3 +1,3 @@
 declare const isBrowser: boolean;
-// biome-ignore lint/style/noVar: This rule exists for a different purpose
+// eslint-disable-next-line no-var
 declare var PopcornAPI: RendererAPI;

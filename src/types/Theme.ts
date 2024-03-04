@@ -1,4 +1,4 @@
-import { Static, Type } from '@sinclair/typebox';
+import { type Static, Type } from '@sinclair/typebox';
 import { TypeCompiler } from '@sinclair/typebox/compiler';
 
 export type Theme = Static<typeof Theme>;
@@ -24,7 +24,7 @@ export const Theme = Type.Object({
           codeberg: Type.String(),
           discord: Type.String(),
           github: Type.String(),
-          gitlab: Type.String()
+          gitlab: Type.String(),
         },
         {
           additionalProperties: Type.String(),

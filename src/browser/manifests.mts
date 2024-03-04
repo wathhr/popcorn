@@ -9,7 +9,7 @@ const commonManifest = {
   homepage_url: `https://github.com/${pkg.author.name}/${pkg.name}`,
 } as const satisfies Partial<chrome.runtime.Manifest>;
 
-export const manifest: Record<`v${2|3}`, chrome.runtime.Manifest> = {
+export const manifest: Record<`v${2 | 3}`, chrome.runtime.Manifest> = {
   v3: {
     manifest_version: 3,
     ...commonManifest,

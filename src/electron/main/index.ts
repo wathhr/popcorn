@@ -1,9 +1,9 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { existsSync, readJsonSync, writeJson } from 'fs-extra';
-import { createLogger, root } from '#/common';
+import { CreateLogger, root } from '#/common';
 import { ConfigChecker } from '#types';
 
-const Logger = new createLogger();
+const Logger = new CreateLogger();
 
 Logger.info('Starting...');
 

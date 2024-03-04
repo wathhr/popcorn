@@ -1,9 +1,9 @@
+import { CreateLogger } from '../renderer/common/logger';
 import { ipc } from '#shared';
-import { createLogger } from '../renderer/common/logger';
 
-const Logger = new createLogger('DevServer');
+const Logger = new CreateLogger('DevServer');
 
-export type Message = {
+export interface Message {
   hello: {
     name: string,
     roles?: string[],
@@ -14,13 +14,12 @@ export type Message = {
     file: string,
     content: string,
   },
-};
+}
 
-export type MessageResponse<T extends keyof Message = keyof Message> = {
+export interface MessageResponse<T extends keyof Message = keyof Message> {
   type: T,
   data: Message[T],
-};
-
+}
 
 class DevServer {
   private wss: WebSocket;
@@ -41,8 +40,8 @@ class DevServer {
     const ws = this.wss = new WebSocket(`ws://localhost:${port}`);
 
     ws.onmessage = this.handleMessage.bind(this);
-    ws.onclose = (event) => event.code === 1000 && Logger.info('Disconnected');
-    ws.onerror = (event) => Logger.error(event);
+    ws.onclose = event => event.code === 1000 && Logger.info('Disconnected');
+    ws.onerror = event => Logger.error(event);
   }
 
   private async handleMessage(message: MessageEvent<string>) {
