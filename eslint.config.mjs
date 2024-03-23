@@ -2,7 +2,7 @@ import antfu from '@antfu/eslint-config';
 
 export default antfu(
   {
-    files: ['*.{ts,mts}', '**/*.{ts,mts}'],
+    files: ['**/*.@(ts|mts)'],
     typescript: true,
     // svelte: true,
     // parses normal json files as jsonc
@@ -80,7 +80,7 @@ export default antfu(
     },
   },
   {
-    files: ['*.d.ts', '**/*.d.ts'],
+    files: ['**/*.d.ts'],
     rules: {
       'ts/no-explicit-any': 'off',
     },

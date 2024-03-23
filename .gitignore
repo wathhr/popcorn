@@ -1,5 +1,5 @@
-dist/
-vendor/
+/dist/
+/vendor/
 
 # Package manager related
 node_modules/
@@ -10,8 +10,8 @@ bun.lockb
 deno.lock
 
 # Private
-./themes/*
-./quickcss/*
+/themes/*
+/quickcss/*
 config.json
 
 # Necessary
