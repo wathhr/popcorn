@@ -13,8 +13,9 @@
 
     "types": [
       "@types/node",
-      "../../../vendor/electron.d.ts",
       "../../../types/globals.d.ts",
+      "../../../types/kernel.d.ts",
+      "../../../vendor/electron.d.ts",
     ],
 
     "paths": {
@@ -22,8 +23,8 @@
       "~/*": ["../../../*"],
       "#": ["."],
       "#/*": ["./*"],
-      "#shared": ["../../shared"],
-      "#shared/*": ["../../shared/*"],
+      "#shared": ["../../#shared"],
+      "#shared/*": ["../../#shared/*"],
       "#types": ["../../types"],
       "#types/*": ["../../types/*"],
     },

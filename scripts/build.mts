@@ -35,18 +35,15 @@ if (types.length === 0) types.push('all');
 
 const validTypes = [];
 for await (const item of Deno.readDir(src)) {
-  if (await exists(join(src, item.name, 'esbuild.config.mts'))) validTypes.push(item.name);
+  if (item.name.startsWith('#') || !await exists(join(src, item.name, 'esbuild.config.mts'))) continue;
+  validTypes.push(item.name);
 }
 
 switch (types[0]) {
-  case 'all':
+  case 'all': {
     types.length = 0;
     types.push(...validTypes);
-    break;
-  case 'kernel':
-    types.length = 0;
-    types.push('main', 'preload', 'renderer');
-    break;
+  } break;
 }
 
 const devServer = dev ? new DevServer() : undefined;

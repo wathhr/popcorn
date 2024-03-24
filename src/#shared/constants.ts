@@ -1,5 +1,5 @@
 type IpcValues =
-  keyof RendererAPI |
+  keyof ElectronAPI |
   keyof MainAPI |
   `${Lowercase<string>}${string}` & Record<never, never>; // any string but still keep auto-completion
 
