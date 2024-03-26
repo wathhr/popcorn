@@ -52,6 +52,7 @@ export default antfu(
       'no-case-declarations': 'error',
       'no-lone-blocks': 'off',
       'no-new': 'off',
+      'unused-imports/no-unused-vars': 'warn',
       'node/prefer-global/process': ['error', 'always'],
       'style/brace-style': 'off',
       'style/multiline-ternary': [

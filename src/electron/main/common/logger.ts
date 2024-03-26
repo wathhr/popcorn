@@ -1,5 +1,12 @@
-import supportsColor from 'supports-color';
-import { type Color, colors } from '#shared';
+import { app, ipcMain, webContents } from 'electron';
+import { sendToAll } from './sendToAll';
+import { type Color, colors, ipc } from '#shared';
+
+const logs: MainAPI['sendLog'][] = [];
+ipcMain.handle(ipc('getMainLogs'), () => logs);
+app.on('web-contents-created', (_, contents) => {
+  logs.forEach(log => contents.send(ipc('sendLog'), log));
+});
 
 class Logger {
   private name: string;
@@ -10,17 +17,38 @@ class Logger {
   }
 
   private color(text: string, color: Color['rgb']) {
-    if (!(supportsColor.stdout !== false && supportsColor.stdout.has16m)) return text;
-
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
-  #log(level: 'log' | 'info' | 'debug' | 'warn' | 'error', ...msg: Parameters<Console['log']>) {
+  #log(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
     const banner = this.name !== 'Popcorn'
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
       : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
 
     console[level](banner, ...msg);
+
+    if (DEBUG || level === 'error') {
+      const message = (() => {
+        try {
+          return structuredClone(msg);
+        } catch (e) {
+          console.error(banner, 'Failed to clone message:', msg, 'With error:', e);
+          return null;
+        }
+      })();
+
+      if (!message) return;
+
+      const log = {
+        component: this.name,
+        level,
+        message,
+        time: Date.now(),
+      } satisfies MainAPI['sendLog'];
+
+      if (webContents.getAllWebContents().length === 0) logs.push(log);
+      else sendToAll(ipc('sendLog'), log);
+    }
   }
 
   log: Console['log'] = (...msg) => this.#log('log', ...msg);

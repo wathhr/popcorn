@@ -38,3 +38,6 @@ interface Kernel {
 }
 
 declare const kernel: Kernel;
+interface Window {
+  kernel: Kernel,
+}

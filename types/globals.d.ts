@@ -19,19 +19,33 @@ interface RendererAPI {
   getThemes(): Promise<ThemeResponse[]> | undefined,
   getTheme(id: Theme['id']): Promise<ThemeResponse> | undefined,
   getUrls(): Promise<string[]> | undefined,
-  getConfig(): Promise<Required<Config>>,
+  getConfig(): Required<Config>,
 }
+
+interface BrowserAPI extends RendererAPI {
+  isBrowser: true,
+}
+
+type ElectronAPI = RendererAPI & {
+  isBrowser: false,
+  getMainLogs(): Promise<MainAPI['sendLog'][]>,
+} & {
+  [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
+    // TODO: Remove the event field maybe for privacy concerns
+    event: import('./exports.ts').Electron.IpcRendererEvent, // pain
+    ...args: ForceArr<MainAPI[K]>
+  ) => void) => () => void;
+};
 
 interface MainAPI {
   saveState: {
     file: string,
     status: 'saved' | 'failed',
   },
+  sendLog: {
+    component?: string,
+    level: 'log' | 'info' | 'debug' | 'warn' | 'error',
+    message: any,
+    time?: number,
+  },
 }
-
-type ElectronAPI = RendererAPI & {
-  [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
-    event: import('./exports.ts').Electron.IpcRendererEvent, // pain
-    ...args: ForceArr<MainAPI[K]>
-  ) => void) => () => void
-};

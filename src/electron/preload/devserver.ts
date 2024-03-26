@@ -1,3 +1,4 @@
+import manifest from '../../../index.json' assert { type: 'json' };
 import { CreateLogger } from '../renderer/common/logger';
 import { ipc } from '#shared';
 
@@ -59,15 +60,19 @@ class DevServer {
             Logger.info('Reloading the renderer script');
             window.postMessage(ipc('stop'), '*');
 
-            // TODO: Figure out a way to do this without creating an element
-            document.getElementById('popcorn-core')?.remove();
+            if (process.contextIsolated) {
+              // TODO: Figure out a way to do this without creating an element
+              document.getElementById('popcorn-core')?.remove();
 
-            const script = document.createElement('script');
-            script.id = 'popcorn-core';
-            script.type = 'module';
-            script.textContent = json.data.content;
+              const script = document.createElement('script');
+              script.id = 'popcorn-core';
+              script.type = 'module';
+              script.textContent = json.data.content;
 
-            document.head.prepend(script);
+              document.head.prepend(script);
+            } else {
+              await import(`${window.kernel.importProtocol}://${window.kernel.packages.getPackages()[manifest.id]!.path}`);
+            }
           } break;
           case 'preload/index.js': {
             location.reload();

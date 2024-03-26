@@ -44,9 +44,9 @@
 
 ## Misc
 - [ ] ~~Use BiomeJS instead of eslint~~
-  - [ ] Use the new eslint configuration
-    - https://github.com/jgchk/eslint-import-resolver-deno
-- [ ] Add github actions
+  - [x] Use the new eslint configuration
+    - [ ] https://github.com/jgchk/eslint-import-resolver-deno
+- [x] Add github actions
   - [x] Linting
   - [x] Releases
     - [ ] Remove the need to add a tag, only use commit name

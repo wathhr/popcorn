@@ -4,6 +4,8 @@ import parse from 'semver/functions/parse';
 import { ipc } from '#shared';
 
 const PopcornAPI: ElectronAPI = {
+  isBrowser: false,
+
   async getTheme() {
     return {
       id: 'test.test',
@@ -34,20 +36,22 @@ const PopcornAPI: ElectronAPI = {
     ];
   },
 
-  async getConfig() {
-    return {
-      enabled: { 'test.test': true },
-      hotkey: 'ctrl+shift+p',
-      quickCssDir: 'troll',
-      themeDirs: [],
-      verbose: true,
-    };
+  getConfig() {
+    return ipcRenderer.sendSync(ipc('getConfig'));
   },
 
   onSaveState(handler) {
-    console.log('trolley');
-
+    ipcRenderer.on(ipc('saveState'), handler);
     return () => ipcRenderer.off(ipc('saveState'), handler);
+  },
+
+  onSendLog(handler) {
+    ipcRenderer.on(ipc('sendLog'), handler);
+    return () => ipcRenderer.off(ipc('sendLog'), handler);
+  },
+
+  async getMainLogs() {
+    return await ipcRenderer.invoke(ipc('getMainLogs'));
   },
 };
 

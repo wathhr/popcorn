@@ -1,7 +1,7 @@
 {
   "name": "popcorn",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "GPL-3.0-or-later",
   "description": "Another theming extension.",
   "author": {
@@ -30,22 +30,21 @@
     "start:chrome": "web-ext run --source-dir ./dist/browser/ -t chromium --browser-console --devtools"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.7.0",
+    "@antfu/eslint-config": "^2.9.0",
     "@types/chrome": "^0.0.261",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.11.24",
+    "@types/node": "^16.18.91",
     "@types/semver": "^7.5.8",
     "@types/webextension-polyfill": "^0.10.7",
     "eslint": "^8.57.0",
     "npm-run-all": "^4.1.5",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.3",
     "web-ext": "^7.11.0"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.32.15",
+    "@sinclair/typebox": "^0.32.19",
     "fs-extra": "^11.2.0",
     "semver": "^7.6.0",
-    "supports-color": "^9.4.0",
     "webextension-polyfill": "^0.10.0"
   }
 }

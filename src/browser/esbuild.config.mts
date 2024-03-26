@@ -13,7 +13,7 @@ interface Opts {
 }
 
 // TODO: Remove building redundancy, I can copy everything over other than the manifest.json
-async function getBuildOpts(opts: Opts): Promise<import('esbuild').BuildOptions> {
+function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
   return {
     entryPoints: [
       './background/index.ts',
@@ -27,10 +27,6 @@ async function getBuildOpts(opts: Opts): Promise<import('esbuild').BuildOptions>
     outdir: `browser-M${opts.version.toUpperCase()}`,
     platform: 'browser',
     format: 'iife',
-    define: {
-      ...(await import('../electron/renderer/esbuild.config.mts')).default.define,
-      isBrowser: 'true',
-    },
     plugins: [
       clearOutputDir(),
       customFiles(opts),

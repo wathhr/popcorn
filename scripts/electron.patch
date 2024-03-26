@@ -16,10 +16,10 @@
  type GlobalRequest = Request;
  
 +///* Section: Patch
-+type $P<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
++type $Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
 +
 +type $MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
-+type $MappedAPI = $MapKeys<RendererAPI>;
++type $MappedAPI = $MapKeys<Omit<ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
 +type $MappedMainAPI = $MapKeys<MainAPI>;
 +type $ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
 +///* End section
@@ -133,7 +133,7 @@
       * process will not be the same as the one thrown in the main process.
       */
 -    invoke(channel: string, ...args: any[]): Promise<any>;
-+    invoke<K extends keyof $MappedAPI>(channel: K, ...args: $P<$MappedAPI[K]>): ReturnType<$MappedAPI[K]>;
++    invoke<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): Promise<ReturnType<$MappedAPI[K]>>;
      /**
       * Alias for `ipcRenderer.removeListener`.
       */
@@ -187,7 +187,7 @@
       * of a method call, consider using `ipcRenderer.invoke`.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $MappedAPI>(channel: K, ...args: $P<$MappedAPI[K]>): void;
++    send<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): void;
      /**
       * The value sent back by the `ipcMain` handler.
       *
@@ -198,13 +198,13 @@
       * resort. It's much better to use the asynchronous version, `invoke()`.
       */
 -    sendSync(channel: string, ...args: any[]): any;
-+    sendSync<K extends keyof $MappedAPI>(channel: K, ...args: $P<$MappedAPI[K]>): any;
++    sendSync<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): ReturnType<$MappedAPI[K]>;
      /**
       * Like `ipcRenderer.send` but the event will be sent to the `<webview>` element in
       * the host page instead of the main process.
       */
 -    sendToHost(channel: string, ...args: any[]): void;
-+    sendToHost<K extends keyof $MappedAPI>(channel: K, ...args: $P<$MappedAPI[K]>): void;
++    sendToHost<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): void;
    }
  
    interface IpcRendererEvent extends Event {

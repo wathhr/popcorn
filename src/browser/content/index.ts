@@ -2,6 +2,8 @@ import type { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 
 globalThis.PopcornAPI = {
+  isBrowser: true,
+
   async getTheme(_id) {
     return {
       id: 'test.test',
@@ -32,7 +34,7 @@ globalThis.PopcornAPI = {
     ];
   },
 
-  async getConfig() {
+  getConfig() {
     return {
       enabled: { 'test.test': true },
       hotkey: 'ctrl+shift+p',

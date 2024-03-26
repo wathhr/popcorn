@@ -8,7 +8,6 @@ on:
       - scripts/types.mts
       - src/**.[cm]?ts
       - types/**.[cm]?ts
-      - src/browser/manifests.mts
       - eslint.config.mjs
   pull_request:
     paths:
@@ -18,7 +17,6 @@ on:
       - scripts/types.mts
       - src/**.ts
       - types/**.ts
-      - src/browser/manifests.mts
       - eslint.config.mjs
 
 jobs:

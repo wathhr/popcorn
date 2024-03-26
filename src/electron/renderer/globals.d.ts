@@ -1,2 +1,1 @@
-declare const isBrowser: boolean;
-declare const PopcornAPI: ElectronAPI;
+declare const PopcornAPI: BrowserAPI | ElectronAPI;
