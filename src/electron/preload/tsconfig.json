@@ -15,7 +15,6 @@
       "@types/node",
       "../../../types/globals.d.ts",
       "../../../types/kernel.d.ts",
-      "../../../vendor/electron.d.ts",
     ],
 
     "paths": {

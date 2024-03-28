@@ -32,7 +32,7 @@ type ElectronAPI = RendererAPI & {
 } & {
   [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
     // TODO: Remove the event field maybe for privacy concerns
-    event: import('./exports.ts').Electron.IpcRendererEvent, // pain
+    event: import('electron').IpcRendererEvent,
     ...args: ForceArr<MainAPI[K]>
   ) => void) => () => void;
 };
