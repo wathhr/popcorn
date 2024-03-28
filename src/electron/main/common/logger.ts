@@ -1,8 +1,24 @@
+import { appendFile, readdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import { app, ipcMain, webContents } from 'electron';
+import { ensureFileSync } from 'fs-extra';
 import { sendToAll } from './sendToAll';
+import { root, startTimeString } from './constants';
 import { type Color, colors, ipc } from '#shared';
 
+ensureFileSync(`${join(root, 'logs', startTimeString)}.log`);
+readdir(join(root, 'logs'))
+  .then((files) => {
+    if (files.length <= 3) return;
+
+    for (const file of files.slice(0, -1)) {
+      rm(join(root, 'logs', file), { force: true }).catch(() => {});
+    }
+  })
+  .catch(() => {});
+
 const logs: MainAPI['sendLog'][] = [];
+
 ipcMain.handle(ipc('getMainLogs'), () => logs);
 app.on('web-contents-created', (_, contents) => {
   logs.forEach(log => contents.send(ipc('sendLog'), log));
@@ -27,9 +43,14 @@ class Logger {
 
     console[level](banner, ...msg);
 
+    queueMicrotask(() => {
+      appendFile(`${join(root, 'logs', startTimeString)}.log`, `[${new Date().toLocaleString('en-US')}] ${level.toUpperCase()}: ${msg.map(i => JSON.stringify(i)).join(', ')}\n`, 'utf8');
+    });
+
     if (DEBUG || level === 'error') {
       const message = (() => {
         try {
+          // @ts-expect-error WIP
           return structuredClone(msg);
         } catch (e) {
           console.error(banner, 'Failed to clone message:', msg, 'With error:', e);
@@ -39,12 +60,12 @@ class Logger {
 
       if (!message) return;
 
-      const log = {
+      const log: MainAPI['sendLog'] = {
         component: this.name,
         level,
         message,
         time: Date.now(),
-      } satisfies MainAPI['sendLog'];
+      };
 
       if (webContents.getAllWebContents().length === 0) logs.push(log);
       else sendToAll(ipc('sendLog'), log);

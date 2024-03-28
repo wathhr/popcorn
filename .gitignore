@@ -12,6 +12,7 @@ deno.lock
 # Private
 /themes/*
 /quickcss/*
+/logs/
 config.json
 
 # Necessary
