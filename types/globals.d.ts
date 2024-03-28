@@ -15,18 +15,15 @@ interface ThemeResponse {
   meta: Omit<Theme, 'id' | 'version' | 'main'>,
 }
 
-interface RendererAPI {
-  getThemes(): Promise<ThemeResponse[]> | undefined,
-  getTheme(id: Theme['id']): Promise<ThemeResponse> | undefined,
-  getUrls(): Promise<string[]> | undefined,
+interface BrowserAPI {
+  isBrowser: true,
+  getThemes(): Promise<ThemeResponse[]>,
+  getTheme(id: Theme['id']): Promise<ThemeResponse>,
+  getUrls(): Promise<string[]>,
   getConfig(): Required<Config>,
 }
 
-interface BrowserAPI extends RendererAPI {
-  isBrowser: true,
-}
-
-type ElectronAPI = RendererAPI & {
+type ElectronAPI = Omit<BrowserAPI, 'isBrowser'> & {
   isBrowser: false,
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
 } & {
