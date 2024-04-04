@@ -4,13 +4,13 @@ on:
     paths:
       - .github/workflows/build.yml
       - package.json
-      - scripts/build.mts
+      - scripts/build/**.mts
       - src/**.[cm]?ts
   pull_request:
     paths:
       - .github/workflows/build.yml
       - package.json
-      - scripts/build.mts
+      - scripts/build/**.mts
       - src/**.[cm]?ts
 
 jobs:
