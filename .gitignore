@@ -13,7 +13,16 @@ deno.lock
 /themes/*
 /quickcss/*
 /logs/
-config.json
+/config.json
 
 # Necessary
 !**/.gitkeep
+
+
+# App
+/src/app/dist/
+/src/app/out/
+/src/app/themes/*
+/src/app/quickcss/*
+/src/app/logs/
+/src/app/config.json

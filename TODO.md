@@ -22,10 +22,7 @@
 - [x] Make a type-safe way to create IPC channels
   - [x] Creating listeners in the renderer
   - [x] Patch [`electron.d.ts`](./vendor/electron.d.ts) instead of exporting a different type
-- [ ] Add minimal electron application for easier testing
-  - https://github.com/Kiyozz/electron-esbuild
-  - [electron-builder](https://github.com/electron-userland/electron-builder) [docs](https://www.electron.build/api/electron-builder.html) [extra](https://github.com/enso-org/enso/blob/develop/app/ide-desktop/lib/client/electron-builder-config.ts)
-  - [electron-forge](https://github.com/electron/forge) [docs](https://js.electronforge.io/modules/_electron_forge_core.html)
+- [x] Add minimal electron application for easier testing
 - [ ] Add auto-updater
 - [ ] Add testing framework
   - [ ] [Vitest](https://github.com/vitest-dev/vitest)
@@ -37,10 +34,9 @@
 ## Scripts
 - [ ] Figure out a better way to add kernel-types, currently they are manually written
 - [ ] Add macro support (https://github.com/unplugin/unplugin-macros) (specifically for constants)
-- [ ] Add a way to easily create patches
+- [ ] ~~Add a way to easily create patches~~
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
-  - [ ] Do an actual rewrite instead of just replacing some basic stuff
 
 ## Misc
 - [ ] ~~Use BiomeJS instead of eslint~~

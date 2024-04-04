@@ -4,4 +4,4 @@ export default {
   platform: 'node',
   format: 'cjs',
   external: ['electron'],
-} satisfies import('esbuild').BuildOptions;
+} satisfies import('#build').DefaultExport;

@@ -1,34 +1,25 @@
 #!/bin/usr/env deno
 
 import * as esbuild from 'esbuild';
-import { parseArgs } from 'std/cli/mod.ts';
 import { deepMerge } from 'std/collections/mod.ts';
 import { ensureDirSync, exists } from 'std/fs/mod.ts';
 import { basename, join, relative } from 'std/path/mod.ts';
 import * as c from 'std/fmt/colors.ts';
-import pkg from '../package.json' with { type: 'json' };
-import { DevServer } from './devserver.mts';
+import pkg from '../../package.json' with { type: 'json' };
+import { DevServer } from '../devserver.mts';
+import { args } from './args.mts';
 
 const __dirname = import.meta.dirname!;
-const root = join(__dirname, '..');
+const root = join(__dirname, '../..');
 const src = join(root, 'src');
 
-const args = parseArgs(Deno.args, {
-  boolean: ['watch', 'dev', 'original-logs'],
-  string: ['types'],
-  collect: ['types'],
-  alias: {
-    d: 'dev',
-    t: 'types',
-    w: 'watch',
-    o: 'original-logs',
-  },
-  default: {
-    dev: Deno.env.get('NODE_ENV') === 'development',
-    watch: false,
-  },
-});
 const { dev, types: initTypes, watch, _ } = args;
+
+export interface ExtraData {
+  args: typeof args,
+}
+
+export type DefaultExport = esbuild.BuildOptions | esbuild.BuildOptions[];
 
 const types = [...initTypes, ..._.filter(t => typeof t === 'string') as string[]];
 if (types.length === 0) types.push('all');
@@ -46,25 +37,27 @@ switch (types[0]) {
   } break;
 }
 
-const devServer = dev ? new DevServer() : undefined;
+const devServer = dev && watch ? new DevServer() : undefined;
 
 const builds: esbuild.BuildContext[] = [];
 for (const type of types) {
-  const config = await import(`../src/${type}/esbuild.config.mts`) as {
-    default?: esbuild.BuildOptions | esbuild.BuildOptions[],
+  if (!validTypes.includes(type)) {
+    console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
+    continue;
+  }
+
+  const config = await import(`../../src/${type}/esbuild.config.mts`) as {
+    default?: DefaultExport,
     independent?: boolean,
   };
-  const typeOptions = Array.isArray(config.default) ? config.default : [config.default];
 
-  for (const typeOption of typeOptions) {
-    if (!typeOption) continue;
-    if (!validTypes.includes(type)) {
-      console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
-      continue;
-    }
+  const typeOptionsArray = Array.isArray(config.default) ? config.default : [config.default];
+
+  for (const typeOptions of typeOptionsArray) {
+    if (!typeOptions) continue;
 
     // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
-    typeOption.entryPoints = ((e) => {
+    typeOptions.entryPoints = ((e) => {
       const relJoin = (...path: string[]) => relative(Deno.cwd(), join(...path));
 
       switch (true) {
@@ -88,7 +81,7 @@ for (const type of types) {
         default:
           return [relJoin(src, type, 'index.ts')];
       }
-    })(typeOption.entryPoints);
+    })(typeOptions.entryPoints);
 
     const baseOptions: esbuild.BuildOptions = {
       bundle: true,
@@ -96,8 +89,8 @@ for (const type of types) {
       minifySyntax: !dev,
       minifyIdentifiers: !dev,
       write: false,
-      outdir: typeOption.outdir
-        ? join(root, 'dist', config.independent ? '' : typeOption.outdir)
+      outdir: typeOptions.outdir
+        ? join(root, 'dist', config.independent ? '' : typeOptions.outdir)
         : join(root, 'dist', config.independent ? '' : type),
       sourcemap: dev ? 'inline' : false,
       define: {
@@ -202,17 +195,17 @@ for (const type of types) {
             }
           },
         },
-        ...typeOption.plugins ?? [],
+        ...typeOptions.plugins ?? [],
       ],
       color: true,
       logLevel: 'info',
     };
 
     // The plugin 'Write and announce file outputs' needs to run before every other plugin but every other option should be overwritten
-    delete typeOption.plugins;
+    delete typeOptions.plugins;
 
     // @ts-expect-error no idea why this errors
-    const opts: esbuild.BuildOptions = deepMerge(typeOption, baseOptions);
+    const opts: esbuild.BuildOptions = deepMerge(typeOptions, baseOptions);
     builds.push(await esbuild.context(opts));
   }
 }
@@ -226,7 +219,7 @@ for (const context of builds) {
   }
 }
 
-if (!watch && !args['original-logs'] && builds.length > 1) {
+if (!watch && builds.length > 1) {
   console.log();
   console.log(c.brightMagenta(`Total build time: ${Date.now() - startTime}ms`));
 }

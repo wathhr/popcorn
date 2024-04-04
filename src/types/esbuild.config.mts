@@ -28,6 +28,6 @@ export default {
       },
     },
   ],
-} satisfies import('esbuild').BuildOptions;
+} satisfies import('#build').DefaultExport;
 
 export const independent = true;

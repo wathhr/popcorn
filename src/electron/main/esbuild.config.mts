@@ -1,6 +1,7 @@
 #!/bin/usr/env false
 
 import { join } from 'std/path/join.ts';
+import { args } from '#build/args.mts';
 
 const __dirname = import.meta.dirname!;
 const root = join(__dirname, '../..');
@@ -12,4 +13,21 @@ export default {
     'electron',
     join(root, 'config.json'),
   ],
-} satisfies import('esbuild').BuildOptions;
+  plugins: [
+    {
+      name: 'Nodemon ripoff',
+      setup(build) {
+        if (!args.executables || !args.dev) return;
+
+        let command: Deno.ChildProcess | undefined;
+
+        build.onEnd(() => {
+          for (const executable of args.executables) {
+            if (command?.pid) Deno.kill(command.pid);
+            command = new Deno.Command(executable).spawn();
+          }
+        });
+      },
+    },
+  ],
+} satisfies import('#build').DefaultExport;

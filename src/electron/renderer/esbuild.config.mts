@@ -3,4 +3,4 @@
 export default {
   platform: 'browser',
   format: 'esm',
-} satisfies import('esbuild').BuildOptions;
+} satisfies import('#build').DefaultExport;

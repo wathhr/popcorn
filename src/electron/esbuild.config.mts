@@ -1,6 +1,6 @@
 #!/bin/usr/env false
 
-const builds: import('esbuild').BuildOptions[] = [];
+const builds: import('#build').DefaultExport = [];
 for await (const item of Deno.readDir(import.meta.dirname!)) {
   if (item.isFile) continue;
   const type = item.name;
