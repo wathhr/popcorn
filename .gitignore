@@ -20,9 +20,9 @@ deno.lock
 
 
 # App
-/src/app/dist/
-/src/app/out/
-/src/app/themes/*
-/src/app/quickcss/*
-/src/app/logs/
-/src/app/config.json
+/app-src/dist/
+/app-src/out/
+/app-src/themes/*
+/app-src/quickcss/*
+/app-src/logs/
+/app-src/config.json

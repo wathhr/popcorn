@@ -24,7 +24,9 @@ export default {
         build.onEnd(() => {
           for (const executable of args.executables) {
             if (command?.pid) Deno.kill(command.pid);
-            command = new Deno.Command(executable).spawn();
+            command = new Deno.Command(executable, {
+              args: ['--inspect'],
+            }).spawn();
           }
         });
       },
