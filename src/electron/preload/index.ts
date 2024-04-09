@@ -42,12 +42,12 @@ const PopcornAPI: ElectronAPI = {
 
   onSaveState(handler) {
     ipcRenderer.on(ipc('saveState'), handler);
-    return () => ipcRenderer.off(ipc('saveState'), handler);
+    return () => ipcRenderer.off(ipc('onSaveState'), handler);
   },
 
   onSendLog(handler) {
     ipcRenderer.on(ipc('sendLog'), handler);
-    return () => ipcRenderer.off(ipc('sendLog'), handler);
+    return () => ipcRenderer.off(ipc('onSendLog'), handler);
   },
 
   async getMainLogs() {

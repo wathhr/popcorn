@@ -1,5 +1,6 @@
 #!/bin/usr/env false
 
+import 'npm:@types/chrome';
 import pkg from '../../package.json' with { type: 'json' };
 
 const commonManifest = {

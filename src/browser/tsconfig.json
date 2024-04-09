@@ -1,6 +1,6 @@
 {
   "extends": "../electron/renderer/tsconfig.json",
-  "include": ["./**/*.ts", "./**/*.mts"],
+  "include": ["./**/*.ts"],
   "compilerOptions": {
     "types": [
       "@types/chrome",
