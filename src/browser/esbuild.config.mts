@@ -4,13 +4,14 @@ import { exists } from 'std/fs/exists.ts';
 import { extname } from 'std/path/extname.ts';
 import { join } from 'std/path/join.ts';
 
-const __dirname = import.meta.dirname!;
-
-const versions: `v${2 | 3}`[] = Deno.args.includes('--mv2') ? ['v2'] : Deno.args.includes('--mv3') ? ['v3'] : ['v2', 'v3'];
-
 interface Opts {
   version: `v${2 | 3}`,
 }
+
+const versions: Opts['version'][] = [];
+if (Deno.args.includes('--mv2')) versions.push('v2');
+if (Deno.args.includes('--mv3')) versions.push('v3');
+if (versions.length === 0) versions.push('v2', 'v3');
 
 // TODO: Remove building redundancy, I can copy everything over other than the manifest.json
 function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
@@ -34,7 +35,7 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
   };
 }
 
-export default await Promise.all(versions.map(async version => await getBuildOpts({ version }))) satisfies import('esbuild').BuildOptions[];
+export default versions.map(version => getBuildOpts({ version })) satisfies import('#build').DefaultExport;
 
 function clearOutputDir(): import('esbuild').Plugin {
   return {
@@ -56,7 +57,7 @@ function customFiles(opts: Opts): import('esbuild').Plugin {
       const regex = /\.ts(?=[\s"',]|$)/g;
 
       build.onLoad({ filter: /manifest\.json/ }, async () => {
-        const manifestFile = join(__dirname, './manifests.mts');
+        const manifestFile = join(import.meta.dirname!, './manifests.mts');
         const { manifest } = await import(`./manifests.mts?${Date.now()}`);
 
         return {

@@ -1,3 +1,5 @@
+#!/bin/usr/env false
+
 import { parseArgs } from 'std/cli/parse_args.ts';
 
 export const args = parseArgs(Deno.args, {

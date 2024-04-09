@@ -3,5 +3,8 @@
 export default {
   platform: 'node',
   format: 'cjs',
-  external: ['electron'],
+  external: [
+    'electron',
+    'electron-legacy',
+  ],
 } satisfies import('#build').DefaultExport;

@@ -15,7 +15,7 @@
     "url": "https://github.com/wathhr/popcorn/issues"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint ./src ./types",
     "lint:ext:mv2": "web-ext lint -s ./dist/browser-MV2",
     "lint:ext:mv3": "web-ext lint -s ./dist/browser-MV3",
     "check": "run-s check:*",
@@ -35,7 +35,8 @@
     "@types/node": "^16.18.91",
     "@types/semver": "^7.5.8",
     "@types/webextension-polyfill": "^0.10.7",
-    "electron": ">=22.3.26",
+    "electron": "^29.2.0",
+    "electron-legacy": "npm:electron@22.3.26",
     "eslint": "^8.57.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.4.3",
@@ -49,7 +50,8 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "electron@22.3.26": "patches/electron@22.3.26.patch"
+      "electron@22.3.26": "patches/electron@22.3.26.patch",
+      "electron@29.2.0": "patches/electron@29.2.0.patch"
     }
   },
   "packageManager": "pnpm@8.15.5",

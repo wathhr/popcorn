@@ -3,7 +3,7 @@
 import pkg from '../../package.json' with { type: 'json' };
 
 const commonManifest = {
-  name: pkg.name[0].toUpperCase() + pkg.name.slice(1),
+  name: pkg.name[0]!.toUpperCase() + pkg.name.slice(1),
   version: pkg.version,
   description: pkg.description,
   homepage_url: `https://github.com/${pkg.author.name}/${pkg.name}`,

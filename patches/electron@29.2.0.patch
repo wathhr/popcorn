@@ -1,13 +1,13 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49daeb15824f2 100644
+index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..c33855f5c5af796321e9b26e2adc8cc3ea23490d 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
 @@ -1,9 +1,19 @@
--// Type definitions for Electron 22.3.26
-+// Type definitions for Electron 22.3.26 (patched)
+-// Type definitions for Electron 29.2.0
++// Type definitions for Electron 29.2.0 (patched)
  // Project: http://electronjs.org/
  // Definitions by: The Electron Team <https://github.com/electron/electron>
- // Definitions: https://github.com/electron/electron-typescript-definitions
+ // Definitions: https://github.com/electron/typescript-definitions
  
  /// <reference types="node" />
 +/// <reference types="../../../../../types/globals.d.ts" />
@@ -21,13 +21,13 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
 +type $ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
 +///* End section
  
- type GlobalEvent = Event & { returnValue: any };
- 
-@@ -5173,38 +5183,59 @@ declare namespace Electron {
+ type DOMEvent = Event;
+ type GlobalResponse = Response;
+@@ -6040,38 +6050,58 @@ declare namespace Electron {
       * are serialized and only the `message` property from the original error is
       * provided to the renderer process. Please refer to #24427 for details.
       */
--    handle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)): void;
+-    handle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
 +    handle<K extends keyof $MappedAPI>(
 +      channel: K,
 +      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
@@ -38,7 +38,7 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
       * Handles a single `invoke`able IPC message, then removes the listener. See
       * `ipcMain.handle(channel, listener)`.
       */
--    handleOnce(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<void>) | (any)): void;
+-    handleOnce(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
 +    handleOnce<K extends keyof $MappedAPI>(
 +      channel: K,
 +      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
@@ -72,7 +72,6 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
       */
 -    removeAllListeners(channel?: string): this;
 +    removeAllListeners(channel?: keyof $MappedAPI): this;
-+
      /**
       * Removes any handler for `channel`, if present.
       */
@@ -91,11 +90,11 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
  
      // Docs: https://electronjs.org/docs/api/structures/ipc-main-event
  
-@@ -5226,11 +5257,11 @@ declare namespace Electron {
+@@ -6093,11 +6123,11 @@ declare namespace Electron {
       * "reply" to the sent message in order to guarantee the reply will go to the
       * correct process and frame.
       */
--    reply: Function;
+-    reply: (channel: string, ...args: any[]) => void;
 +    reply<K extends keyof $MappedMainAPI>(channel: K, ...args: ForceArr<$MappedMainAPI[K]>): void;
      /**
       * Set this to the value to be returned in a synchronous message
@@ -105,12 +104,17 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
      /**
       * Returns the `webContents` that sent the message
       */
-@@ -5299,18 +5330,27 @@ declare namespace Electron {
+@@ -6170,22 +6200,31 @@ declare namespace Electron {
       * returned by `invoke` will reject. However, the `Error` object in the renderer
       * process will not be the same as the one thrown in the main process.
       */
 -    invoke(channel: string, ...args: any[]): Promise<any>;
 +    invoke<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): Promise<ReturnType<$MappedAPI[K]>>;
+     /**
+      * Alias for `ipcRenderer.removeListener`.
+      */
+-    off(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
++    off(channel: keyof $MappedAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
      /**
       * Listens to `channel`, when a new message arrives `listener` would be called with
       * `listener(event, args...)`.
@@ -136,7 +140,7 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
       * Send a message to the main process, optionally transferring ownership of zero or
       * more `MessagePort` objects.
       *
-@@ -5327,12 +5367,12 @@ declare namespace Electron {
+@@ -6202,12 +6241,12 @@ declare namespace Electron {
      /**
       * Removes all listeners, or those of the specified `channel`.
       */
@@ -146,12 +150,12 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
       * Removes the specified `listener` from the listener array for the specified
       * `channel`.
       */
--    removeListener(channel: string, listener: (...args: any[]) => void): this;
+-    removeListener(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
 +    removeListener(channel: keyof $MappedMainAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
      /**
       * Send an asynchronous message to the main process via `channel`, along with
       * arguments. Arguments will be serialized with the Structured Clone Algorithm,
-@@ -5357,7 +5397,7 @@ declare namespace Electron {
+@@ -6232,7 +6271,7 @@ declare namespace Electron {
       * If you want to receive a single response from the main process, like the result
       * of a method call, consider using `ipcRenderer.invoke`.
       */
@@ -160,17 +164,12 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
      /**
       * The value sent back by the `ipcMain` handler.
       *
-@@ -5382,16 +5422,16 @@ declare namespace Electron {
+@@ -6257,12 +6296,12 @@ declare namespace Electron {
       * renderer process until the reply is received, so use this method only as a last
       * resort. It's much better to use the asynchronous version, `invoke()`.
       */
 -    sendSync(channel: string, ...args: any[]): any;
 +    sendSync<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): ReturnType<$MappedAPI[K]>;
-     /**
-      * Sends a message to a window with `webContentsId` via `channel`.
-      */
--    sendTo(webContentsId: number, channel: string, ...args: any[]): void;
-+    sendTo<K extends keyof $MappedAPI>(webContentsId: number, channel: K, ...args: $Parameters<$MappedAPI[K]>): void;
      /**
       * Like `ipcRenderer.send` but the event will be sent to the `<webview>` element in
       * the host page instead of the main process.
@@ -180,16 +179,16 @@ index 1ce7930cf2fc83d15dc38d7d61058b7d8b3f48b1..a65b0ab08c921a9b30e5098740f49dae
    }
  
    interface IpcRendererEvent extends Event {
-@@ -11663,7 +11703,7 @@ declare namespace Electron {
+@@ -13928,7 +13967,7 @@ declare namespace Electron {
       *
-      * An example of sending messages from the main process to the renderer process:
+      * For additional reading, refer to Electron's IPC guide.
       */
 -    send(channel: string, ...args: any[]): void;
 +    send<K extends keyof $MappedMainAPI>(channel: K, ...args: ForceArr<$MappedMainAPI[K]>): void;
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
-@@ -12179,7 +12219,7 @@ declare namespace Electron {
+@@ -14456,7 +14495,7 @@ declare namespace Electron {
       * The renderer process can handle the message by listening to `channel` with the
       * `ipcRenderer` module.
       */

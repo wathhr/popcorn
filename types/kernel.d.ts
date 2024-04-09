@@ -33,7 +33,7 @@ interface Kernel {
       off(event: string, callback: (pack: PackageInfo) => void): void,
     },
   },
-  sendFinished(): void,
+  sendFinished(): true | undefined,
   importProtocol: 'kernel',
 }
 

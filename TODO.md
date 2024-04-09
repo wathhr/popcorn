@@ -38,10 +38,13 @@
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
 
+## Linting
+- [ ] https://typescript-eslint.io/rules/no-base-to-string/
+- [ ] https://github.com/jgchk/eslint-import-resolver-deno
+
 ## Misc
 - [ ] ~~Use BiomeJS instead of eslint~~
   - [x] Use the new eslint configuration
-    - [ ] https://github.com/jgchk/eslint-import-resolver-deno
 - [x] Add github actions
   - [x] Linting
   - [x] Releases
