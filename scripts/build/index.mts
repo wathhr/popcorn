@@ -1,59 +1,58 @@
-#!/bin/usr/env deno
+#!/bin/usr/env false
 
 import * as esbuild from 'esbuild';
 import { deepMerge } from 'std/collections/mod.ts';
 import { ensureDirSync, exists } from 'std/fs/mod.ts';
 import { join, relative } from 'std/path/mod.ts';
-import * as c from 'std/fmt/colors.ts';
 import pkg from '../../package.json' with { type: 'json' };
-import { DevServer } from '../devserver.mts';
-import { args } from './args.mts';
-import { customLogs } from './plugins.mts';
+import { DevServer } from '#build/devserver.mts';
+import { customLogs } from '#build/plugins/custom-logs.mts';
 
 const __dirname = import.meta.dirname!;
 const root = join(__dirname, '../..');
 const src = join(root, 'src');
 
-const { dev, types: initTypes, watch, _ } = args;
-
 export type DefaultExport = esbuild.BuildOptions | esbuild.BuildOptions[];
+export type Options = Partial<{
+  'dev': boolean,
+  'watch': boolean,
+  'original-logs': boolean,
+  'types': string[],
+  'executables': string[],
+  '_': (string | number)[],
+  [key: string]: unknown,
+}>;
 
-const types = [...initTypes, ..._.filter(t => typeof t === 'string') as string[]];
-if (types.length === 0) types.push('all');
-
-const validTypes = [];
+export const validTypes: string[] = [];
 for await (const item of Deno.readDir(src)) {
   if (item.name.startsWith('#') || !await exists(join(src, item.name, 'esbuild.config.mts'))) continue;
   validTypes.push(item.name);
 }
 
-switch (types[0]) {
-  case 'all': {
-    types.length = 0;
-    types.push(...validTypes);
-  } break;
-}
+export async function processConfigFile(type: string, opts: Options = {}, devServer?: DevServer) {
+  if (!validTypes.includes(type)) throw new Error(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
 
-const devServer = dev && watch ? new DevServer() : undefined;
+  const { dev } = opts;
+  const killDevServer = devServer === undefined;
+  devServer ??= dev ? new DevServer() : undefined;
 
-const builds: esbuild.BuildContext[] = [];
-for (const type of types) {
-  if (!validTypes.includes(type)) {
-    console.warn(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
-    continue;
-  }
+  const urlSearchParams = new URLSearchParams(Object.fromEntries(Object.entries(opts)
+    .map(([name, value]) => [name, typeof value === 'string' ? value : value?.toString()])
+    .filter(([, value]) => value !== undefined),
+  ));
 
-  const config = await import(`../../src/${type}/esbuild.config.mts`) as {
+  const config = await import(`file://${join(src, type, 'esbuild.config.mts')}?${urlSearchParams.toString()}`) as {
     default?: DefaultExport,
     independent?: boolean,
   };
 
+  if (!config.default) throw new Error(`"${type}" does not export an esbuild config. Skipping...`);
+
   const typeOptionsArray = Array.isArray(config.default) ? config.default : [config.default];
 
+  const contexts: esbuild.BuildContext[] = [];
   for (const typeOptions of typeOptionsArray) {
-    if (!typeOptions) continue;
-
-    // @ts-expect-error just don't look at this, i know it's painful to look at but it works fine
+    // @ts-expect-error this works fine
     typeOptions.entryPoints = ((e) => {
       const relJoin = (...path: string[]) => relative(Deno.cwd(), join(...path));
 
@@ -118,7 +117,7 @@ for (const type of types) {
             });
           },
         },
-        customLogs,
+        customLogs(urlSearchParams),
         ...typeOptions.plugins ?? [],
       ],
       color: true,
@@ -129,29 +128,18 @@ for (const type of types) {
     delete typeOptions.plugins;
 
     // @ts-expect-error no idea why this errors
-    const opts: esbuild.BuildOptions = deepMerge(typeOptions, baseOptions);
-    builds.push(await esbuild.context(opts));
+    const processedTypeOptions: esbuild.BuildOptions = deepMerge(typeOptions, baseOptions);
+    contexts.push(await esbuild.context(processedTypeOptions));
   }
+
+  if (killDevServer) devServer?.stop?.();
+  return contexts;
 }
 
-const startTime = Date.now();
-for (const context of builds) {
-  if (watch) context.watch();
-  else {
+export async function build(type: string, opts: Options = {}) {
+  const contexts = await processConfigFile(type, opts);
+  for (const context of contexts) {
     await context.rebuild();
     await context.dispose();
   }
 }
-
-if (!watch && builds.length > 1) {
-  console.log(); // new line
-  console.log(c.brightMagenta(`Total build time: ${Date.now() - startTime}ms`));
-}
-
-Deno.addSignalListener('SIGINT', () => {
-  console.log('Stopping...');
-  builds.forEach(async build => await build.dispose());
-
-  devServer?.stop?.();
-  Deno.exit();
-});

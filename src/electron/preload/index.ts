@@ -3,7 +3,9 @@ import type { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
 import { ipc } from '#shared';
 
-const PopcornAPI: ElectronAPI = {
+if (!isKernel) import('./inject');
+
+const PopcornAPI: Omit<ElectronAPI, 'getWindowData'> = {
   isBrowser: false,
 
   async getTheme() {

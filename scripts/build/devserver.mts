@@ -1,4 +1,6 @@
-import type { Message, MessageResponse } from '../src/electron/preload/devserver.ts';
+#!/bin/usr/env false
+
+import type { Message, MessageResponse } from '../../src/electron/preload/devserver.ts';
 
 export class DevServer {
   private server: Deno.HttpServer;

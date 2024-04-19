@@ -1,5 +1,5 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..c33855f5c5af796321e9b26e2adc8cc3ea23490d 100644
+index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..e1f6d89a283cbfbeb8136fc2443942d92c5a5af3 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
 @@ -1,9 +1,19 @@
@@ -188,7 +188,30 @@ index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..c33855f5c5af796321e9b26e2adc8cc3
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
-@@ -14456,7 +14495,7 @@ declare namespace Electron {
+@@ -14207,6 +14246,22 @@ declare namespace Electron {
+      * respectively. The formula for this is `scale := 1.2 ^ level`.
+      */
+     zoomLevel: number;
++    /**
++     * @patched - this was added by popcorn
++     * An object containing info about the original preload
++     */
++    originalWindowData?: {
++      originalPreload: string;
++      windowOptions: Electron.BrowserWindowConstructorOptions;
++    };
++    /**
++     * @patched - this was added by kernel
++     * An object containing info about the original preload
++     */
++    kernelWindowData?: {
++      originalPreload: string;
++      windowOptions: Electron.BrowserWindowConstructorOptions;
++    };
+   }
+ 
+   interface WebFrame {
+@@ -14456,7 +14511,7 @@ declare namespace Electron {
       * The renderer process can handle the message by listening to `channel` with the
       * `ipcRenderer` module.
       */

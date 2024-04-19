@@ -1,8 +1,7 @@
 #!/bin/usr/env false
 
-import { exists } from 'std/fs/exists.ts';
-import { extname } from 'std/path/extname.ts';
 import { join } from 'std/path/join.ts';
+import { clearOutdir, customFiles } from '#build/plugins/index.mts';
 
 interface Opts {
   version: `v${2 | 3}`,
@@ -15,6 +14,8 @@ if (versions.length === 0) versions.push('v2', 'v3');
 
 // TODO: Remove building redundancy, I can copy everything over other than the manifest.json
 function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
+  const regex = /\.ts(?=[\s"',]|$)/g;
+
   return {
     entryPoints: [
       './background/index.ts',
@@ -29,54 +30,25 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
     platform: 'browser',
     format: 'iife',
     plugins: [
-      clearOutputDir(),
-      customFiles(opts),
+      clearOutdir,
+      customFiles({ regex, replace: '.js' }),
+      {
+        name: 'Manifest version',
+        setup(build) {
+          build.onLoad({ filter: /manifest\.json/ }, async () => {
+            const manifestFile = join(import.meta.dirname!, './manifests.mts');
+            const { manifest } = await import(`./manifests.mts?${Date.now()}`);
+
+            return {
+              contents: JSON.stringify(manifest[opts.version], null, 2).replace(regex, '.js'),
+              loader: 'copy',
+              watchFiles: [manifestFile],
+            };
+          });
+        },
+      },
     ],
   };
 }
 
 export default versions.map(version => getBuildOpts({ version })) satisfies import('#build').DefaultExport;
-
-function clearOutputDir(): import('esbuild').Plugin {
-  return {
-    name: 'Clear outDir',
-    setup(build) {
-      build.onStart(async () => {
-        const out = build.initialOptions.outdir!;
-        if (await exists(out)) await Deno.remove(out, { recursive: true });
-        await Deno.mkdir(out, { recursive: true });
-      });
-    },
-  };
-}
-
-function customFiles(opts: Opts): import('esbuild').Plugin {
-  return {
-    name: 'Custom files',
-    setup(build) {
-      const regex = /\.ts(?=[\s"',]|$)/g;
-
-      build.onLoad({ filter: /manifest\.json/ }, async () => {
-        const manifestFile = join(import.meta.dirname!, './manifests.mts');
-        const { manifest } = await import(`./manifests.mts?${Date.now()}`);
-
-        return {
-          contents: JSON.stringify(manifest[opts.version], null, 2).replace(regex, '.js'),
-          loader: 'copy',
-          watchFiles: [manifestFile],
-        };
-      });
-
-      const loaders = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', 'tsx', ...Object.keys(build.initialOptions.loader ?? {})];
-      build.onLoad({ filter: /.*/ }, async ({ path }) => {
-        if (loaders.includes(extname(path))) return;
-
-        return {
-          contents: (await Deno.readTextFile(path)).replace(regex, '.js'),
-          loader: 'copy',
-          watchFiles: [path],
-        };
-      });
-    },
-  };
-}

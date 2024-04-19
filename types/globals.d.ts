@@ -3,6 +3,7 @@
 declare const NODE_ENV: 'development' | 'production';
 declare const DEBUG: boolean;
 declare const pkg: typeof import('../package.json');
+declare const isKernel: boolean;
 
 type Config = Omit<import('#types').Config, '$schema'>;
 type Theme = Omit<import('#types').Theme, '$schema'>;
@@ -25,6 +26,7 @@ interface BrowserAPI {
 
 type ElectronAPI = Omit<BrowserAPI, 'isBrowser'> & {
   isBrowser: false,
+  getWindowData(): Electron.WebContents.originalWindowData,
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
 } & {
   [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
