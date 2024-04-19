@@ -2,6 +2,7 @@ name: Check
 on:
   push:
     paths:
+      - .github/workflows/check.yml
       - package.json
       - tsconfig.json
       - /**/tsconfig.json
@@ -10,6 +11,7 @@ on:
       - eslint.config.mjs
   pull_request:
     paths:
+      - .github/workflows/check.yml
       - package.json
       - tsconfig.json
       - /**/tsconfig.json
@@ -21,7 +23,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
 
-    name: Run TypeChecks
+    name: Run Checks
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
