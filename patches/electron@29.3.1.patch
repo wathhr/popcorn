@@ -1,10 +1,10 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..e1f6d89a283cbfbeb8136fc2443942d92c5a5af3 100644
+index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0288ca21e 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
 @@ -1,9 +1,19 @@
--// Type definitions for Electron 29.2.0
-+// Type definitions for Electron 29.2.0 (patched)
+-// Type definitions for Electron 29.3.1
++// Type definitions for Electron 29.3.1 (patched)
  // Project: http://electronjs.org/
  // Definitions by: The Electron Team <https://github.com/electron/electron>
  // Definitions: https://github.com/electron/typescript-definitions
@@ -179,7 +179,33 @@ index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..e1f6d89a283cbfbeb8136fc2443942d9
    }
  
    interface IpcRendererEvent extends Event {
-@@ -13928,7 +13967,7 @@ declare namespace Electron {
+@@ -6997,7 +7036,6 @@ declare namespace Electron {
+      */
+     themeSource: ('system' | 'light' | 'dark');
+   }
+-
+   class NavigationHistory extends NodeEventEmitter {
+ 
+     // Docs: https://electronjs.org/docs/api/navigation-history
+@@ -9586,7 +9624,7 @@ declare namespace Electron {
+      * make a permission request if the check is denied. To clear the handler, call
+      * `setPermissionCheckHandler(null)`.
+      */
+-    setPermissionCheckHandler(handler: ((webContents: (WebContents) | (null), permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'geolocation' | 'fullscreen' | 'hid' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'openExternal' | 'pointerLock' | 'serial' | 'storage-access' | 'top-level-storage-access' | 'usb', requestingOrigin: string, details: PermissionCheckHandlerHandlerDetails) => boolean) | (null)): void;
++    setPermissionCheckHandler(handler: ((webContents: (WebContents) | (null), permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'geolocation' | 'fullscreen' | 'hid' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'openExternal' | 'pointerLock' | 'serial' | 'usb', requestingOrigin: string, details: PermissionCheckHandlerHandlerDetails) => boolean) | (null)): void;
+     /**
+      * Sets the handler which can be used to respond to permission requests for the
+      * `session`. Calling `callback(true)` will allow the permission and
+@@ -9595,7 +9633,7 @@ declare namespace Electron {
+      * `setPermissionCheckHandler` to get complete permission handling. Most web APIs
+      * do a permission check and then make a permission request if the check is denied.
+      */
+-    setPermissionRequestHandler(handler: ((webContents: WebContents, permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'display-capture' | 'fullscreen' | 'geolocation' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'pointerLock' | 'keyboardLock' | 'openExternal' | 'storage-access' | 'top-level-storage-access' | 'window-management' | 'unknown', callback: (permissionGranted: boolean) => void, details: PermissionRequestHandlerHandlerDetails) => void) | (null)): void;
++    setPermissionRequestHandler(handler: ((webContents: WebContents, permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'display-capture' | 'fullscreen' | 'geolocation' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'pointerLock' | 'keyboardLock' | 'openExternal' | 'window-management' | 'unknown', callback: (permissionGranted: boolean) => void, details: PermissionRequestHandlerHandlerDetails) => void) | (null)): void;
+     /**
+      * Adds scripts that will be executed on ALL web contents that are associated with
+      * this session just before normal `preload` scripts run.
+@@ -13950,7 +13988,7 @@ declare namespace Electron {
       *
       * For additional reading, refer to Electron's IPC guide.
       */
@@ -188,7 +214,7 @@ index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..e1f6d89a283cbfbeb8136fc2443942d9
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
-@@ -14207,6 +14246,22 @@ declare namespace Electron {
+@@ -14234,6 +14272,22 @@ declare namespace Electron {
       * respectively. The formula for this is `scale := 1.2 ^ level`.
       */
      zoomLevel: number;
@@ -211,7 +237,7 @@ index 0a266ea70b6bb35c0a63898169d4a4434b3e404e..e1f6d89a283cbfbeb8136fc2443942d9
    }
  
    interface WebFrame {
-@@ -14456,7 +14511,7 @@ declare namespace Electron {
+@@ -14483,7 +14537,7 @@ declare namespace Electron {
       * The renderer process can handle the message by listening to `channel` with the
       * `ipcRenderer` module.
       */
