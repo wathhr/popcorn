@@ -31,7 +31,6 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
     format: 'iife',
     plugins: [
       clearOutdir,
-      customFiles({ regex, replace: '.js' }),
       {
         name: 'Manifest version',
         setup(build) {
@@ -47,6 +46,7 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
           });
         },
       },
+      customFiles({ regex, replace: '.js' }),
     ],
   };
 }
