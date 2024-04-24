@@ -3,7 +3,10 @@
     "esbuild": "https://deno.land/x/esbuild@v0.20.1/mod.js",
     "std/": "https://deno.land/std@0.222.1/",
     "#build": "./scripts/build/index.mts",
-    "#build/": "./scripts/build/"
+    "#build/": "./scripts/build/",
+    "#utils": "./scripts/utils/index.mts",
+    "#utils/": "./scripts/utils/",
+    "#pkg": "./package.json"
   },
   "lint": {
     "rules": {

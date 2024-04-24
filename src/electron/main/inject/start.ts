@@ -1,8 +1,5 @@
 // ! https://github.com/kernel-mod/electron/blob/2023-01-15-07-14-02/src/main/startOriginal.ts
 
-/* eslint-disable ts/no-var-requires */
-/* eslint-disable ts/no-require-imports */
-
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import Module from 'node:module';

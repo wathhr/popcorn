@@ -4,6 +4,10 @@ import { join } from 'node:path';
 import electron, { ipcMain } from 'electron';
 import { ipc } from '#shared';
 
+ipcMain.on(ipc('$getWindowData'), (event) => {
+  if (event.sender.originalWindowData) event.returnValue = event.sender.originalWindowData;
+});
+
 const preloadPath = join(__dirname, 'preload.js');
 
 // Extending the class does not work.
@@ -47,5 +51,4 @@ require.cache[electronPath]!.exports = {
   BrowserWindow: ProxiedBrowserWindow,
 };
 
-// eslint-disable-next-line ts/no-require-imports
 if (!process.argv.includes('--no-start-original')) require('./start');

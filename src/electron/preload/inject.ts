@@ -5,13 +5,12 @@ import { ipc } from '#shared';
 
 const windowData = ipcRenderer.sendSync(ipc('$getWindowData'));
 
-const hasContextIsolation = windowData.windowOptions.webPreferences.contextIsolation ?? true;
+const hasContextIsolation = windowData.windowOptions.webPreferences!.contextIsolation ?? true;
 if (!hasContextIsolation) contextBridge.exposeInMainWorld = (key, value) => {
-  // @ts-expect-error no idea why this errors
+  // @ts-expect-error no way to type this properly
   window[key] = value;
 };
 
-// eslint-disable-next-line ts/no-require-imports
 require(windowData.originalPreload);
 
 const rendererScript = readFileSync(join(__dirname, 'renderer.js'), 'utf8');

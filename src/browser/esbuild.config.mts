@@ -1,7 +1,8 @@
 #!/bin/usr/env false
 
 import { join } from 'std/path/join.ts';
-import { clearOutdir, customFiles } from '#build/plugins/index.mts';
+import { clearOutdir, corejs, customFiles } from '#build/plugins/index.mts';
+import pkg from '#pkg' with { type: 'json' };
 
 interface Opts {
   version: `v${2 | 3}`,
@@ -23,7 +24,7 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
       './popup/index.ts',
 
       // extras
-      './manifest.json', // trolley
+      './manifest.json',
       './popup/index.html',
     ],
     outdir: `browser-M${opts.version.toUpperCase()}`,
@@ -31,6 +32,7 @@ function getBuildOpts(opts: Opts): import('esbuild').BuildOptions {
     format: 'iife',
     plugins: [
       clearOutdir,
+      corejs(pkg.browserslist.production),
       {
         name: 'Manifest version',
         setup(build) {

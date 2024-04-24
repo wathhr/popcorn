@@ -21,6 +21,7 @@
 - [ ] Add testing framework
   - [Storybook](https://github.com/storybookjs/storybook)
   - [Testing library](https://github.com/testing-library/svelte-testing-library)
+- [ ] Follow [VSCode's UX guidelines](https://code.visualstudio.com/api/ux-guidelines/overview)
 
 ## Electron
 - [x] Make a type-safe way to create IPC channels
@@ -30,10 +31,10 @@
 - [ ] Add auto-updater
 - [ ] Add testing framework
   - [ ] [Vitest](https://github.com/vitest-dev/vitest)
-- [ ] Create my own injector instead of relying on kernel
-- [ ] Add kernel-specific stuff (maybe)
-  - [ ] [Imports](https://github.com/kernel-mod/electron/blob/master/tsconfig.json#L9)
-  - [ ] [IPC](https://github.com/kernel-mod/electron/blob/master/src/main/ipc.ts)
+- [x] Create my own injector instead of relying on kernel
+- [ ] ~~Add kernel-specific stuff (maybe)~~
+  - [ ] ~~[Imports](https://github.com/kernel-mod/electron/blob/master/tsconfig.json#L9)~~
+  - [ ] ~~[IPC](https://github.com/kernel-mod/electron/blob/master/src/main/ipc.ts)~~
 - [x] Add the ability to import legacy versions of electron in case of deprecated stuff
   - [ ] Do the same for node
   - [ ] For some reason typescript can't get type declarations when importing from `electron-legacy/[main,renderer,...]`

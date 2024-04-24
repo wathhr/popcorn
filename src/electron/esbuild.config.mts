@@ -1,6 +1,7 @@
 #!/bin/usr/env false
 import { deepMerge } from 'std/collections/mod.ts';
-import { customFiles } from '#build/plugins/index.mts';
+import { corejs, customFiles } from '#build/plugins/index.mts';
+import pkg from '#pkg' with { type: 'json' };
 
 const params = new URL(import.meta.url).searchParams;
 
@@ -16,6 +17,10 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
     {
       // TODO: Don't overwrite this
       entryPoints: [{ in: `./${type}/index.ts`, out: `${type}` }],
+      plugins: [corejs(pkg.browserslist.electron)],
+      define: {
+        isKernel: params.get('kernel') ?? 'false',
+      },
     },
   ));
 }

@@ -1,5 +1,5 @@
 /dist/
-/vendor/
+/temp/
 
 # Package manager related
 node_modules/

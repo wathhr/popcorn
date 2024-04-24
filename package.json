@@ -45,11 +45,18 @@
   },
   "dependencies": {
     "@sinclair/typebox": "^0.32.19",
+    "core-js": "^3.37.0",
     "fs-extra": "^11.2.0",
     "semver": "^7.6.0",
-    "webextension-polyfill": "^0.10.0"
+    "webextension-polyfill": "^0.11.0"
   },
   "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "node-fetch": "*",
+        "eslint": ">=8"
+      }
+    },
     "patchedDependencies": {
       "electron@30.0.1": "patches/electron@30.0.1.patch",
       "electron@28.2.10": "patches/electron@28.2.10.patch"
@@ -58,5 +65,21 @@
   "packageManager": "pnpm@9.0.4",
   "engines": {
     "pnpm": ">=8"
+  },
+  "browserslist": {
+    "production": [
+      "> 0.2% and not dead",
+      "Chrome >= 108",
+      "not Safari > 0",
+      "not Android > 0",
+      "not ChromeAndroid > 0",
+      "not Samsung > 0",
+      "not OperaMobile > 0",
+      "not iOS > 0"
+    ],
+    "electron": [
+      "electron >= 22",
+      "node >= 16"
+    ]
   }
 }

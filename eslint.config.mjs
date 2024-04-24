@@ -87,4 +87,11 @@ export default antfu(
       'ts/no-explicit-any': 'off',
     },
   },
+  {
+    files: ['**/inject/**/*.?(c|m)@(j|t)s', '**/inject.?(c|m)@(j|t)s'],
+    rules: {
+      'ts/no-require-imports': 'off',
+      'ts/no-var-requires': 'off',
+    },
+  },
 );

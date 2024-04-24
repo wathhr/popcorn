@@ -32,9 +32,9 @@ for await (const item of Deno.readDir(src)) {
 export async function processConfigFile(type: string, opts: Options = {}, devServer?: DevServer) {
   if (!validTypes.includes(type)) throw new Error(`"${type}" is an invalid type, valid types are: ${validTypes.join(', ')}. Skipping...`);
 
-  const { dev } = opts;
+  const { dev, watch } = opts;
   const killDevServer = devServer === undefined;
-  devServer ??= dev ? new DevServer() : undefined;
+  devServer ??= watch ? new DevServer() : undefined;
 
   const urlSearchParams = new URLSearchParams(Object.fromEntries(Object.entries(opts)
     .map(([name, value]) => [name, typeof value === 'string' ? value : value?.toString()])
