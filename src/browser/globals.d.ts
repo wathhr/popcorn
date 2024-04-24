@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-var
-declare var PopcornAPI: BrowserAPI | ElectronAPI;
+declare var PopcornAPI: Popcorn.BrowserAPI | Popcorn.ElectronAPI;

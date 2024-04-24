@@ -1,6 +1,7 @@
 #!/bin/usr/env false
 
-import { legacyImport } from '#build/plugins/index.mts';
+import { corejs, legacyImport } from '#build/plugins/index.mts';
+import pkg from '#pkg' with { type: 'json' };
 
 const params = new URL(import.meta.url).searchParams;
 
@@ -10,6 +11,7 @@ export default {
   external: ['electron'],
   plugins: [
     legacyImport,
+    corejs(pkg.browserslist['electron-main']),
     {
       name: 'Nodemon ripoff',
       setup(build) {
@@ -20,8 +22,11 @@ export default {
         build.onEnd(() => {
           for (const executable of (params.get('executables') ?? '').split(',')) {
             if (command?.pid) Deno.kill(command.pid);
-            command = new Deno.Command(executable, {
-              args: ['--inspect'],
+
+            const [cmd, ...args] = executable.split(' ');
+
+            command = new Deno.Command(cmd, {
+              args: ['--inspect', ...args],
             }).spawn();
           }
         });

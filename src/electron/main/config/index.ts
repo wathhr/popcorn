@@ -7,7 +7,7 @@ import './ipc';
 
 const Logger = new CreateLogger('Config');
 
-const defaultConfig: Required<Config> = {
+const defaultConfig: Required<Popcorn.Config> = {
   enabled: {},
   hotkey: 'ctrl+shift+p',
   quickCssDir: './quickcss',
@@ -21,7 +21,7 @@ const defaultConfig: Required<Config> = {
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
 };
 
-export const config = ((): Required<Config> => {
+export const config = ((): Required<Popcorn.Config> => {
   const configFile = join(root, 'config.json');
 
   if (!existsSync(configFile)) {

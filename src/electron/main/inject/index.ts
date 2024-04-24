@@ -1,14 +1,10 @@
 // ! https://github.com/kernel-mod/electron/blob/2023-01-15-07-14-02/src/core/patchers/BrowserWindowPatcher.ts
 
-import path from 'node:path';
+import { join } from 'node:path';
 import electron, { ipcMain } from 'electron';
 import { ipc } from '#shared';
 
-ipcMain.on(ipc('getWindowData'), (event) => {
-  if (event.sender.originalWindowData) event.returnValue = event.sender.originalWindowData;
-});
-
-const preloadPath = path.join(__dirname, 'preload.js');
+const preloadPath = join(__dirname, 'preload.js');
 
 // Extending the class does not work.
 const ProxiedBrowserWindow = new Proxy(electron.BrowserWindow, {
@@ -34,6 +30,10 @@ const ProxiedBrowserWindow = new Proxy(electron.BrowserWindow, {
 
     return window;
   },
+});
+
+ipcMain.on(ipc('$getWindowData'), (event) => {
+  if (event.sender.originalWindowData) event.returnValue = event.sender.originalWindowData;
 });
 
 // Get the path to Electron to replace it.

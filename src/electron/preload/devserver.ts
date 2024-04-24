@@ -1,6 +1,7 @@
-import manifest from '../../../index.json' assert { type: 'json' };
+import { webFrame } from 'electron';
 import { CreateLogger } from '../renderer/common/logger';
-import { ipc } from '#shared';
+import manifest from '~/index.json' assert { type: 'json' };
+import { ipc, isKernel } from '#shared';
 
 const Logger = new CreateLogger('DevServer');
 
@@ -60,19 +61,8 @@ class DevServer {
             Logger.info('Reloading the renderer script');
             window.postMessage(ipc('stop'), '*');
 
-            if (process.contextIsolated) {
-              // TODO: Figure out a way to do this without creating an element
-              document.getElementById('popcorn-core')?.remove();
-
-              const script = document.createElement('script');
-              script.id = 'popcorn-core';
-              script.type = 'module';
-              script.textContent = json.data.content;
-
-              document.head.prepend(script);
-            } else {
-              await import(`${window.kernel.importProtocol}://${window.kernel.packages.getPackages()[manifest.id]!.path}`);
-            }
+            if (!process.contextIsolated && isKernel) await import(`${window.kernel.importProtocol}://${window.kernel.packages.getPackages()[manifest.id]!.path}`);
+            else webFrame.top?.executeJavaScript(json.data.content);
           } break;
           case 'preload/index.js': {
             location.reload();

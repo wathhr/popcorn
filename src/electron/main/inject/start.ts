@@ -23,7 +23,7 @@ const originalAsar = (() => {
 })();
 
 if (!originalAsar) {
-  Logger.error('Could not find original asar. Tried the following:', paths);
+  Logger.error('Could not find original asar. Tried the following:', paths.map(p => join(basePath, p)));
   process.exit(1);
 }
 

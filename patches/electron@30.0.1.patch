@@ -1,37 +1,37 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0288ca21e 100644
+index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..9f443b80cabc571382a990d7482e8366224da52f 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
 @@ -1,9 +1,19 @@
--// Type definitions for Electron 29.3.1
-+// Type definitions for Electron 29.3.1 (patched)
+-// Type definitions for Electron 30.0.1
++// Type definitions for Electron 30.0.1 (patched)
  // Project: http://electronjs.org/
  // Definitions by: The Electron Team <https://github.com/electron/electron>
  // Definitions: https://github.com/electron/typescript-definitions
  
  /// <reference types="node" />
-+/// <reference types="../../../../../types/globals.d.ts" />
++/// <reference types="../../types/globals.d.ts" />
 +
-+///* Section: Patch
-+type $Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
++declare namespace $PopcornInternals {
++  type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
++  type ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
 +
-+type $MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
-+type $MappedAPI = $MapKeys<Omit<ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
-+type $MappedMainAPI = $MapKeys<MainAPI>;
-+type $ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
-+///* End section
++  type MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
++  type MappedAPI = MapKeys<Omit<Popcorn.ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
++  type MappedMainAPI = MapKeys<Popcorn.MainAPI>;
++}
  
  type DOMEvent = Event;
  type GlobalResponse = Response;
-@@ -6040,38 +6050,58 @@ declare namespace Electron {
+@@ -8155,38 +8165,58 @@ declare namespace Electron {
       * are serialized and only the `message` property from the original error is
       * provided to the renderer process. Please refer to #24427 for details.
       */
 -    handle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
-+    handle<K extends keyof $MappedAPI>(
++    handle<K extends keyof $PopcornInternals.MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
-+        ? (event: IpcMainInvokeEvent, ...args: Args) => $ReturnType<NonNullable<Ret>>
++      listener: $PopcornInternals.MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainInvokeEvent, ...args: Args) => $PopcornInternals.ReturnType<NonNullable<Ret>>
 +        : never,
 +    ): void;
      /**
@@ -39,10 +39,10 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
       * `ipcMain.handle(channel, listener)`.
       */
 -    handleOnce(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
-+    handleOnce<K extends keyof $MappedAPI>(
++    handleOnce<K extends keyof $PopcornInternals.MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
-+        ? (event: IpcMainInvokeEvent, ...args: Args) => $ReturnType<NonNullable<Ret>>
++      listener: $PopcornInternals.MappedAPI[K] extends (...args: infer Args) => infer Ret
++        ? (event: IpcMainInvokeEvent, ...args: Args) => $PopcornInternals.ReturnType<NonNullable<Ret>>
 +        : never,
 +    ): void;
      /**
@@ -50,9 +50,9 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
       * `listener(event, args...)`.
       */
 -    on(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
-+    on<K extends keyof $MappedAPI>(
++    on<K extends keyof $PopcornInternals.MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
++      listener: $PopcornInternals.MappedAPI[K] extends (...args: infer Args) => infer Ret
 +        ? (event: IpcMainEvent<Awaited<Ret>>, ...args: Args) => void
 +        : never,
 +    ): this;
@@ -61,9 +61,9 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
       * only the next time a message is sent to `channel`, after which it is removed.
       */
 -    once(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
-+    once<K extends keyof $MappedAPI>(
++    once<K extends keyof $PopcornInternals.MappedAPI>(
 +      channel: K,
-+      listener: $MappedAPI[K] extends (...args: infer Args) => infer Ret
++      listener: $PopcornInternals.MappedAPI[K] extends (...args: infer Args) => infer Ret
 +        ? (event: IpcMainEvent<Awaited<Ret>>, ...args: Args) => void
 +        : never,
 +    ): this;
@@ -71,18 +71,18 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
       * Removes listeners of the specified `channel`.
       */
 -    removeAllListeners(channel?: string): this;
-+    removeAllListeners(channel?: keyof $MappedAPI): this;
++    removeAllListeners(channel?: keyof $PopcornInternals.MappedAPI): this;
      /**
       * Removes any handler for `channel`, if present.
       */
 -    removeHandler(channel: string): void;
-+    removeHandler(channel: keyof $MappedAPI): void;
++    removeHandler(channel: keyof $PopcornInternals.MappedAPI): void;
      /**
       * Removes the specified `listener` from the listener array for the specified
       * `channel`.
       */
 -    removeListener(channel: string, listener: (...args: any[]) => void): this;
-+    removeListener(channel: keyof $MappedAPI, listener: (...args: any[]) => void): this;
++    removeListener(channel: keyof $PopcornInternals.MappedAPI, listener: (...args: any[]) => void): this;
    }
  
 -  interface IpcMainEvent extends Event {
@@ -90,12 +90,12 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
  
      // Docs: https://electronjs.org/docs/api/structures/ipc-main-event
  
-@@ -6093,11 +6123,11 @@ declare namespace Electron {
+@@ -8208,11 +8238,11 @@ declare namespace Electron {
       * "reply" to the sent message in order to guarantee the reply will go to the
       * correct process and frame.
       */
 -    reply: (channel: string, ...args: any[]) => void;
-+    reply<K extends keyof $MappedMainAPI>(channel: K, ...args: ForceArr<$MappedMainAPI[K]>): void;
++    reply<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * Set this to the value to be returned in a synchronous message
       */
@@ -104,117 +104,102 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
      /**
       * Returns the `webContents` that sent the message
       */
-@@ -6170,22 +6200,31 @@ declare namespace Electron {
+@@ -8254,7 +8284,10 @@ declare namespace Electron {
+     /**
+      * Alias for `ipcRenderer.on`.
+      */
+-    addListener(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
++    addListener<K extends keyof $PopcornInternals.MappedMainAPI>(
++      channel: K,
++      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
++    ): this;
+     /**
+      * Resolves with the response from the main process.
+      *
+@@ -8285,22 +8318,30 @@ declare namespace Electron {
       * returned by `invoke` will reject. However, the `Error` object in the renderer
       * process will not be the same as the one thrown in the main process.
       */
 -    invoke(channel: string, ...args: any[]): Promise<any>;
-+    invoke<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): Promise<ReturnType<$MappedAPI[K]>>;
++    invoke<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): Promise<ReturnType<$PopcornInternals.MappedAPI[K]>>;
      /**
       * Alias for `ipcRenderer.removeListener`.
       */
 -    off(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
-+    off(channel: keyof $MappedAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
++    off(channel: keyof $PopcornInternals.MappedAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
      /**
       * Listens to `channel`, when a new message arrives `listener` would be called with
       * `listener(event, args...)`.
       */
 -    on(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
-+    on<K extends keyof $MappedMainAPI>(
++    on<K extends keyof $PopcornInternals.MappedMainAPI>(
 +      channel: K,
-+      listener: (event: IpcRendererEvent, ...args: ForceArr<$MappedMainAPI[K]>) => void,
++      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
 +    ): this;
      /**
       * Adds a one time `listener` function for the event. This `listener` is invoked
       * only the next time a message is sent to `channel`, after which it is removed.
       */
 -    once(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
-+    once<K extends keyof $MappedMainAPI>(
++    once<K extends keyof $PopcornInternals.MappedMainAPI>(
 +      channel: K,
-+      listener: (event: IpcRendererEvent, ...args: ForceArr<$MappedMainAPI[K]>) => void,
++      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
 +    ): this;
-+    // TODO: Type this properly
      /**
-+     * @deprecated (patched) use is discouraged as it is not typed properly
-+     * 
++     * @warning Not typed properly
++     *
       * Send a message to the main process, optionally transferring ownership of zero or
       * more `MessagePort` objects.
       *
-@@ -6202,12 +6241,12 @@ declare namespace Electron {
+@@ -8317,12 +8358,12 @@ declare namespace Electron {
      /**
       * Removes all listeners, or those of the specified `channel`.
       */
 -    removeAllListeners(channel: string): this;
-+    removeAllListeners(channel?: keyof $MappedMainAPI): this;
++    removeAllListeners(channel?: keyof $PopcornInternals.MappedMainAPI): this;
      /**
       * Removes the specified `listener` from the listener array for the specified
       * `channel`.
       */
 -    removeListener(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
-+    removeListener(channel: keyof $MappedMainAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
++    removeListener(channel: keyof $PopcornInternals.MappedMainAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
      /**
       * Send an asynchronous message to the main process via `channel`, along with
       * arguments. Arguments will be serialized with the Structured Clone Algorithm,
-@@ -6232,7 +6271,7 @@ declare namespace Electron {
+@@ -8347,7 +8388,7 @@ declare namespace Electron {
       * If you want to receive a single response from the main process, like the result
       * of a method call, consider using `ipcRenderer.invoke`.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): void;
++    send<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): void;
      /**
       * The value sent back by the `ipcMain` handler.
       *
-@@ -6257,12 +6296,12 @@ declare namespace Electron {
+@@ -8372,12 +8413,12 @@ declare namespace Electron {
       * renderer process until the reply is received, so use this method only as a last
       * resort. It's much better to use the asynchronous version, `invoke()`.
       */
 -    sendSync(channel: string, ...args: any[]): any;
-+    sendSync<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): ReturnType<$MappedAPI[K]>;
++    sendSync<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): ReturnType<$PopcornInternals.MappedAPI[K]>;
      /**
       * Like `ipcRenderer.send` but the event will be sent to the `<webview>` element in
       * the host page instead of the main process.
       */
 -    sendToHost(channel: string, ...args: any[]): void;
-+    sendToHost<K extends keyof $MappedAPI>(channel: K, ...args: $Parameters<$MappedAPI[K]>): void;
++    sendToHost<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): void;
    }
  
    interface IpcRendererEvent extends Event {
-@@ -6997,7 +7036,6 @@ declare namespace Electron {
-      */
-     themeSource: ('system' | 'light' | 'dark');
-   }
--
-   class NavigationHistory extends NodeEventEmitter {
- 
-     // Docs: https://electronjs.org/docs/api/navigation-history
-@@ -9586,7 +9624,7 @@ declare namespace Electron {
-      * make a permission request if the check is denied. To clear the handler, call
-      * `setPermissionCheckHandler(null)`.
-      */
--    setPermissionCheckHandler(handler: ((webContents: (WebContents) | (null), permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'geolocation' | 'fullscreen' | 'hid' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'openExternal' | 'pointerLock' | 'serial' | 'storage-access' | 'top-level-storage-access' | 'usb', requestingOrigin: string, details: PermissionCheckHandlerHandlerDetails) => boolean) | (null)): void;
-+    setPermissionCheckHandler(handler: ((webContents: (WebContents) | (null), permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'geolocation' | 'fullscreen' | 'hid' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'openExternal' | 'pointerLock' | 'serial' | 'usb', requestingOrigin: string, details: PermissionCheckHandlerHandlerDetails) => boolean) | (null)): void;
-     /**
-      * Sets the handler which can be used to respond to permission requests for the
-      * `session`. Calling `callback(true)` will allow the permission and
-@@ -9595,7 +9633,7 @@ declare namespace Electron {
-      * `setPermissionCheckHandler` to get complete permission handling. Most web APIs
-      * do a permission check and then make a permission request if the check is denied.
-      */
--    setPermissionRequestHandler(handler: ((webContents: WebContents, permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'display-capture' | 'fullscreen' | 'geolocation' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'pointerLock' | 'keyboardLock' | 'openExternal' | 'storage-access' | 'top-level-storage-access' | 'window-management' | 'unknown', callback: (permissionGranted: boolean) => void, details: PermissionRequestHandlerHandlerDetails) => void) | (null)): void;
-+    setPermissionRequestHandler(handler: ((webContents: WebContents, permission: 'clipboard-read' | 'clipboard-sanitized-write' | 'display-capture' | 'fullscreen' | 'geolocation' | 'idle-detection' | 'media' | 'mediaKeySystem' | 'midi' | 'midiSysex' | 'notifications' | 'pointerLock' | 'keyboardLock' | 'openExternal' | 'window-management' | 'unknown', callback: (permissionGranted: boolean) => void, details: PermissionRequestHandlerHandlerDetails) => void) | (null)): void;
-     /**
-      * Adds scripts that will be executed on ALL web contents that are associated with
-      * this session just before normal `preload` scripts run.
-@@ -13950,7 +13988,7 @@ declare namespace Electron {
+@@ -16192,7 +16233,7 @@ declare namespace Electron {
       *
       * For additional reading, refer to Electron's IPC guide.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $MappedMainAPI>(channel: K, ...args: ForceArr<$MappedMainAPI[K]>): void;
++    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
-@@ -14234,6 +14272,22 @@ declare namespace Electron {
+@@ -16476,6 +16517,22 @@ declare namespace Electron {
       * respectively. The formula for this is `scale := 1.2 ^ level`.
       */
      zoomLevel: number;
@@ -236,13 +221,13 @@ index 1e6d8977d23562da80515b196f58a9727f1ce18d..b89e76335b9b8798917a135b8ad843c0
 +    };
    }
  
-   interface WebFrame {
-@@ -14483,7 +14537,7 @@ declare namespace Electron {
+   class WebContentsView extends View {
+@@ -16750,7 +16807,7 @@ declare namespace Electron {
       * The renderer process can handle the message by listening to `channel` with the
       * `ipcRenderer` module.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $MappedMainAPI>(channel: K, ...args: ForceArr<$MappedMainAPI[K]>): void;
++    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * A `WebFrameMain[]` collection containing the direct descendents of `frame`.
       *

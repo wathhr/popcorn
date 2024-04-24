@@ -1,10 +1,12 @@
 type IpcValues =
-  keyof ElectronAPI |
-  keyof MainAPI |
+  keyof Popcorn.ElectronAPI |
+  keyof Popcorn.MainAPI |
   `${Lowercase<string>}${string}` & Record<never, never>; // any string but still keep auto-completion
 
 /** @param name must be camelCase */
 export const ipc = <T extends IpcValues>(name?: T) => `POPCORN_${(name ?? '').replace(/([A-Z])/g, '_$1').toUpperCase()}` as EventName<T>;
+
+export const isKernel = 'kernel' in globalThis || Object.keys(require?.cache ?? {}).some(str => str.includes('kernel.asar'));
 
 export interface Color {
   str: string,

@@ -1,11 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { SemVer } from 'semver';
 import parse from 'semver/functions/parse';
-import { ipc } from '#shared';
+import { ipc, isKernel } from '#shared';
 
 if (!isKernel) import('./inject');
 
-const PopcornAPI: Omit<ElectronAPI, 'getWindowData'> = {
+const PopcornAPI: Omit<Popcorn.ElectronAPI, `$${string}`> = {
   isBrowser: false,
 
   async getTheme() {

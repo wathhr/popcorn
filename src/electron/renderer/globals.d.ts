@@ -1,1 +1,1 @@
-declare const PopcornAPI: BrowserAPI | ElectronAPI;
+declare const PopcornAPI: Popcorn.BrowserAPI | Popcorn.ElectronAPI;

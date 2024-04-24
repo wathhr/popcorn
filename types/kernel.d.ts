@@ -37,7 +37,8 @@ interface Kernel {
   importProtocol: 'kernel',
 }
 
-declare const kernel: Kernel;
+// eslint-disable-next-line no-var, vars-on-top
+declare var kernel: Kernel;
 interface Window {
   kernel: Kernel,
 }

@@ -17,7 +17,7 @@ readdir(join(root, 'logs'))
   })
   .catch(() => {});
 
-const logs: MainAPI['sendLog'][] = [];
+const logs: Popcorn.MainAPI['sendLog'][] = [];
 
 ipcMain.handle(ipc('getMainLogs'), () => logs);
 app.on('web-contents-created', (_, contents) => {
@@ -36,7 +36,7 @@ class Logger {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
-  #log(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
+  #log(level: Popcorn.MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
     const banner = this.name !== 'Popcorn'
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
       : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
@@ -50,7 +50,6 @@ class Logger {
     if (DEBUG || level === 'error') {
       const message = (() => {
         try {
-          // @ts-expect-error WIP
           return structuredClone(msg);
         } catch (e) {
           console.error(banner, 'Failed to clone message:', msg, 'With error:', e);
@@ -60,7 +59,7 @@ class Logger {
 
       if (!message) return;
 
-      const log: MainAPI['sendLog'] = {
+      const log: Popcorn.MainAPI['sendLog'] = {
         component: this.name,
         level,
         message,

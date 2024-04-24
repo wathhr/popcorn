@@ -16,9 +16,6 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
     {
       // TODO: Don't overwrite this
       entryPoints: [{ in: `./${type}/index.ts`, out: `${type}` }],
-      define: {
-        isKernel: params.get('kernel') ?? 'false',
-      },
     },
   ));
 }

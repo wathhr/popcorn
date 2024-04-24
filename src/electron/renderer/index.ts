@@ -1,5 +1,6 @@
 import { CreateLogger } from '#/common';
 import type { PopcornShared } from '#/types';
+import { isKernel } from '#shared';
 
 const Logger = new CreateLogger();
 
@@ -11,16 +12,13 @@ declare global {
 }
 
 Logger.info('Starting...');
+Logger.debug('Kernel:', isKernel);
 const ipc = import('./modules/ipc');
 
 if (!PopcornAPI.isBrowser) {
   const MainLogger = new CreateLogger('Main');
-  function createLog(log: MainAPI['sendLog']) {
-    console.log(log);
-
-    if (log.component) {
-      return new CreateLogger('Main', log.component)[log.level](...(log.message ?? []));
-    }
+  function createLog(log: Popcorn.MainAPI['sendLog']) {
+    if (log.component) return new CreateLogger('Main', log.component)[log.level](...(log.message ?? []));
 
     MainLogger[log.level](...log.message);
   }
