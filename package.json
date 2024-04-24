@@ -68,8 +68,7 @@
   },
   "browserslist": {
     "production": [
-      "> 0.2% and not dead",
-      "Chrome >= 108",
+      "> 0.3% and not dead",
       "not Safari > 0",
       "not Android > 0",
       "not ChromeAndroid > 0",
@@ -77,9 +76,11 @@
       "not OperaMobile > 0",
       "not iOS > 0"
     ],
-    "electron": [
-      "electron >= 22",
-      "node >= 16"
+    "electron-renderer": [
+      "electron >= 28"
+    ],
+    "electron-main": [
+      "node >= 18"
     ]
   }
 }
