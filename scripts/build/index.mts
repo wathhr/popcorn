@@ -143,6 +143,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
 
     // The plugin 'Write and announce file outputs' needs to run before every other plugin but every other option should be overwritten
     delete typeOptions.plugins;
+    delete typeOptions.customOptions;
 
     // @ts-expect-error no idea why this errors
     const processedTypeOptions: esbuild.BuildOptions = deepMerge(typeOptions, baseOptions);
