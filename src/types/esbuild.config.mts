@@ -6,6 +6,9 @@ for await (const file of Deno.readDir(import.meta.dirname!)) {
 }
 
 export default {
+  customOptions: {
+    independent: true,
+  },
   entryPoints: jsonFiles,
   plugins: [
     {
@@ -29,5 +32,3 @@ export default {
     },
   ],
 } satisfies import('#build').DefaultExport;
-
-export const independent = true;

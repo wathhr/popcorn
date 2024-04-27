@@ -1,7 +1,6 @@
 import compat from 'npm:core-js-compat';
 import browserslist from 'npm:browserslist';
 import { join } from 'std/path/mod.ts';
-import { root } from '#utils/index.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof pkg['browserslist'] & string)): import('esbuild').Plugin {
@@ -22,7 +21,7 @@ export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof p
 
       const imports = `import 'core-js/modules/${list.join('.js\';\nimport \'core-js/modules/')}.js';`;
 
-      const dir = join(root, 'temp'); // needs to be in the project directory else esbuild can't resolve the imports
+      const dir = join(import.meta.dirname!, '../../../temp'); // needs to be in the project directory else esbuild can't resolve the imports
       await Deno.mkdir(dir, { recursive: true });
 
       const tempFile = await Deno.makeTempFile({ prefix: 'corejs', suffix: '.js', dir });

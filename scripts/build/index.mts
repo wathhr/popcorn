@@ -12,7 +12,19 @@ const __dirname = import.meta.dirname!;
 const root = join(__dirname, '../..');
 const src = join(root, 'src');
 
-export type DefaultExport = esbuild.BuildOptions | esbuild.BuildOptions[];
+type MaybeArray<T> = T | T[];
+
+export type DefaultExport = MaybeArray<esbuild.BuildOptions & {
+  customOptions?: Partial<{
+    independent: boolean,
+  }>,
+}>;
+
+export type ModuleExport = Partial<{
+  default: DefaultExport,
+  onEnd: (opts: esbuild.PluginBuild['initialOptions'], result: esbuild.BuildResult) => void,
+}>;
+
 export type Options = Partial<{
   'dev': boolean,
   'watch': boolean,
@@ -41,17 +53,16 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
     .filter(([, value]) => value !== undefined),
   ));
 
-  const config = await import(`file://${join(src, type, 'esbuild.config.mts')}?${urlSearchParams.toString()}`) as {
-    default?: DefaultExport,
-    independent?: boolean,
-  };
+  const config: ModuleExport = await import(`file://${join(src, type, 'esbuild.config.mts')}?${urlSearchParams.toString()}`);
 
   if (!config.default) throw new Error(`"${type}" does not export an esbuild config. Skipping...`);
 
   const typeOptionsArray = Array.isArray(config.default) ? config.default : [config.default];
 
   const contexts: esbuild.BuildContext[] = [];
-  for (const typeOptions of typeOptionsArray) {
+  for (let i = 0; i < typeOptionsArray.length; i++) {
+    const typeOptions = typeOptionsArray[i];
+
     // @ts-expect-error this works fine
     typeOptions.entryPoints = ((e) => {
       const relJoin = (...path: string[]) => relative(Deno.cwd(), join(...path));
@@ -86,8 +97,8 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
       minifyIdentifiers: !dev,
       write: false,
       outdir: typeOptions.outdir
-        ? join(root, 'dist', config.independent ? '' : typeOptions.outdir)
-        : join(root, 'dist', config.independent ? '' : type),
+        ? join(root, 'dist', typeOptions.customOptions?.independent ? '' : typeOptions.outdir)
+        : join(root, 'dist', typeOptions.customOptions?.independent ? '' : type),
       sourcemap: dev ? 'inline' : false,
       define: {
         NODE_ENV: dev ? '"development"' : '"production"',
@@ -119,6 +130,12 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
         },
         customLogs(urlSearchParams),
         ...typeOptions.plugins ?? [],
+        ...(typeOptionsArray.length - 1 === i && config.onEnd
+          ? [{
+            name: 'onEnd',
+            setup: build => build.onEnd(result => config.onEnd!(build.initialOptions, result)),
+          } satisfies esbuild.Plugin]
+          : []),
       ],
       color: true,
       logLevel: 'info',
