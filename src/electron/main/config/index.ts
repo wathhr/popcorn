@@ -1,41 +1,41 @@
 import { join } from 'node:path';
-import { existsSync, readJsonSync, writeJson } from 'fs-extra';
-import { CreateLogger, root } from '#/common';
+import { existsSync, readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import { CreateLogger, configDir, resolvePath } from '#/common';
 import { ConfigChecker } from '#types';
 
 import './ipc';
 
 const Logger = new CreateLogger('Config');
 
-const defaultConfig: Required<Popcorn.Config> = {
+export const defaultConfig: Required<Popcorn.Config> = {
   enabled: {},
   hotkey: 'ctrl+shift+p',
   quickCssDir: './quickcss',
   themeDirs: [
     './themes/',
     ...(process.platform === 'win32'
-      ? ['%USERPROFILE%/discord/themes/']
-      : ['$HOME/discord/themes/']
-    ),
+      ? [resolvePath('%USERPROFILE%/discord/themes/')]
+      : [resolvePath('$HOME/discord/themes/')]),
   ],
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
 };
 
 export const config = ((): Required<Popcorn.Config> => {
-  const configFile = join(root, 'config.json');
+  const configFile = join(configDir, 'config.json');
 
   if (!existsSync(configFile)) {
     Logger.info('config.json not found, creating one.');
-    writeJson(configFile, {
+    writeFile(configFile, JSON.stringify({
       $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
       ...defaultConfig,
-    }, { spaces: 2 });
+    }, null, 2));
 
     return defaultConfig;
   }
 
   try {
-    const json = readJsonSync(configFile);
+    const json: Popcorn.Config = JSON.parse(readFileSync(configFile, 'utf8'));
     const errors = [...ConfigChecker.Errors(json)];
 
     if (errors.length > 0) {
@@ -43,6 +43,10 @@ export const config = ((): Required<Popcorn.Config> => {
       return defaultConfig;
     }
 
+    json.quickCssDir &&= resolvePath(json.quickCssDir);
+    json.themeDirs &&= json.themeDirs.map(resolvePath);
+
+    // @ts-expect-error we do a little lying
     delete json.$schema;
     return { ...defaultConfig, ...json };
   } catch (e) {

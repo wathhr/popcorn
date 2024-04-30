@@ -1,21 +1,29 @@
 import { appendFile, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { formatWithOptions } from 'node:util';
 import { app, ipcMain, webContents } from 'electron';
-import { ensureFileSync } from 'fs-extra';
 import { sendToAll } from './sendToAll';
-import { root, startTimeString } from './constants';
+import { configDir, startTimeString } from './constants';
 import { type Color, colors, ipc } from '#shared';
 
-ensureFileSync(`${join(root, 'logs', startTimeString)}.log`);
-readdir(join(root, 'logs'))
-  .then((files) => {
-    if (files.length <= 3) return;
+const logFile = (() => {
+  const file = join(configDir, 'logs', `${startTimeString}.log`);
 
-    for (const file of files.slice(0, -1)) {
-      rm(join(root, 'logs', file), { force: true }).catch(() => {});
-    }
-  })
-  .catch(() => {});
+  mkdirSync(join(configDir, 'logs'), { recursive: true });
+  writeFileSync(file, '');
+  readdir(join(configDir, 'logs'))
+    .then((files) => {
+      if (files.length <= 3) return;
+
+      for (const file of files.slice(0, -1)) {
+        rm(join(configDir, 'logs', file), { force: true }).catch(() => {});
+      }
+    })
+    .catch(() => {});
+
+  return file;
+})();
 
 const logs: Popcorn.MainAPI['sendLog'][] = [];
 
@@ -36,6 +44,20 @@ class Logger {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
+  private appendLog(level: Popcorn.MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
+    appendFile(logFile, [
+      `[${new Date().toLocaleString('en-US')}] `,
+      `${level.toUpperCase()}: `,
+      msg.map(argument => formatWithOptions({
+        colors: false,
+        depth: 5,
+        getters: true,
+        showProxy: true,
+      }, argument)).join(', '),
+      '\n',
+    ].join(''), 'utf-8');
+  }
+
   #log(level: Popcorn.MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
     const banner = this.name !== 'Popcorn'
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
@@ -43,9 +65,7 @@ class Logger {
 
     console[level](banner, ...msg);
 
-    queueMicrotask(() => {
-      appendFile(`${join(root, 'logs', startTimeString)}.log`, `[${new Date().toLocaleString('en-US')}] ${level.toUpperCase()}: ${msg.map(i => JSON.stringify(i)).join(', ')}\n`, 'utf8');
-    });
+    queueMicrotask(() => this.appendLog(level, ...msg));
 
     if (DEBUG || level === 'error') {
       const message = (() => {
@@ -71,11 +91,11 @@ class Logger {
     }
   }
 
-  log: Console['log'] = (...msg) => this.#log('log', ...msg);
-  info: Console['info'] = (...msg) => this.#log('info', ...msg);
   debug: Console['debug'] = (...msg) => DEBUG && this.#log('debug', ...msg);
-  warn: Console['warn'] = (...msg) => this.#log('warn', ...msg);
   error: Console['error'] = (...msg) => this.#log('error', ...msg);
+  info: Console['info'] = (...msg) => this.#log('info', ...msg);
+  log: Console['log'] = (...msg) => this.#log('log', ...msg);
+  warn: Console['warn'] = (...msg) => this.#log('warn', ...msg);
 }
 
 export {

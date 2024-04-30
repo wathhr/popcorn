@@ -8,10 +8,5 @@
     "#utils/": "./scripts/utils/",
     "#pkg": "./package.json"
   },
-  "lint": {
-    "rules": {
-      "exclude": ["no-explicit-any"]
-    }
-  },
   "nodeModulesDir": false
 }

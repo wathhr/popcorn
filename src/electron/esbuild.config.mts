@@ -3,9 +3,7 @@ import { deepMerge } from 'std/collections/mod.ts';
 import { createPackage } from 'npm:@electron/asar';
 import { customFiles } from '#build/plugins/index.mts';
 
-const params = new URL(import.meta.url).searchParams;
-
-const builds: import('#build').DefaultExport = params.get('kernel') === 'true' ? [{ entryPoints: ['./package.json'], plugins: [customFiles()] }] : [];
+const builds: import('#build').DefaultExport = [{ entryPoints: ['../../package.json'], plugins: [customFiles()] }];
 for await (const item of Deno.readDir(import.meta.dirname!)) {
   if (item.isFile) continue;
   const type = item.name;
@@ -19,10 +17,14 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
   ));
 }
 
-export default builds;
+builds.at(-1)?.plugins?.push({
+  name: 'Create ASAR',
+  async setup(build) {
+    const outDir = build.initialOptions.outdir;
+    if (!outDir) return;
+    const fileName = outDir.replace(/\/?$/, '.asar');
+    await createPackage(outDir, fileName);
+  },
+});
 
-export const onEnd: import('#build').ModuleExport['onEnd'] = async (opts) => {
-  const outDir = opts.outdir;
-  if (!outDir) return;
-  await createPackage(outDir, outDir.replace(/\/?$/, '.asar'));
-};
+export default builds;

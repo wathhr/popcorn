@@ -9,6 +9,7 @@
 ## Code management
 - [ ] Move `src/electron/renderer` to `src/browser` and use it from there instead
 - [ ] Remove all of the manual `Omit<>`s
+- [ ] Add file system manager
 
 ## Extension
 - [x] Implement

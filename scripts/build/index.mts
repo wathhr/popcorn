@@ -4,12 +4,13 @@ import * as esbuild from 'esbuild';
 import { deepMerge } from 'std/collections/mod.ts';
 import { ensureDirSync, exists } from 'std/fs/mod.ts';
 import { join, relative } from 'std/path/mod.ts';
-import pkg from '../../package.json' with { type: 'json' };
+import pkg from '#pkg' with { type: 'json' };
 import { DevServer } from '#build/devserver.mts';
 import { customLogs } from '#build/plugins/custom-logs.mts';
 
-const __dirname = import.meta.dirname!;
-const root = join(__dirname, '../..');
+if (!import.meta.dirname) throw new Error('This script must be run locally');
+
+const root = join(import.meta.dirname, '../..');
 const src = join(root, 'src');
 
 type MaybeArray<T> = T | T[];
@@ -22,7 +23,6 @@ export type DefaultExport = MaybeArray<esbuild.BuildOptions & {
 
 export type ModuleExport = Partial<{
   default: DefaultExport,
-  onEnd: (opts: esbuild.PluginBuild['initialOptions'], result: esbuild.BuildResult) => void,
 }>;
 
 export type Options = Partial<{
@@ -130,12 +130,6 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
         },
         customLogs(urlSearchParams),
         ...typeOptions.plugins ?? [],
-        ...(typeOptionsArray.length - 1 === i && config.onEnd
-          ? [{
-            name: 'onEnd',
-            setup: build => build.onEnd(result => config.onEnd!(build.initialOptions, result)),
-          } satisfies esbuild.Plugin]
-          : []),
       ],
       color: true,
       logLevel: 'info',
