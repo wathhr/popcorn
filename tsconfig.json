@@ -19,8 +19,11 @@
     "noEmit": true,
 
     "paths": {
+      "~": ["./"],
+      "~/*": ["./*"],
       "#types": ["./src/types"],
       "#types/*": ["./src/types/*"],
     },
   },
+  "exclude": ["./app-src"]
 }

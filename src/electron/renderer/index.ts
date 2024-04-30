@@ -1,6 +1,7 @@
 import { CreateLogger } from '#/common';
 import type { PopcornShared } from '#/types';
 import { isKernel } from '#shared';
+import type { MainAPI } from '~/types';
 
 const Logger = new CreateLogger();
 
@@ -17,7 +18,7 @@ const ipc = import('./modules/ipc');
 
 if (!PopcornAPI.isBrowser) {
   const MainLogger = new CreateLogger('Main');
-  function createLog(log: Popcorn.MainAPI['sendLog']) {
+  function createLog(log: MainAPI['sendLog']) {
     if (log.component) return new CreateLogger('Main', log.component)[log.level](...(log.message ?? []));
 
     MainLogger[log.level](...log.message);

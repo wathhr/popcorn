@@ -1,5 +1,5 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index dc38d227a32b261f431230e5e2f99207cb606990..b78124483d1870f29e983a21313fcbe214125f93 100644
+index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e06736fe953d2 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
 @@ -1,9 +1,19 @@
@@ -231,3 +231,59 @@ index dc38d227a32b261f431230e5e2f99207cb606990..b78124483d1870f29e983a21313fcbe2
      /**
       * A `WebFrameMain[]` collection containing the direct descendents of `frame`.
       *
+@@ -20935,40 +20992,40 @@ declare namespace Electron {
+ 
+ }
+ 
+-declare module 'electron' {
++declare module 'electron-legacy' {
+   export = Electron.CrossProcessExports;
+ }
+ 
+-declare module 'electron/main' {
++declare module 'electron-legacy/main' {
+   export = Electron.Main;
+ }
+ 
+-declare module 'electron/common' {
++declare module 'electron-legacy/common' {
+   export = Electron.Common;
+ }
+ 
+-declare module 'electron/renderer' {
++declare module 'electron-legacy/renderer' {
+   export = Electron.Renderer;
+ }
+ 
+-declare module 'electron/utility' {
++declare module 'electron-legacy/utility' {
+   export = Electron.Utility;
+ }
+ 
+ interface NodeRequireFunction {
+-  (moduleName: 'electron'): typeof Electron.CrossProcessExports;
+-  (moduleName: 'electron/main'): typeof Electron.Main;
+-  (moduleName: 'electron/common'): typeof Electron.Common;
+-  (moduleName: 'electron/renderer'): typeof Electron.Renderer;
+-  (moduleName: 'electron/utility'): typeof Electron.Utility;
++  (moduleName: 'electron-legacy'): typeof Electron.CrossProcessExports;
++  (moduleName: 'electron-legacy/main'): typeof Electron.Main;
++  (moduleName: 'electron-legacy/common'): typeof Electron.Common;
++  (moduleName: 'electron-legacy/renderer'): typeof Electron.Renderer;
++  (moduleName: 'electron-legacy/utility'): typeof Electron.Utility;
+ }
+ 
+ interface NodeRequire {
+-  (moduleName: 'electron'): typeof Electron.CrossProcessExports;
+-  (moduleName: 'electron/main'): typeof Electron.Main;
+-  (moduleName: 'electron/common'): typeof Electron.Common;
+-  (moduleName: 'electron/renderer'): typeof Electron.Renderer;
+-  (moduleName: 'electron/utility'): typeof Electron.Utility;
++  (moduleName: 'electron-legacy'): typeof Electron.CrossProcessExports;
++  (moduleName: 'electron-legacy/main'): typeof Electron.Main;
++  (moduleName: 'electron-legacy/common'): typeof Electron.Common;
++  (moduleName: 'electron-legacy/renderer'): typeof Electron.Renderer;
++  (moduleName: 'electron-legacy/utility'): typeof Electron.Utility;
+ }
+ 
+ interface File {

@@ -6,6 +6,7 @@ import { app, ipcMain, webContents } from 'electron';
 import { sendToAll } from './sendToAll';
 import { configDir, startTimeString } from './constants';
 import { type Color, colors, ipc } from '#shared';
+import type { MainAPI } from '~/types';
 
 const logFile = (() => {
   const file = join(configDir, 'logs', `${startTimeString}.log`);
@@ -25,7 +26,7 @@ const logFile = (() => {
   return file;
 })();
 
-const logs: Popcorn.MainAPI['sendLog'][] = [];
+const logs: MainAPI['sendLog'][] = [];
 
 ipcMain.handle(ipc('getMainLogs'), () => logs);
 app.on('web-contents-created', (_, contents) => {
@@ -44,7 +45,7 @@ class Logger {
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
-  private appendLog(level: Popcorn.MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
+  private appendLog(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
     appendFile(logFile, [
       `[${new Date().toLocaleString('en-US')}] `,
       `${level.toUpperCase()}: `,
@@ -58,7 +59,7 @@ class Logger {
     ].join(''), 'utf-8');
   }
 
-  #log(level: Popcorn.MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
+  #log(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
     const banner = this.name !== 'Popcorn'
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
       : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
@@ -79,7 +80,7 @@ class Logger {
 
       if (!message) return;
 
-      const log: Popcorn.MainAPI['sendLog'] = {
+      const log: MainAPI['sendLog'] = {
         component: this.name,
         level,
         message,

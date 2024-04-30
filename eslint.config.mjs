@@ -82,7 +82,7 @@ export default antfu(
     },
   },
   {
-    files: ['**/*.d.ts'],
+    files: ['**/types/*.ts', '**/types.ts', '**/*.d.ts'],
     rules: {
       'ts/no-explicit-any': 'off',
     },

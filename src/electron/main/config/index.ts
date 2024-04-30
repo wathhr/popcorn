@@ -3,12 +3,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { CreateLogger, configDir, resolvePath } from '#/common';
 import { ConfigChecker } from '#types';
+import type { Config } from '~/types';
 
 import './ipc';
 
 const Logger = new CreateLogger('Config');
 
-export const defaultConfig: Required<Popcorn.Config> = {
+export const defaultConfig: Required<Config> = {
   enabled: {},
   hotkey: 'ctrl+shift+p',
   quickCssDir: './quickcss',
@@ -21,7 +22,7 @@ export const defaultConfig: Required<Popcorn.Config> = {
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
 };
 
-export const config = ((): Required<Popcorn.Config> => {
+export const config = ((): Required<Config> => {
   const configFile = join(configDir, 'config.json');
 
   if (!existsSync(configFile)) {
@@ -35,7 +36,7 @@ export const config = ((): Required<Popcorn.Config> => {
   }
 
   try {
-    const json: Popcorn.Config = JSON.parse(readFileSync(configFile, 'utf8'));
+    const json: Config = JSON.parse(readFileSync(configFile, 'utf8'));
     const errors = [...ConfigChecker.Errors(json)];
 
     if (errors.length > 0) {

@@ -1,6 +1,9 @@
+import type { ElectronAPI, EventName, MainAPI } from '~/types';
+import type { NumRange } from '~/types/utils';
+
 type IpcValues =
-  keyof Popcorn.ElectronAPI |
-  keyof Popcorn.MainAPI |
+  keyof ElectronAPI |
+  keyof MainAPI |
   `${Lowercase<string>}${string}` & Record<never, never>; // any string but still keep auto-completion
 
 /** @param name must be camelCase */

@@ -1,1 +1,1 @@
-declare const PopcornAPI: Popcorn.BrowserAPI | Popcorn.ElectronAPI;
+declare const PopcornAPI: import('~/types').BrowserAPI | import('~/types').ElectronAPI;
