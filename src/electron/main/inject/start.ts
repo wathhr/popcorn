@@ -1,7 +1,7 @@
 // ! https://github.com/kernel-mod/electron/blob/2023-01-15-07-14-02/src/main/startOriginal.ts
 
 import { existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import Module from 'node:module';
 import type { PackageJson } from 'type-fest';
 import electron from 'electron';
@@ -10,7 +10,8 @@ import { CreateLogger } from '#/common';
 const Logger = new CreateLogger('Injector');
 
 const basePath = join(dirname(require.main!.filename), '..');
-const paths = ['app-original.asar', 'app-original'];
+const baseFilename = basename(dirname(require.main!.filename)).replace(/\.asar$|[\\/]$/, '');
+const paths = [`${baseFilename}-original.asar`, `${baseFilename}-original`];
 const originalAsar = (() => {
   for (const path of paths) {
     if (existsSync(join(basePath, path))) return path;
@@ -21,6 +22,12 @@ const originalAsar = (() => {
 
 if (!originalAsar) {
   Logger.error('Could not find original asar. Tried the following:', paths.map(p => join(basePath, p)));
+  electron.dialog.showErrorBox(
+    'Could not find original asar',
+    `Could not find original asar. Tried the following: ${paths.map(p => join(basePath, p)).join('\n')}`,
+  );
+
+  electron.app.quit();
   process.exit(1);
 }
 
