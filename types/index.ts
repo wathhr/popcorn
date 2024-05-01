@@ -25,7 +25,7 @@ export interface BrowserAPI {
 
 export type ElectronAPI = Omit<BrowserAPI, 'isBrowser'> & MappedMainAPI & {
   isBrowser: false,
-  $getWindowData(): Electron.WebContents['originalWindowData'],
+  $getWindowData(): import('electron').WebContents['originalWindowData'],
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
 };
 
@@ -45,7 +45,7 @@ export interface MainAPI {
 type MappedMainAPI = {
   [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
     // TODO: Remove the event field maybe for privacy concerns
-    event: Electron.IpcRendererEvent,
+    event: import('electron').IpcRendererEvent,
     ...args: ForceArr<MainAPI[K]>
   ) => void) => () => void;
 };

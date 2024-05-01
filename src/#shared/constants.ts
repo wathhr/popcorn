@@ -1,6 +1,12 @@
 import type { ElectronAPI, EventName, MainAPI } from '~/types';
 import type { NumRange } from '~/types/utils';
 
+// stub for renderer
+declare const require: NodeRequire;
+interface NodeRequire {
+  cache?: Record<string, unknown>,
+}
+
 type IpcValues =
   keyof ElectronAPI |
   keyof MainAPI |
