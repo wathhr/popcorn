@@ -21,13 +21,13 @@ export default {
 
         build.onEnd(() => {
           for (const executable of (params.get('executables') ?? '').split(',')) {
-            if (command?.pid) Deno.kill(command.pid);
+            if (command) try {
+              command.kill();
+            } catch { /* omitted */ };
 
             const [cmd, ...args] = executable.split(' ');
 
-            command = new Deno.Command(cmd, {
-              args: ['--inspect', ...args],
-            }).spawn();
+            command = new Deno.Command(cmd, { args }).spawn();
           }
         });
       },

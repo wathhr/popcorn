@@ -9,7 +9,7 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
   const type = item.name;
 
   builds.push(deepMerge(
-    (await import(`./${type}/esbuild.config.mts`)).default,
+    (await import(`./${type}/esbuild.config.mts?${new URL(import.meta.url).searchParams.toString()}`)).default,
     {
       // TODO: Don't overwrite this
       entryPoints: [{ in: `./${type}/index.ts`, out: `${type}` }],
