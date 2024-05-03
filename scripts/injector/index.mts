@@ -1,3 +1,5 @@
+#!/bin/usr/env false
+
 import { copy, exists } from 'std/fs/mod.ts';
 import { basename, join } from 'std/path/mod.ts';
 

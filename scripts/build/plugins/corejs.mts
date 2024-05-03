@@ -1,3 +1,5 @@
+#!/bin/usr/env false
+
 import compat from 'npm:core-js-compat';
 import browserslist from 'npm:browserslist';
 import { join } from 'std/path/mod.ts';

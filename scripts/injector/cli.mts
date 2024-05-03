@@ -1,3 +1,5 @@
+#!/bin/usr/env deno
+
 import { parseArgs } from 'std/cli/mod.ts';
 import { injectLocal, injectRemote } from './index.mts';
 import pkg from '#pkg' with { type: 'json' };
