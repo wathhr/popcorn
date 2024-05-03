@@ -12,7 +12,7 @@
     "./src/electron/main/esbuild.config.mts",
     "./src/electron/preload/esbuild.config.mts",
     "./src/electron/renderer/esbuild.config.mts",
-    "./src/types/esbuild.config.mts",
+    "./src/types",
   ],
 
   "deno.importMap": "./deno.jsonc",

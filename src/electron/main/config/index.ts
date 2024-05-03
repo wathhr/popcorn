@@ -2,14 +2,15 @@ import { join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { CreateLogger, configDir, resolvePath } from '#/common';
-import { ConfigChecker } from '#types';
-import type { Config } from '~/types';
+import { type Config, ConfigChecker } from '#types';
 
 import './ipc';
 
 const Logger = new CreateLogger('Config');
 
 export const defaultConfig: Required<Config> = {
+  $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
+  configVersion: 1,
   enabled: {},
   hotkey: 'ctrl+shift+p',
   quickCssDir: './quickcss',
@@ -27,10 +28,7 @@ export const config = ((): Required<Config> => {
 
   if (!existsSync(configFile)) {
     Logger.info('config.json not found, creating one.');
-    writeFile(configFile, JSON.stringify({
-      $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
-      ...defaultConfig,
-    }, null, 2));
+    writeFile(configFile, JSON.stringify(defaultConfig, null, 2));
 
     return defaultConfig;
   }
@@ -47,8 +45,6 @@ export const config = ((): Required<Config> => {
     json.quickCssDir &&= resolvePath(json.quickCssDir);
     json.themeDirs &&= json.themeDirs.map(resolvePath);
 
-    // @ts-expect-error we do a little lying
-    delete json.$schema;
     return { ...defaultConfig, ...json };
   } catch (e) {
     Logger.error('Failed to read config.json:', e);

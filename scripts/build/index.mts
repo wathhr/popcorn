@@ -6,7 +6,7 @@ import { ensureDirSync, exists } from 'std/fs/mod.ts';
 import { join, relative } from 'std/path/mod.ts';
 import pkg from '#pkg' with { type: 'json' };
 import { DevServer } from '#build/devserver.mts';
-import { customLogs } from '#build/plugins/custom-logs.mts';
+import { customLogs } from '#build/plugins/index.mts';
 
 if (!import.meta.dirname) throw new Error('This script must be run locally');
 

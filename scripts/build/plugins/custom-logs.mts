@@ -70,9 +70,10 @@ export function customLogs(params: URL['searchParams']) {
         const unshownAmount = result.outputFiles.length - maxFiles;
         if (unshownAmount > 0) console.log(margin, `...and ${unshownAmount} more output file${unshownAmount > 1 ? 's' : ''}...`);
 
-        const elapsed = Date.now() - start;
-        console.log(); // new line
-        console.log(`%c${Deno.build.os === 'windows' ? '' : '⚡ '}Done in ${elapsed}ms`, 'color: green');
+        if (result.errors.length <= 0) {
+          const elapsed = Date.now() - start;
+          console.log(`\n%c${Deno.build.os === 'windows' ? '' : '⚡ '}Done in ${elapsed}ms`, 'color: green');
+        }
       });
     },
   } satisfies import('esbuild').Plugin;

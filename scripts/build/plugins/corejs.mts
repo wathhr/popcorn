@@ -1,6 +1,7 @@
 import compat from 'npm:core-js-compat';
 import browserslist from 'npm:browserslist';
 import { join } from 'std/path/mod.ts';
+import { exists } from 'std/fs/exists.ts';
 import pkg from '#pkg' with { type: 'json' };
 
 export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof pkg['browserslist'] & string)): import('esbuild').Plugin {
@@ -25,7 +26,7 @@ export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof p
         const imports = `import 'core-js/modules/${list.join('.js\';\nimport \'core-js/modules/')}.js';`;
 
         const file = join(dir, `corejs-${Date.now()}.js`);
-        await Deno.mkdir(dir);
+        if (!await exists(dir)) await Deno.mkdir(dir);
         await Deno.writeTextFile(file, imports);
 
         build.initialOptions.inject?.push(file);

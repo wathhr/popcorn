@@ -6,6 +6,6 @@ import pkg from '#pkg' with { type: 'json' };
 export default {
   platform: 'node',
   format: 'cjs',
-  external: ['electron', 'popcorn://*'],
+  external: ['electron'],
   plugins: [legacyImport, corejs(pkg.browserslist['electron-main'])],
 } satisfies import('#build').DefaultExport;

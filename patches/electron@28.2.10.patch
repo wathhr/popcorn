@@ -1,8 +1,8 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e06736fe953d2 100644
+index dc38d227a32b261f431230e5e2f99207cb606990..62bfb8890f515384f824ee588743307f2cac1036 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
-@@ -1,9 +1,19 @@
+@@ -1,10 +1,20 @@
 -// Type definitions for Electron 28.2.10
 +// Type definitions for Electron 28.2.10 (patched)
  // Project: http://electronjs.org/
@@ -10,19 +10,20 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
  // Definitions: https://github.com/electron/typescript-definitions
  
  /// <reference types="node" />
-+/// <reference types="../../types/globals.d.ts" />
-+
+ 
 +declare namespace $PopcornInternals {
 +  type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
 +  type ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
++  type ForceArr = import('../../../../../types/utils.ts').ForceArr;
 +
-+  type MapKeys<T> = { [K in keyof T as EventName<K & string>]: T[K] };
-+  type MappedAPI = MapKeys<Omit<Popcorn.ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
-+  type MappedMainAPI = MapKeys<Popcorn.MainAPI>;
++  type MapKeys<T> = { [K in keyof T as import('../../../../../types/index.ts').EventName<K & string>]: T[K] };
++  type MappedAPI = MapKeys<Omit<import('../../../../../types/index.ts').ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
++  type MappedMainAPI = MapKeys<import('../../../../../types/index.ts').MainAPI>;
 +}
- 
++
  type DOMEvent = Event;
  type GlobalResponse = Response;
+ type GlobalRequest = Request;
 @@ -6093,38 +6103,58 @@ declare namespace Electron {
       * are serialized and only the `message` property from the original error is
       * provided to the renderer process. Please refer to #24427 for details.
@@ -95,7 +96,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
       * correct process and frame.
       */
 -    reply: (channel: string, ...args: any[]) => void;
-+    reply<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
++    reply<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * Set this to the value to be returned in a synchronous message
       */
@@ -111,7 +112,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
 -    addListener(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
 +    addListener<K extends keyof $PopcornInternals.MappedMainAPI>(
 +      channel: K,
-+      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
++      listener: (event: IpcRendererEvent, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
 +    ): this;
      /**
       * Resolves with the response from the main process.
@@ -134,7 +135,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
 -    on(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
 +    on<K extends keyof $PopcornInternals.MappedMainAPI>(
 +      channel: K,
-+      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
++      listener: (event: IpcRendererEvent, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
 +    ): this;
      /**
       * Adds a one time `listener` function for the event. This `listener` is invoked
@@ -143,7 +144,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
 -    once(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
 +    once<K extends keyof $PopcornInternals.MappedMainAPI>(
 +      channel: K,
-+      listener: (event: IpcRendererEvent, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
++      listener: (event: IpcRendererEvent, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>) => void,
 +    ): this;
      /**
 +     * @warning Not typed properly
@@ -195,7 +196,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
       * For additional reading, refer to Electron's IPC guide.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
++    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
@@ -227,7 +228,7 @@ index dc38d227a32b261f431230e5e2f99207cb606990..082be9169fd824b4a1fa2d1def7e0673
       * `ipcRenderer` module.
       */
 -    send(channel: string, ...args: any[]): void;
-+    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
++    send<K extends keyof $PopcornInternals.MappedMainAPI>(channel: K, ...args: $PopcornInternals.ForceArr<$PopcornInternals.MappedMainAPI[K]>): void;
      /**
       * A `WebFrameMain[]` collection containing the direct descendents of `frame`.
       *

@@ -1,15 +1,5 @@
 import type { CamelToScreamingSnakeCase, ForceArr } from './utils';
-
-export type Config = Omit<import('#types').Config, '$schema'>;
-export type Theme = Omit<import('#types').Theme, '$schema'>;
-
-export interface ThemeResponse {
-  id: Theme['id'],
-  version: import('semver').SemVer,
-  css: string,
-  main: string,
-  meta: Omit<Theme, 'id' | 'version' | 'main'>,
-}
+import type { Config, Theme } from '#types';
 
 export type EventName<T> = T extends string
   ? `POPCORN_${CamelToScreamingSnakeCase<T>}`
@@ -17,8 +7,7 @@ export type EventName<T> = T extends string
 
 export interface BrowserAPI {
   isBrowser: true,
-  getThemes(): Promise<ThemeResponse[]>,
-  getTheme(id: Theme['id']): Promise<ThemeResponse>,
+  getThemes(): Promise<Theme[]>,
   getUrls(): Promise<string[]>,
   getConfig(): Required<Config>,
 }

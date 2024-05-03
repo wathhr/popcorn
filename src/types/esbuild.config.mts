@@ -18,8 +18,8 @@ export default {
           const { type } = JSON.parse(await Deno.readTextFile(path));
           if (typeof type !== 'string') return;
 
-          const file = await import(`./${type}.ts`).catch(() => undefined);
-          if (!file) throw new Error(`Could not find ${type}.ts`);
+          const file = await import(`file://${import.meta.dirname!}/${type}.ts`).catch(e => e);
+          if (file instanceof Error) throw new Error(`Something went wrong loading ${type}.ts: ${file}`);
           if (!file[type]) throw new Error(`${type}.ts has no export of ${type}`);
 
           return {

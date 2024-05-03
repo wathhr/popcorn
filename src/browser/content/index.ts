@@ -1,16 +1,12 @@
-import type { SemVer } from 'semver';
-import parse from 'semver/functions/parse';
-
 globalThis.PopcornAPI = {
   isBrowser: true,
 
-  async getTheme(_id) {
-    return {
-      id: 'test.test',
-      version: parse('1.0.0') as SemVer,
-      css: 'body { background-color: red; }',
-      main: 'troll',
-      meta: {
+  async getThemes() {
+    return [
+      {
+        id: 'test.test',
+        main: 'troll',
+        manifestVersion: 1,
         description: 'Test theme',
         name: 'Test theme',
         version: '1.0.0',
@@ -19,12 +15,6 @@ globalThis.PopcornAPI = {
           discord: 'https://discord.gg/example',
         },
       },
-    };
-  },
-
-  async getThemes() {
-    return [
-      await PopcornAPI.getTheme('test.test')!,
     ];
   },
 
@@ -36,11 +26,13 @@ globalThis.PopcornAPI = {
 
   getConfig() {
     return {
-      enabled: { 'test.test': true },
+      $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
+      configVersion: 1,
+      enabled: {},
       hotkey: 'ctrl+shift+p',
-      quickCssDir: 'troll',
+      quickCssDir: './quickcss',
       themeDirs: [],
-      verbose: true,
+      verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
     };
   },
 };

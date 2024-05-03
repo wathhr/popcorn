@@ -1,6 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { SemVer } from 'semver';
-import parse from 'semver/functions/parse';
 import { ipc, isKernel } from '#shared';
 import type { ElectronAPI } from '~/types';
 
@@ -9,28 +7,8 @@ if (!isKernel) import('./inject');
 const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
   isBrowser: false,
 
-  async getTheme() {
-    return {
-      id: 'test.test',
-      version: parse('1.0.0') as SemVer,
-      css: 'body { background-color: red; }',
-      main: 'troll',
-      meta: {
-        description: 'Test theme',
-        name: 'Test theme',
-        version: '1.0.0',
-        metaLinks: {
-          github: 'https://github.com/example/test',
-          discord: 'https://discord.gg/example',
-        },
-      },
-    };
-  },
-
   async getThemes() {
-    return [
-      await PopcornAPI.getTheme('test.test')!,
-    ];
+    return await ipcRenderer.invoke(ipc('getThemes'));
   },
 
   async getUrls() {

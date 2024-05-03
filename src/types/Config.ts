@@ -6,6 +6,7 @@ export type Config = Static<typeof Config>;
 export const Config = Type.Partial(
   Type.Object({
     $schema: Type.Optional(Type.String()),
+    configVersion: Type.Literal(1),
     hotkey: Type.String({
       description: 'The hotkey for opening and closing the Popcorn modal',
       example: 'ctrl+p ctrl+s',
