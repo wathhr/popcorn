@@ -6,33 +6,41 @@ if (!isKernel) import('./inject');
 
 const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
   isBrowser: false,
-
-  async getThemes() {
-    return await ipcRenderer.invoke(ipc('getThemes'));
-  },
-
-  async getUrls() {
-    return [
-      'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
+  isSplash: (() => {
+    const possibleVars = [
+      'splash',
+      'Splash',
+      'SPLASH',
+      '__SPLASH',
+      '__SPLASH__',
+      'splashScreen',
+      'SplashScreen',
+      'SPLASHSCREEN',
+      '__SPLASHSCREEN',
+      '__SPLASHSCREEN__',
     ];
-  },
 
-  getConfig() {
-    return ipcRenderer.sendSync(ipc('getConfig'));
+    for (const varName of possibleVars) if (varName in window) return true;
+
+    return false;
+  })(),
+
+  getThemes: () => ipcRenderer.invoke(ipc('getThemes')),
+  getConfig: () => ipcRenderer.sendSync(ipc('getConfig')),
+  getMainLogs: () => ipcRenderer.invoke(ipc('getMainLogs')),
+
+  async getUserStyles() {
+    return this.getConfig().userStyles;
   },
 
   onSaveState(handler) {
     ipcRenderer.on(ipc('saveState'), handler);
-    return () => ipcRenderer.off(ipc('onSaveState'), handler);
+    return () => ipcRenderer.off(ipc('saveState'), handler);
   },
 
   onSendLog(handler) {
     ipcRenderer.on(ipc('sendLog'), handler);
-    return () => ipcRenderer.off(ipc('onSendLog'), handler);
-  },
-
-  async getMainLogs() {
-    return await ipcRenderer.invoke(ipc('getMainLogs'));
+    return () => ipcRenderer.off(ipc('sendLog'), handler);
   },
 };
 

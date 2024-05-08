@@ -1,4 +1,4 @@
-import { app, session } from 'electron';
+import { app } from 'electron';
 
 function parsePolicy(policy: string) {
   const result: Record<string, string[]> = {};
@@ -14,8 +14,8 @@ function parsePolicy(policy: string) {
   return result;
 }
 
-app.on('ready', () => {
-  session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders, resourceType }, cb) => {
+app.on('session-created', (session) => {
+  session.webRequest.onHeadersReceived(({ responseHeaders, resourceType }, cb) => {
     if (!responseHeaders) return;
 
     if (resourceType === 'mainFrame') {
@@ -24,7 +24,7 @@ app.on('ready', () => {
 
       const csp = parsePolicy(responseHeaders[header]![0]!);
 
-      for (const directive of ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src']) {
+      for (const directive of ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src', 'prefetch-src']) {
         csp[directive] ??= [];
         csp[directive]!.push('*', 'blob:', 'data:', 'popcorn:', '\'unsafe-inline\'');
       }
@@ -42,5 +42,5 @@ app.on('ready', () => {
     cb({ cancel: false, responseHeaders });
   });
 
-  session.defaultSession.webRequest.onHeadersReceived = () => { };
+  session.webRequest.onHeadersReceived = () => { };
 });

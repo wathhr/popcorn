@@ -6,7 +6,7 @@ import { config } from '#/config';
 const preloadPath = join(__dirname, 'preload.js');
 
 class ProxiedBrowserWindow extends electron.BrowserWindow {
-  constructor(options: Electron.BrowserWindowConstructorOptions) {
+  constructor(options: Electron.BrowserWindowConstructorOptions | undefined = {}) {
     options.webPreferences ??= {};
     const originalPreload = options.webPreferences.preload!;
 
@@ -26,7 +26,7 @@ class ProxiedBrowserWindow extends electron.BrowserWindow {
 }
 
 ipcMain.on(ipc('$getWindowData'), (event) => {
-  if (event.sender.originalWindowData) event.returnValue = event.sender.originalWindowData;
+  event.returnValue = event.sender.originalWindowData!;
 });
 
 const electronPath = require.resolve('electron');

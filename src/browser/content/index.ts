@@ -1,5 +1,6 @@
 globalThis.PopcornAPI = {
   isBrowser: true,
+  isSplash: false,
 
   async getThemes() {
     return [
@@ -18,7 +19,7 @@ globalThis.PopcornAPI = {
     ];
   },
 
-  async getUrls() {
+  async getUserStyles() {
     return [
       'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
     ];
@@ -34,6 +35,7 @@ globalThis.PopcornAPI = {
       themeDirs: [],
       verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
       transparencyType: 'none',
+      userStyles: [],
     };
   },
 };

@@ -1,8 +1,8 @@
 diff --git a/electron.d.ts b/electron.d.ts
-index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c62a2925d7 100644
+index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..3a0fc086585479ef55156a14f292c7c7d01be9ba 100644
 --- a/electron.d.ts
 +++ b/electron.d.ts
-@@ -1,10 +1,20 @@
+@@ -1,10 +1,24 @@
 -// Type definitions for Electron 30.0.1
 +// Type definitions for Electron 30.0.1 (patched)
  // Project: http://electronjs.org/
@@ -14,17 +14,21 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
 +declare namespace $PopcornInternals {
 +  type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
 +  type ReturnType<T> = T | Awaited<T> | Promise<Awaited<T>>;
-+  type ForceArr = import('../../../../../types/utils.ts').ForceArr;
++  type ForceArr<T> = T extends any[] ? T : [T];
++  type KeysOfValue<T, U> = { [K in keyof T]: T[K] extends U ? K : never }[keyof T];
++  type FilterKeys<T, U> = { [K in KeysOfValue<T, U>]: T[K] };
 +
++  // Using the import keyword does not work for some reason so I need to do it like this instead
 +  type MapKeys<T> = { [K in keyof T as import('../../../../../types/index.ts').EventName<K & string>]: T[K] };
-+  type MappedAPI = MapKeys<Omit<import('../../../../../types/index.ts').ElectronAPI, 'isBrowser'>>; // TODO: Make this more flexible so it omits any key that is not a function
++  type MappedAPI = MapKeys<FilterKeys<import('../../../../../types/index.ts').ElectronAPI, Function>>;
 +  type MappedMainAPI = MapKeys<import('../../../../../types/index.ts').MainAPI>;
 +}
++
 +
  type DOMEvent = Event;
  type GlobalResponse = Response;
  type GlobalRequest = Request;
-@@ -8155,38 +8165,58 @@ declare namespace Electron {
+@@ -8155,38 +8169,58 @@ declare namespace Electron {
       * are serialized and only the `message` property from the original error is
       * provided to the renderer process. Please refer to #24427 for details.
       */
@@ -91,7 +95,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
  
      // Docs: https://electronjs.org/docs/api/structures/ipc-main-event
  
-@@ -8208,11 +8238,11 @@ declare namespace Electron {
+@@ -8208,11 +8242,11 @@ declare namespace Electron {
       * "reply" to the sent message in order to guarantee the reply will go to the
       * correct process and frame.
       */
@@ -105,7 +109,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * Returns the `webContents` that sent the message
       */
-@@ -8254,7 +8284,10 @@ declare namespace Electron {
+@@ -8254,7 +8288,10 @@ declare namespace Electron {
      /**
       * Alias for `ipcRenderer.on`.
       */
@@ -117,17 +121,17 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * Resolves with the response from the main process.
       *
-@@ -8285,22 +8318,30 @@ declare namespace Electron {
+@@ -8285,22 +8322,30 @@ declare namespace Electron {
       * returned by `invoke` will reject. However, the `Error` object in the renderer
       * process will not be the same as the one thrown in the main process.
       */
 -    invoke(channel: string, ...args: any[]): Promise<any>;
-+    invoke<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): Promise<ReturnType<$PopcornInternals.MappedAPI[K]>>;
++    invoke<K extends keyof $PopcornInternals.MappedAPI>(channel: K, ...args: $PopcornInternals.Parameters<$PopcornInternals.MappedAPI[K]>): Promise<Awaited<ReturnType<$PopcornInternals.MappedAPI[K]>>>;
      /**
       * Alias for `ipcRenderer.removeListener`.
       */
 -    off(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
-+    off(channel: keyof $PopcornInternals.MappedAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
++    off(channel: keyof $PopcornInternals.MappedMainAPI, listener: (event: IpcRendererEvent, ...args: any[]) => void): this;
      /**
       * Listens to `channel`, when a new message arrives `listener` would be called with
       * `listener(event, args...)`.
@@ -152,7 +156,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
       * Send a message to the main process, optionally transferring ownership of zero or
       * more `MessagePort` objects.
       *
-@@ -8317,12 +8358,12 @@ declare namespace Electron {
+@@ -8317,12 +8362,12 @@ declare namespace Electron {
      /**
       * Removes all listeners, or those of the specified `channel`.
       */
@@ -167,7 +171,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * Send an asynchronous message to the main process via `channel`, along with
       * arguments. Arguments will be serialized with the Structured Clone Algorithm,
-@@ -8347,7 +8388,7 @@ declare namespace Electron {
+@@ -8347,7 +8392,7 @@ declare namespace Electron {
       * If you want to receive a single response from the main process, like the result
       * of a method call, consider using `ipcRenderer.invoke`.
       */
@@ -176,7 +180,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * The value sent back by the `ipcMain` handler.
       *
-@@ -8372,12 +8413,12 @@ declare namespace Electron {
+@@ -8372,12 +8417,12 @@ declare namespace Electron {
       * renderer process until the reply is received, so use this method only as a last
       * resort. It's much better to use the asynchronous version, `invoke()`.
       */
@@ -191,7 +195,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
    }
  
    interface IpcRendererEvent extends Event {
-@@ -16192,7 +16233,7 @@ declare namespace Electron {
+@@ -16192,7 +16237,7 @@ declare namespace Electron {
       *
       * For additional reading, refer to Electron's IPC guide.
       */
@@ -200,7 +204,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * Sends an input `event` to the page. **Note:** The `BrowserWindow` containing the
       * contents needs to be focused for `sendInputEvent()` to work.
-@@ -16476,6 +16517,22 @@ declare namespace Electron {
+@@ -16476,6 +16521,22 @@ declare namespace Electron {
       * respectively. The formula for this is `scale := 1.2 ^ level`.
       */
      zoomLevel: number;
@@ -223,7 +227,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
    }
  
    class WebContentsView extends View {
-@@ -16750,7 +16807,7 @@ declare namespace Electron {
+@@ -16750,7 +16811,7 @@ declare namespace Electron {
       * The renderer process can handle the message by listening to `channel` with the
       * `ipcRenderer` module.
       */
@@ -232,7 +236,7 @@ index 28ff3afa052ee39f4f43f47a62d485f46c3d1cd3..012356a37f75e9d244bb368bf48940c6
      /**
       * A `WebFrameMain[]` collection containing the direct descendents of `frame`.
       *
-@@ -23209,40 +23266,40 @@ declare namespace Electron {
+@@ -23209,40 +23270,40 @@ declare namespace Electron {
  
  }
  

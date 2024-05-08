@@ -1,21 +1,23 @@
 import type { CamelToScreamingSnakeCase, ForceArr } from './utils';
 import type { Config, Theme } from '#types';
 
-export type EventName<T> = T extends string
-  ? `POPCORN_${CamelToScreamingSnakeCase<T>}`
-  : never;
-
 export interface BrowserAPI {
   isBrowser: true,
+  isSplash: false,
+
   getThemes(): Promise<Theme[]>,
-  getUrls(): Promise<string[]>,
+  getUserStyles(): Promise<string[]>,
   getConfig(): Required<Config>,
 }
 
-export type ElectronAPI = Omit<BrowserAPI, 'isBrowser'> & MappedMainAPI & {
+export interface ElectronAPI extends Omit<BrowserAPI, 'isBrowser' | 'isSplash'>, MappedMainAPI {
   isBrowser: false,
-  $getWindowData(): import('electron').WebContents['originalWindowData'],
+  isSplash: boolean,
+
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
+
+  // internals
+  $getWindowData(): NonNullable<import('electron').WebContents['originalWindowData' | 'kernelWindowData']>,
 };
 
 export interface MainAPI {
@@ -30,6 +32,10 @@ export interface MainAPI {
     time?: number,
   },
 }
+
+export type EventName<T> = T extends string
+  ? `POPCORN_${CamelToScreamingSnakeCase<T>}`
+  : never;
 
 type MappedMainAPI = {
   [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (

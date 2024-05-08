@@ -22,6 +22,7 @@ export const defaultConfig: Required<Config> = {
   ],
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
   transparencyType: 'none',
+  userStyles: [],
 };
 
 export const config = ((): Required<Config> => {

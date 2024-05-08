@@ -26,7 +26,10 @@ export const Config = Type.Partial(
       Type.Literal('acrylic'),
       Type.Literal('tabbed'),
     ], {
-      description: 'KERNEL NOT SUPPORTED\nWINDOWS ONLY\n\nThe type of transparency the window should have\n\n- `none`: Don\'t draw any system backdrop\n- `mica`: Draw the backdrop material effect corresponding to a long-lived window.\n- `acrylic`: Draw the backdrop material effect corresponding to a transient window\n- `tabbed`: Draw the backdrop material effect corresponding to a window with a tabbed title bar',
+      description: 'KERNEL NOT SUPPORTED\Setting this to anything other than `none` on non-Windows platforms will set the window\'s vibrancy to `fullscreen-ui`\n\nThe type of transparency the window should have\n\n- `none`: Don\'t draw any system backdrop\n- `mica`: Draw the backdrop material effect corresponding to a long-lived window.\n- `acrylic`: Draw the backdrop material effect corresponding to a transient window\n- `tabbed`: Draw the backdrop material effect corresponding to a window with a tabbed title bar',
+    }),
+    userStyles: Type.Array(Type.String(), {
+      description: '`.user.css` files to load',
     }),
   }),
 );
