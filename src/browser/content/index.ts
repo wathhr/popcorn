@@ -33,6 +33,7 @@ globalThis.PopcornAPI = {
       quickCssDir: './quickcss',
       themeDirs: [],
       verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
+      transparencyType: 'none',
     };
   },
 };
