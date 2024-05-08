@@ -1,8 +1,7 @@
-// ! https://github.com/kernel-mod/electron/blob/2023-01-15-07-14-02/src/core/patchers/BrowserWindowPatcher.ts
-
 import { join } from 'node:path';
 import electron, { ipcMain } from 'electron';
 import { ipc } from '#shared';
+import { config } from '#/config';
 
 const preloadPath = join(__dirname, 'preload.js');
 
@@ -12,6 +11,11 @@ class ProxiedBrowserWindow extends electron.BrowserWindow {
     const originalPreload = options.webPreferences.preload!;
 
     options.webPreferences.preload = preloadPath;
+    if (config.transparencyType !== 'none') {
+      options.backgroundColor = '#00000000';
+      options.vibrancy = 'fullscreen-ui';
+      options.backgroundMaterial = config.transparencyType;
+    }
 
     super(options);
     this.webContents.originalWindowData = {

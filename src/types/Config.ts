@@ -20,6 +20,14 @@ export const Config = Type.Partial(
       description: 'Enabled or disabled themes by id',
     }),
     verbose: Type.Boolean(),
+    transparencyType: Type.Union([
+      Type.Literal('none'),
+      Type.Literal('mica'),
+      Type.Literal('acrylic'),
+      Type.Literal('tabbed'),
+    ], {
+      description: 'KERNEL NOT SUPPORTED\nWINDOWS ONLY\n\nThe type of transparency the window should have\n\n- `none`: Don\'t draw any system backdrop\n- `mica`: Draw the backdrop material effect corresponding to a long-lived window.\n- `acrylic`: Draw the backdrop material effect corresponding to a transient window\n- `tabbed`: Draw the backdrop material effect corresponding to a window with a tabbed title bar',
+    }),
   }),
 );
 

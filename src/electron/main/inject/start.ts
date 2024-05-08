@@ -1,5 +1,3 @@
-// ! https://github.com/kernel-mod/electron/blob/2023-01-15-07-14-02/src/main/startOriginal.ts
-
 import { existsSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import Module from 'node:module';
@@ -53,7 +51,7 @@ else unsafeApp.setDesktopName(`${unsafeApp.name}.desktop`);
 if (originalPkg.v8Flags != null) require('node:v8').setFlagsFromString(originalPkg.v8Flags);
 
 require.main!.filename = fullOriginalMain;
-unsafeApp.setAppPath?.(originalAsar);
+unsafeApp.setAppPath(originalAsar);
 
 // Module._load(file, Module, true) is used instead of require() because it lets you load the file as if it was the first file being run in the Node environment
 // Using require could result in things breaking if the app ever uses require.main

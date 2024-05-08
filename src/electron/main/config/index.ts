@@ -21,6 +21,7 @@ export const defaultConfig: Required<Config> = {
       : [resolvePath('$HOME/discord/themes/')]),
   ],
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
+  transparencyType: 'none',
 };
 
 export const config = ((): Required<Config> => {
