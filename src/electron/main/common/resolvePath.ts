@@ -1,6 +1,7 @@
-import { normalize } from 'node:path';
+import { isAbsolute, join, normalize } from 'node:path';
+import { configDir } from './constants';
 
-export function resolvePath(path: string) {
+export function resolvePath(path: string, defaultPath = configDir) {
   const windowsRegex = /%([^%]+)%/g; // matches %variableName%
   const unixRegex = /\$(?:{(?=[^}]*}))?(\w+)}?/g; // matches $variableName and ${variableName}
 
@@ -9,5 +10,6 @@ export function resolvePath(path: string) {
     else return path.replace(unixRegex, (_, name) => process.env[name] ?? `$${name}`);
   })());
 
-  return newPath;
+  if (isAbsolute(newPath)) return newPath;
+  else return join(defaultPath, newPath);
 }

@@ -57,14 +57,14 @@ class DevServer {
 
       case this.is(json, 'reload'): {
         switch (json.data.file) {
-          case 'renderer/index.js': {
+          case 'renderer.js': {
             Logger.info('Reloading the renderer script');
             window.postMessage(ipc('stop'), '*');
 
             if (!process.contextIsolated && isKernel) await import(`${window.kernel.importProtocol}://${window.kernel.packages.getPackages()[manifest.id]!.path}`);
-            else webFrame.top?.executeJavaScript(json.data.content);
+            else webFrame.executeJavaScript(await fetch('popcorn://core/renderer.js').then(res => res.text()));
           } break;
-          case 'preload/index.js': {
+          case 'preload.js': {
             location.reload();
           } break;
         }

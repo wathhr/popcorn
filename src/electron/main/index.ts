@@ -4,11 +4,13 @@ import { config } from './config';
 import { isKernel } from '#shared';
 
 import './patch-csp';
+import './protocol';
 
 const Logger = new CreateLogger();
 Logger.info('Starting...');
 Logger.debug('Kernel:', isKernel);
 
+// TODO: Fix this from the eslint config
 // eslint-disable-next-line ts/no-require-imports
 if (!isKernel) require('./inject');
 
@@ -18,6 +20,7 @@ app.on('browser-window-created', (_, window) => {
   if (process.argv.includes('--devtools')) window.webContents.openDevTools();
 });
 
+// TODO: Add better error handling, https://stackoverflow.com/questions/41102060/typescript-extending-error-class
 process.on('uncaughtExceptionMonitor', (err, origin) => {
   Logger.error('Uncaught exception', err, origin);
 });

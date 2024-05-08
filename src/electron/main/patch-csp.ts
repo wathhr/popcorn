@@ -30,7 +30,7 @@ app.on('ready', () => {
       }
 
       csp['script-src'] ??= [];
-      csp['script-src'].push('\'unsafe-eval\'');
+      csp['script-src'].push('\'unsafe-eval\'', 'popcorn:');
       responseHeaders[header] = [
         Object.entries(csp)
           .filter(([, values]) => values?.length)

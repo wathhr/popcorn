@@ -33,7 +33,7 @@ export class DomManager {
   }
 
   addElement(element: HTMLElement, position: 'start' | 'end' = 'end') {
-    /* eslint-disable prefer-rest-params */
+    // eslint-disable-next-line prefer-rest-params
     this.logger.debug(this.name, 'addElement', arguments);
 
     if (position === 'start') {

@@ -9,8 +9,11 @@ import './ipc';
 const Logger = new CreateLogger('Themes');
 
 let themes: Theme[] | undefined;
+export const themeLocationCache = new Map<Theme['id'], string>();
 
-export async function getThemes() {
+export async function getThemes(force = false) {
+  if (themes && !force) return themes;
+
   themes = [];
 
   for (const dir of config.themeDirs) {
@@ -35,6 +38,7 @@ export async function getThemes() {
         }
 
         themes.push(json);
+        themeLocationCache.set(json.id, themeDir);
       } catch (e) {
         Logger.error(`Failed theme manifest in "${dir}":`, e);
         continue;
@@ -44,3 +48,5 @@ export async function getThemes() {
 
   return themes;
 }
+
+getThemes(true);

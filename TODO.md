@@ -8,8 +8,6 @@
 
 ## Code management
 - [ ] Move `src/electron/renderer` to `src/browser` and use it from there instead
-- [ ] Remove all of the manual `Omit<>`s
-- [ ] Add file system manager
 
 ## Extension
 - [x] Implement
@@ -37,8 +35,9 @@
   - [ ] ~~[Imports](https://github.com/kernel-mod/electron/blob/master/tsconfig.json#L9)~~
   - [ ] ~~[IPC](https://github.com/kernel-mod/electron/blob/master/src/main/ipc.ts)~~
 - [x] Add the ability to import legacy versions of electron in case of deprecated stuff
-  - [ ] Do the same for node
+  - [ ] ~~Do the same for node~~
   - [ ] For some reason typescript can't get type declarations when importing from `electron-legacy/[main,renderer,...]`
+- [ ] Add file system manager
 
 ## Scripts
 - [ ] Figure out a better way to add kernel-types, currently they are manually written
@@ -46,6 +45,7 @@
 - [ ] ~~Add a way to easily create patches~~
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
+- [ ] Add symlink support for the injector
 
 ## Linting
 - [ ] https://typescript-eslint.io/rules/no-base-to-string/

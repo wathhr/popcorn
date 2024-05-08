@@ -13,9 +13,9 @@ export const defaultConfig: Required<Config> = {
   configVersion: 1,
   enabled: {},
   hotkey: 'ctrl+shift+p',
-  quickCssDir: './quickcss',
+  quickCssDir: join(configDir, 'quickcss'),
   themeDirs: [
-    './themes/',
+    join(configDir, 'themes/'),
     ...(process.platform === 'win32'
       ? [resolvePath('%USERPROFILE%/discord/themes/')]
       : [resolvePath('$HOME/discord/themes/')]),
@@ -43,7 +43,7 @@ export const config = ((): Required<Config> => {
     }
 
     json.quickCssDir &&= resolvePath(json.quickCssDir);
-    json.themeDirs &&= json.themeDirs.map(resolvePath);
+    json.themeDirs &&= json.themeDirs.map(d => resolvePath(d));
 
     return { ...defaultConfig, ...json };
   } catch (e) {
