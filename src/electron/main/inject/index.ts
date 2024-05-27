@@ -1,14 +1,15 @@
 import { join } from 'node:path';
-import electron, { ipcMain } from 'electron';
+import electron from 'electron';
 import { ipc } from '#shared';
 import { config } from '#/config';
 
 const preloadPath = join(__dirname, 'preload.js');
 
-class ProxiedBrowserWindow extends electron.BrowserWindow {
-  constructor(options: Electron.BrowserWindowConstructorOptions | undefined = {}) {
+class BrowserWindow extends electron.BrowserWindow {
+  constructor(options?: Electron.BrowserWindowConstructorOptions) {
+    options ??= {};
     options.webPreferences ??= {};
-    const originalPreload = options.webPreferences.preload!;
+    const originalPreload = options.webPreferences.preload ?? preloadPath;
 
     options.webPreferences.preload = preloadPath;
     if (config.transparencyType !== 'none') {
@@ -25,7 +26,10 @@ class ProxiedBrowserWindow extends electron.BrowserWindow {
   }
 }
 
-ipcMain.on(ipc('$getWindowData'), (event) => {
+// esbuild minifies the name of BrowserWindow which breaks things for some reason and this hack fixes it 👍
+Object.defineProperty(BrowserWindow, 'name', { value: 'BrowserWindow' });
+
+electron.ipcMain.on(ipc('$getWindowData'), (event) => {
   event.returnValue = event.sender.originalWindowData!;
 });
 
@@ -33,7 +37,7 @@ const electronPath = require.resolve('electron');
 delete require.cache[electronPath]!.exports;
 require.cache[electronPath]!.exports = {
   ...electron,
-  BrowserWindow: ProxiedBrowserWindow,
+  BrowserWindow,
 };
 
 if (!process.argv.includes('--no-start-original')) require('./start');

@@ -13,7 +13,7 @@ export function customLogs(params: URL['searchParams']) {
   return {
     name: 'Custom logging',
     setup(build) {
-      if (params.get('original-logs') === 'true') return;
+      if (params.get('original-logs') === 'true' || build.initialOptions.logLevel === 'silent') return;
       let start = Date.now();
       build.onStart(() => void (start = Date.now()));
 
@@ -29,6 +29,7 @@ export function customLogs(params: URL['searchParams']) {
         return;
       }
 
+      const sizeWarningThreshold = 1024 * 1024;
       build.onEnd((result) => {
         if (!result.outputFiles) return;
 
@@ -57,14 +58,11 @@ export function customLogs(params: URL['searchParams']) {
             margin
             + relPath.replace(basename(file.path), '')
             + c.brightWhite(basename(file.path))
-            + c.cyan(' '.repeat(spacer) + sizeString),
+            + ' '.repeat(spacer)
+            + (file.contents.byteLength >= sizeWarningThreshold
+              ? c.red(`${sizeString}${Deno.build.os === 'windows' ? '' : ' ⚠️'}`)
+              : c.cyan(sizeString)),
           );
-
-          // console.log(
-          //   `${margin}${relPath.replace(basename(file.path), '')}%c${basename(file.path)}%c${' '.repeat(spacer)}${sizeString}`,
-          //   'color: white; font-weight: bold', // This is not the same as c.brightWhite,
-          //   'color: cyan',
-          // );
         }
 
         const unshownAmount = result.outputFiles.length - maxFiles;

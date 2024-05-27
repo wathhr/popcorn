@@ -2,7 +2,7 @@
 
 import * as esbuild from 'esbuild';
 import { deepMerge } from 'std/collections/mod.ts';
-import { ensureDirSync, exists } from 'std/fs/mod.ts';
+import { ensureDir, exists } from 'std/fs/mod.ts';
 import { join, relative } from 'std/path/mod.ts';
 import pkg from '#pkg' with { type: 'json' };
 import { DevServer } from '#build/devserver.mts';
@@ -15,11 +15,20 @@ const src = join(root, 'src');
 
 type MaybeArray<T> = T | T[];
 
-export type DefaultExport = MaybeArray<esbuild.BuildOptions & {
+export type DefaultExport = MaybeArray<{
   customOptions?: Partial<{
     independent: boolean,
   }>,
-}>;
+} & Exclude<
+  esbuild.BuildOptions,
+  'minify' |
+  'minifyIdentifiers' |
+  'minifySyntax' |
+  'write' |
+  'sourcemap' |
+  'color' |
+  'logLevel'
+>>;
 
 export type ModuleExport = Partial<{
   default: DefaultExport,
@@ -90,15 +99,17 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
       }
     })(typeOptions.entryPoints);
 
+    typeOptions.outdir &&= join(root, 'dist', typeOptions.customOptions?.independent ? '' : typeOptions.outdir);
+    typeOptions.outdir ??= join(root, 'dist', typeOptions.customOptions?.independent ? '' : type);
+
     const baseOptions: esbuild.BuildOptions = {
       bundle: true,
       minify: !dev,
-      minifySyntax: !dev,
       minifyIdentifiers: !dev,
+      minifySyntax: !dev,
+      minifyWhitespace: !dev,
       write: false,
-      outdir: typeOptions.outdir
-        ? join(root, 'dist', typeOptions.customOptions?.independent ? '' : typeOptions.outdir)
-        : join(root, 'dist', typeOptions.customOptions?.independent ? '' : type),
+      metafile: true,
       sourcemap: dev ? 'inline' : false,
       define: {
         NODE_ENV: dev ? '"development"' : '"production"',
@@ -109,22 +120,23 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
         {
           name: 'Write and announce file outputs',
           setup(build) {
-            build.onEnd((result) => {
-              result.outputFiles?.forEach((file) => {
+            build.onEnd(async (result) => {
+              for (const file of result.outputFiles!) {
                 const dir = join(file.path, '..');
-                ensureDirSync(dir);
-                Deno.writeFileSync(file.path, file.contents);
+                if (!await exists(dir)) await ensureDir(dir);
+                await Deno.writeFile(file.path, file.contents);
 
                 if (!devServer) return;
 
-                const relFilePath = relative(join(root, 'dist'), file.path).replace(/\\/g, '/');
+                const relFilePath = relative(typeOptions.outdir!, file.path).replace(/\\/g, '/');
                 const name = relFilePath.split('/')[0];
+                console.log(name);
 
-                devServer.send(name, 'reload', {
+                devServer.send('*', 'reload', {
                   content: file.text,
                   file: relFilePath,
                 });
-              });
+              }
             });
           },
         },
@@ -140,7 +152,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
     delete typeOptions.customOptions;
 
     // @ts-expect-error no idea why this errors
-    const processedTypeOptions: esbuild.BuildOptions = deepMerge(typeOptions, baseOptions);
+    const processedTypeOptions: esbuild.BuildOptions = deepMerge(baseOptions, typeOptions);
     contexts.push(await esbuild.context(processedTypeOptions));
   }
 

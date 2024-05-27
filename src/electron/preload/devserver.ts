@@ -1,5 +1,5 @@
 import { webFrame } from 'electron';
-import { CreateLogger } from '../renderer/common/logger';
+import { CreateLogger } from '../../browser/common/logger';
 import manifest from '~/index.json' assert { type: 'json' };
 import { ipc, isKernel } from '#shared';
 
@@ -7,8 +7,7 @@ const Logger = new CreateLogger('DevServer');
 
 export interface Message {
   hello: {
-    name: string,
-    roles?: string[],
+    roles: [string, ...string[]],
     nonce: number,
   },
   stop: never,
@@ -23,20 +22,18 @@ export interface MessageResponse<T extends keyof Message = keyof Message> {
   data: Message[T],
 }
 
+const is = <T extends keyof Message>(json: MessageResponse, type: T): json is MessageResponse<T> & boolean => json.type === type;
+
+function parse(text: string) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Invalid JSON: ${text}`);
+  }
+}
+
 class DevServer {
   private wss: WebSocket;
-
-  private parse(text: string) {
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(`Invalid JSON: ${text}`);
-    }
-  }
-
-  private is<T extends keyof Message>(json: MessageResponse, type: T): json is MessageResponse<T> {
-    return json.type === type;
-  }
 
   constructor(port = 7331) {
     const ws = this.wss = new WebSocket(`ws://localhost:${port}`);
@@ -47,21 +44,21 @@ class DevServer {
   }
 
   private async handleMessage(message: MessageEvent<string>) {
-    const json = this.parse(message.data);
+    const json = parse(message.data);
 
     switch (true) {
-      case this.is(json, 'hello'): {
-        this.send('hello', { name: 'preload', roles: ['renderer'], nonce: json.data.nonce });
+      case is(json, 'hello'): {
+        this.send('hello', { roles: ['preload', 'renderer'], nonce: json.data.nonce });
         Logger.info('Connected');
       } break;
 
-      case this.is(json, 'reload'): {
+      case is(json, 'reload'): {
         switch (json.data.file) {
           case 'renderer.js': {
             Logger.info('Reloading the renderer script');
             window.postMessage(ipc('stop'), '*');
 
-            if (!process.contextIsolated && isKernel) await import(`${window.kernel.importProtocol}://${window.kernel.packages.getPackages()[manifest.id]!.path}`);
+            if (!process.contextIsolated && isKernel) await import(`${kernel.importProtocol}://${kernel.packages.getPackages()[manifest.id]!.path}`);
             else webFrame.executeJavaScript(await fetch('popcorn://core/renderer.js').then(res => res.text()));
           } break;
           case 'preload.js': {

@@ -1,4 +1,4 @@
-import * as renderer from '#';
+import * as renderer from '#/content';
 import { ipc } from '#shared/constants';
 
 function messageHandler(event: MessageEvent) {

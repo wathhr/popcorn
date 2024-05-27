@@ -1,0 +1,7 @@
+@import './a.css';
+
+body {
+  h1 {
+    color: var(--color);
+  }
+}

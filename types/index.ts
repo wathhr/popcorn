@@ -1,11 +1,16 @@
 import type { CamelToScreamingSnakeCase, ForceArr } from './utils';
 import type { Config, Theme } from '#types';
 
+export interface ThemeResponse extends Theme {
+  /** The location of the directory of the theme */
+  location: string,
+}
+
 export interface BrowserAPI {
   isBrowser: true,
   isSplash: false,
 
-  getThemes(): Promise<Theme[]>,
+  getThemes(): Promise<ThemeResponse[]>,
   getUserStyles(): Promise<string[]>,
   getConfig(): Required<Config>,
 }

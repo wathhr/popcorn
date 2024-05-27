@@ -24,7 +24,7 @@ app.on('session-created', (session) => {
 
       const csp = parsePolicy(responseHeaders[header]![0]!);
 
-      for (const directive of ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src', 'prefetch-src']) {
+      for (const directive of ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src']) {
         csp[directive] ??= [];
         csp[directive]!.push('*', 'blob:', 'data:', 'popcorn:', '\'unsafe-inline\'');
       }

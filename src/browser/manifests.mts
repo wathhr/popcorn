@@ -1,7 +1,7 @@
 #!/bin/usr/env false
 /// <reference types="npm:@types/chrome" />
 
-import pkg from '../../package.json' with { type: 'json' };
+import pkg from '#pkg' with { type: 'json' };
 
 const commonManifest = {
   name: pkg.name[0]!.toUpperCase() + pkg.name.slice(1),
@@ -16,7 +16,7 @@ export const manifest: Record<`v${2 | 3}`, chrome.runtime.Manifest> = {
     ...commonManifest,
 
     action: {
-      default_popup: './popup/index.html',
+      default_popup: './views/popup.html',
     },
     background: {
       service_worker: './background/index.ts',
@@ -41,7 +41,7 @@ export const manifest: Record<`v${2 | 3}`, chrome.runtime.Manifest> = {
     ...commonManifest,
 
     browser_action: {
-      default_popup: './popup/index.html',
+      default_popup: './views/popup.html',
     },
     background: {
       persistent: true,

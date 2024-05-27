@@ -2,17 +2,14 @@
 
 import compat from 'npm:core-js-compat';
 import browserslist from 'npm:browserslist';
-import { join } from 'std/path/mod.ts';
-import { exists } from 'std/fs/exists.ts';
+import { basename, join } from 'std/path/mod.ts';
 import pkg from '#pkg' with { type: 'json' };
 
 export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof pkg['browserslist'] & string)): import('esbuild').Plugin {
   return {
     name: 'corejs',
-    async setup(build) {
-      const dir = join(import.meta.dirname!, '../../../temp'); // needs to be in the project directory else esbuild can't resolve the imports
-      if (!await exists(dir)) await Deno.mkdir(dir);
-      const files: string[] = [];
+    setup(build) {
+      let file: string | undefined;
 
       build.onStart(async () => {
         // @ts-expect-error this is correct i don't care what typescript says
@@ -27,18 +24,26 @@ export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof p
           modules: ['core-js/stable'],
         });
 
-        const imports = `import 'core-js/modules/${list.join('.js\';\nimport \'core-js/modules/')}.js';`;
+        const pathList = await Promise.all(
+          list.map(async (path) => {
+            return await build.resolve(`core-js/modules/${path}.js`, {
+              kind: 'require-call',
+              resolveDir: join(import.meta.dirname!, '../../../'),
+            }).then(r => r.path.replaceAll('\\', '/'));
+          }),
+        );
 
-        const file = join(dir, `corejs-${Date.now()}.js`);
-        files.push(file);
+        const imports = `import '${pathList.join('\';\nimport \'')}';`;
+
+        file = await Deno.makeTempFile({ prefix: 'corejs-', suffix: '.js' });
         await Deno.writeTextFile(file, imports);
 
-        build.initialOptions.inject?.push(file);
+        build.initialOptions.inject ??= [];
+        build.initialOptions.inject &&= build.initialOptions.inject.filter(i => !basename(i).startsWith('corejs-'));
+        build.initialOptions.inject.push(file);
       });
 
-      build.onEnd(async () => {
-        while (files.length > 0) await Deno.remove(files.pop()!);
-      });
+      build.onEnd(() => void (file && Deno.removeSync(file)));
     },
   };
 }

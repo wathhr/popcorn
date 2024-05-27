@@ -7,7 +7,7 @@
 - [x] Add validation to user-defined objects (such as the config) using [typebox](https://github.com/sinclairzx81/typebox)
 
 ## Code management
-- [ ] Move `src/electron/renderer` to `src/browser` and use it from there instead
+- [x] Move `src/electron/renderer` to `src/browser` and use it from there instead
 
 ## Extension
 - [x] Implement
@@ -40,12 +40,15 @@
 - [ ] Add file system manager
 
 ## Scripts
-- [ ] Figure out a better way to add kernel-types, currently they are manually written
+- [ ] ~~Figure out a better way to add kernel-types, currently they are manually written~~
 - [ ] Add macro support (https://github.com/unplugin/unplugin-macros) (specifically for constants)
 - [ ] ~~Add a way to easily create patches~~
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
 - [ ] Add symlink support for the injector
+- [ ] Improve logging from building
+  - [ ] Grouping builds
+  - [ ] Add custom output files
 
 ## Linting
 - [ ] https://typescript-eslint.io/rules/no-base-to-string/

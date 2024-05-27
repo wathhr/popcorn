@@ -2,12 +2,12 @@
 
 import { extname } from 'std/path/mod.ts';
 
-interface Opts {
+type Opts = Record<string, never> | {
   regex: RegExp,
   replace: string,
-}
+};
 
-export function customFiles(opts?: Opts): import('esbuild').Plugin {
+export function customFiles(opts: Opts = {}): import('esbuild').Plugin {
   return {
     name: 'Custom files',
     setup(build) {
@@ -17,7 +17,7 @@ export function customFiles(opts?: Opts): import('esbuild').Plugin {
         if (loaders.includes(extname(path))) return;
 
         let content = await Deno.readTextFile(path);
-        if (opts?.regex) content = content.replace(opts.regex, opts.replace);
+        if (opts.regex) content = content.replace(opts.regex, opts.replace);
 
         return {
           contents: content,

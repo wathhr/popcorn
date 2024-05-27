@@ -1,43 +1,31 @@
-globalThis.PopcornAPI = {
-  isBrowser: true,
-  isSplash: false,
+import { CreateLogger } from '#/common';
+import { isKernel } from '#shared';
+import type { MainAPI } from '~/types';
 
-  async getThemes() {
-    return [
-      {
-        id: 'test.test',
-        main: 'troll',
-        manifestVersion: 1,
-        description: 'Test theme',
-        name: 'Test theme',
-        version: '1.0.0',
-        metaLinks: {
-          github: 'https://github.com/example/test',
-          discord: 'https://discord.gg/example',
-        },
-      },
-    ];
-  },
+// eslint-disable-next-line ts/no-require-imports
+if (!('PopcornAPI' in globalThis)) require('./api.ts');
 
-  async getUserStyles() {
-    return [
-      'https://github.com/elad2412/the-new-css-reset/raw/main/css/reset.css',
-    ];
-  },
+const Logger = new CreateLogger();
 
-  getConfig() {
-    return {
-      $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
-      configVersion: 1,
-      enabled: {},
-      hotkey: 'ctrl+shift+p',
-      quickCssDir: './quickcss',
-      themeDirs: [],
-      verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
-      transparencyType: 'none',
-      userStyles: [],
-    };
-  },
-};
+Logger.info('Starting...');
+Logger.debug('Kernel:', isKernel);
+const ipc = import('./modules/ipc');
 
-import('~/src/electron/renderer');
+if (!PopcornAPI.isBrowser) {
+  const MainLogger = new CreateLogger('Main');
+  function createLog(log: MainAPI['sendLog']) {
+    if (log.component) return new CreateLogger('Main', log.component)[log.level](...[log.message].flat());
+
+    MainLogger[log.level](...log.message);
+  }
+
+  PopcornAPI.getMainLogs().then((logs) => {
+    for (const log of logs) createLog(log);
+  });
+  PopcornAPI.onSendLog((_, log) => createLog(log));
+}
+
+export async function stop() {
+  (await ipc).stop();
+  Logger.info('Stopping...');
+}

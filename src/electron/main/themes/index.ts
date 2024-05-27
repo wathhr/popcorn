@@ -3,12 +3,13 @@ import { join } from 'node:path';
 import { config } from '#/config';
 import { CreateLogger } from '#/common';
 import { type Theme, ThemeChecker } from '#types';
+import type { ThemeResponse } from '~/types';
 
 import './ipc';
 
 const Logger = new CreateLogger('Themes');
 
-let themes: Theme[] | undefined;
+let themes: ThemeResponse[] | undefined;
 export const themeLocationCache = new Map<Theme['id'], string>();
 
 export async function getThemes(force = false) {
@@ -37,7 +38,10 @@ export async function getThemes(force = false) {
           continue;
         }
 
-        themes.push(json);
+        themes.push({
+          location: themeDir,
+          ...json,
+        });
         themeLocationCache.set(json.id, themeDir);
       } catch (e) {
         Logger.error(`Failed theme manifest in "${themeDir}":`, e);

@@ -19,11 +19,14 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
 
 builds.at(-1)?.plugins?.push({
   name: 'Create ASAR',
-  async setup(build) {
+  setup(build) {
     const outDir = build.initialOptions.outdir;
     if (!outDir) return;
-    const fileName = outDir.replace(/\/?$/, '.asar');
-    await createPackage(outDir, fileName);
+
+    build.onEnd(async () => {
+      const fileName = outDir.replace(/\/?$/, '.asar');
+      await createPackage(outDir, fileName);
+    });
   },
 });
 

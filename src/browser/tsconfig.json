@@ -1,18 +1,27 @@
 {
-  "extends": "../electron/renderer/tsconfig.json",
+  "extends": "../../tsconfig.json",
   "include": ["./**/*.ts"],
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ESNext",
+
+    "lib": [
+      "DOM",
+      "ESNext",
+    ],
+
     "types": [
-      "@types/chrome",
       "./globals.d.ts",
       "../../types/globals.d.ts",
+      "../../types/kernel.d.ts",
     ],
 
     "paths": {
       "~": ["../.."],
       "~/*": ["../../*"],
-      "#": [".", "../electron/renderer"],
-      "#/*": ["./*", "../electron/renderer/*"],
+      "#": ["."],
+      "#/*": ["./*"],
       "#shared": ["../#shared"],
       "#shared/*": ["../#shared/*"],
       "#types": ["../types"],

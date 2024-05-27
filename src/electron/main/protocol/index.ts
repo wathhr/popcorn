@@ -20,7 +20,7 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-app.on('ready', () => {
+app.whenReady().then(() => {
   protocol.handle('popcorn', (request) => {
     const { host, pathname } = new URL(request.url);
 

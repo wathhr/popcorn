@@ -21,6 +21,7 @@ const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
     ];
 
     for (const varName of possibleVars) if (varName in window) return true;
+    if (/(public)?(splash\.html?|splash[\\/]\w+\.html?)$/i.test(location.href)) return true;
 
     return false;
   })(),
@@ -30,7 +31,7 @@ const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
   getMainLogs: () => ipcRenderer.invoke(ipc('getMainLogs')),
 
   async getUserStyles() {
-    return this.getConfig().userStyles;
+    return PopcornAPI.getConfig().userStyles;
   },
 
   onSaveState(handler) {

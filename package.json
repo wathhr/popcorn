@@ -20,14 +20,14 @@
     "lint:ext:mv2": "web-ext lint -s ./dist/browser-MV2",
     "lint:ext:mv3": "web-ext lint -s ./dist/browser-MV3",
     "check": "run-s check:*",
-    "check:main": "tsc --noEmit --project ./src/electron/main/tsconfig.json",
-    "check:preload": "tsc --noEmit --project ./src/electron/preload/tsconfig.json",
-    "check:renderer": "tsc --noEmit --project ./src/electron/renderer/tsconfig.json",
+    "check:electron": "tsc --noEmit --project ./src/electron/main/tsconfig.json && tsc --noEmit --project ./src/electron/preload/tsconfig.json",
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",
     "build": "deno run --allow-all scripts/build/cli.mts",
     "watch": "deno run --allow-all scripts/build/cli.mts --watch --dev",
-    "start:firefox": "web-ext run --source-dir ./dist/browser/ --browser-console --devtools",
-    "start:chrome": "web-ext run --source-dir ./dist/browser/ -t chromium --browser-console --devtools"
+    "start:firefox:mv2": "web-ext run --source-dir ./dist/browser-MV2/ --browser-console --devtools",
+    "start:firefox:mv3": "web-ext run --source-dir ./dist/browser-MV3/ --browser-console --devtools",
+    "start:chrome:mv2": "web-ext run --source-dir ./dist/browser-MV2/ -t chromium --browser-console --devtools",
+    "start:chrome:mv3": "web-ext run --source-dir ./dist/browser-MV3/ -t chromium --browser-console --devtools"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.9.0",

@@ -2,7 +2,7 @@ import { appendFile, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { formatWithOptions } from 'node:util';
-import { app, ipcMain, webContents } from 'electron';
+import { app, ipcMain } from 'electron';
 import { sendToAll } from './sendToAll';
 import { configDir, startTimeString } from './constants';
 import { type Color, colors, ipc } from '#shared';
@@ -28,10 +28,9 @@ const logFile = (() => {
 
 const logs: MainAPI['sendLog'][] = [];
 
+// TODO: Only send this if we are confident it's the main window
+app.on('web-contents-created', (_, contents) => logs.forEach(log => contents.send(ipc('sendLog'), log)));
 ipcMain.handle(ipc('getMainLogs'), () => logs);
-app.on('web-contents-created', (_, contents) => {
-  logs.forEach(log => contents.send(ipc('sendLog'), log));
-});
 
 class Logger {
   private name: string;
@@ -64,7 +63,7 @@ class Logger {
       ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
       : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
 
-    console[level](banner, ...msg);
+    if (DEBUG || level !== 'debug') console[level](banner, ...msg);
 
     queueMicrotask(() => this.appendLog(level, ...msg));
 
@@ -87,12 +86,12 @@ class Logger {
         time: Date.now(),
       };
 
-      if (webContents.getAllWebContents().length === 0) logs.push(log);
-      else sendToAll(ipc('sendLog'), log);
+      logs.push(log);
+      sendToAll(ipc('sendLog'), log);
     }
   }
 
-  debug: Console['debug'] = (...msg) => DEBUG && this.#log('debug', ...msg);
+  debug: Console['debug'] = (...msg) => this.#log('debug', ...msg);
   error: Console['error'] = (...msg) => this.#log('error', ...msg);
   info: Console['info'] = (...msg) => this.#log('info', ...msg);
   log: Console['log'] = (...msg) => this.#log('log', ...msg);
