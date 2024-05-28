@@ -129,10 +129,9 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
                 if (!devServer) return;
 
                 const relFilePath = relative(typeOptions.outdir!, file.path).replace(/\\/g, '/');
-                const name = relFilePath.split('/')[0];
-                console.log(name);
+                const name = relFilePath.split('/')[0].replace(/\.\w+$/, '');
 
-                devServer.send('*', 'reload', {
+                devServer.send(name, 'reload', {
                   content: file.text,
                   file: relFilePath,
                 });

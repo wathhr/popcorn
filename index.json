@@ -1,7 +1,4 @@
 {
   "name": "popcorn",
-  "id": "walter.popcorn",
-  "dependencies": [
-    "wathhr.csp-disable"
-  ]
+  "id": "walter.popcorn"
 }
