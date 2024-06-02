@@ -12,9 +12,8 @@ if (Deno.args.includes('--mv3')) versions.push('v3');
 if (versions.length === 0) versions.push('v2', 'v3');
 
 const views: string[] = [];
-for await (const item of Deno.readDir(join(import.meta.dirname!, './views'))) {
+for await (const item of Deno.readDir(join(import.meta.dirname!, './views')))
   if (item.name.endsWith('.html')) views.push(join('./views', item.name));
-}
 
 export default [
   // First manifest file

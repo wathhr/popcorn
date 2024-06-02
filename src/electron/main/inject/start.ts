@@ -11,9 +11,7 @@ const basePath = join(dirname(require.main!.filename), '..');
 const baseFilename = basename(dirname(require.main!.filename)).replace(/\.asar$|[\\/]$/, '');
 const paths = [`${baseFilename}-original.asar`, `${baseFilename}-original`];
 const originalAsar = (() => {
-  for (const path of paths) {
-    if (existsSync(join(basePath, path))) return path;
-  }
+  for (const path of paths) if (existsSync(join(basePath, path))) return path;
 
   return null;
 })();

@@ -2,7 +2,6 @@ import antfu from '@antfu/eslint-config';
 
 export default antfu(
   {
-    files: ['**/*.?(c|m)@(j|t)s'],
     typescript: true,
     // svelte: true,
     // parses normal json files as jsonc
@@ -48,7 +47,11 @@ export default antfu(
         'always',
       ],
       'no-console': 'off',
-      'curly': 'off',
+      'curly': [
+        'error',
+        'multi',
+        'consistent',
+      ],
       'no-template-curly-in-string': 'off',
       'no-case-declarations': 'error',
       'no-lone-blocks': 'off',
@@ -78,6 +81,7 @@ export default antfu(
       'ts/no-redeclare': 'off',
       'ts/no-explicit-any': 'error',
       'antfu/if-newline': 'off',
+      'antfu/curly': 'off',
       'unicorn/escape-case': 'off',
     },
   },

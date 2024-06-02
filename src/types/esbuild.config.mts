@@ -1,9 +1,8 @@
 #!/bin/usr/env false
 
 const jsonFiles = [];
-for await (const file of Deno.readDir(import.meta.dirname!)) {
+for await (const file of Deno.readDir(import.meta.dirname!))
   if (file.name.endsWith('.json')) jsonFiles.push(file.name);
-}
 
 export default {
   customOptions: {

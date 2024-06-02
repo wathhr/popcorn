@@ -3,21 +3,19 @@ globalThis.PopcornAPI = {
   isSplash: false,
 
   async getThemes() {
-    return [
-      {
-        id: 'test.test',
-        main: 'troll',
-        location: 'https://github.com/example/test/blob/main/',
-        manifestVersion: 1,
-        description: 'Test theme',
-        name: 'Test theme',
-        version: '1.0.0',
-        metaLinks: {
-          github: 'https://github.com/example/test',
-          discord: 'https://discord.gg/example',
-        },
+    return new Set([{
+      id: 'test.test',
+      main: 'troll',
+      location: 'https://github.com/example/test/blob/main/',
+      manifestVersion: 1,
+      description: 'Test theme',
+      name: 'Test theme',
+      version: '1.0.0',
+      metaLinks: {
+        github: 'https://github.com/example/test',
+        discord: 'https://discord.gg/example',
       },
-    ];
+    }]);
   },
 
   async getUserStyles() {

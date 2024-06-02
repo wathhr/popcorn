@@ -17,9 +17,7 @@ const logFile = (() => {
     .then((files) => {
       if (files.length <= 3) return;
 
-      for (const file of files.slice(0, -1)) {
-        rm(join(configDir, 'logs', file), { force: true }).catch(() => {});
-      }
+      for (const file of files.slice(0, -1)) rm(join(configDir, 'logs', file), { force: true }).catch(() => {});
     })
     .catch(() => {});
 
