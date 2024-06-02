@@ -125,7 +125,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
                 if (!await exists(dir)) await ensureDir(dir);
                 await Deno.writeFile(file.path, file.contents);
 
-                if (!devServer) return;
+                if (!devServer) continue;
 
                 const relFilePath = relative(typeOptions.outdir!, file.path).replace(/\\/g, '/');
                 const name = relFilePath.split('/')[0].replace(/\.\w+$/, '');

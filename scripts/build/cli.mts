@@ -47,25 +47,13 @@ if (types.has('all')) {
 const devServer = dev && watch ? new DevServer() : undefined;
 
 const builds: esbuild.BuildContext[] = [];
-for (const type of types) {
+for (const type of types)
   builds.push(...await processConfigFile(type, args, devServer)
     .catch((e) => {
       console.error(e);
       return [];
     }),
   );
-}
-
-const startTime = Date.now();
-for (const context of builds) {
-  if (watch) context.watch();
-  else {
-    await context.rebuild();
-    await context.dispose();
-  }
-}
-
-if (!watch && builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
 
 Deno.addSignalListener('SIGINT', () => {
   console.log('Stopping...');
@@ -74,3 +62,15 @@ Deno.addSignalListener('SIGINT', () => {
   devServer?.stop?.();
   Deno.exit();
 });
+
+const startTime = Date.now();
+for (const context of builds)
+  if (watch) context.watch();
+  else {
+    await context.rebuild();
+    await context.dispose();
+    await context.cancel();
+  }
+
+if (!watch && builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
+Deno.exit();

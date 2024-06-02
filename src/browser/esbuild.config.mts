@@ -27,8 +27,8 @@ export default [
   },
   {
     entryPoints: [
-      './background/index.ts',
       './content/index.ts',
+      './background/index.ts',
     ],
     outbase: import.meta.dirname!,
     outdir: `browser-m${versions[0]}`,
@@ -64,6 +64,8 @@ export default [
           name: 'Copy directory',
           setup(build) {
             build.onStart(async () => {
+              await new Promise(resolve => setTimeout(resolve, 50)); // race condition
+
               const outDir = build.initialOptions.outdir!;
               const src = join(outDir, `../browser-m${versions[0]}/`);
               if (!await exists(src)) return;

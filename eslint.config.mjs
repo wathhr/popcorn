@@ -50,7 +50,6 @@ export default antfu(
       'curly': [
         'error',
         'multi',
-        'consistent',
       ],
       'no-template-curly-in-string': 'off',
       'no-case-declarations': 'error',
