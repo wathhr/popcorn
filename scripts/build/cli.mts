@@ -13,14 +13,13 @@ const root = join(__dirname, '../..');
 const src = join(root, 'src');
 
 const args = parseArgs(Deno.args, {
-  boolean: ['watch', 'dev', 'original-logs', 'kernel'],
+  boolean: ['watch', 'dev'],
   string: ['types', 'executables'],
   collect: ['types', 'executables'],
   alias: {
     d: 'dev',
     t: 'types',
     w: 'watch',
-    o: 'original-logs',
     e: 'executables',
   },
   default: {
@@ -31,8 +30,8 @@ const args = parseArgs(Deno.args, {
 
 const { dev, watch, _ } = args;
 
-const types = [...args.types, ..._.filter(t => typeof t === 'string') as string[]];
-if (types.length === 0) types.push('all');
+const types = new Set(...args.types, _.filter(t => typeof t === 'string'));
+if (types.size === 0) types.add('all');
 
 const validTypes = [];
 for await (const item of Deno.readDir(src)) {
@@ -40,18 +39,21 @@ for await (const item of Deno.readDir(src)) {
   validTypes.push(item.name);
 }
 
-switch (types[0]) {
-  case 'all': {
-    types.length = 0;
-    types.push(...validTypes);
-  } break;
+if (types.has('all')) {
+  types.clear();
+  for (const type of validTypes) types.add(type);
 }
 
 const devServer = dev && watch ? new DevServer() : undefined;
 
 const builds: esbuild.BuildContext[] = [];
 for (const type of types) {
-  builds.push(...await processConfigFile(type, args, devServer));
+  builds.push(...await processConfigFile(type, args, devServer)
+    .catch((e) => {
+      console.error(e);
+      return [];
+    }),
+  );
 }
 
 const startTime = Date.now();
@@ -63,10 +65,7 @@ for (const context of builds) {
   }
 }
 
-if (!watch && builds.length > 1) {
-  console.log(); // new line
-  console.log(c.brightMagenta(`Total build time: ${Date.now() - startTime}ms`));
-}
+if (!watch && builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
 
 Deno.addSignalListener('SIGINT', () => {
   console.log('Stopping...');

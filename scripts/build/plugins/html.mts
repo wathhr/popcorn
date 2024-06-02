@@ -1,7 +1,11 @@
+#!/bin/usr/env false
+
 import type * as esbuild from 'esbuild';
 import { join, relative } from 'std/path/mod.ts';
 import { minifyHTML } from 'https://deno.land/x/minify/mod.ts';
 import { DOMParser } from 'https://deno.land/x/deno_dom/deno-dom-wasm.ts';
+import { addToGroup } from '#build/plugins/custom-logs.mts';
+import { resultToCache } from '#build/utils/index.mts';
 
 interface Opts {
   esbuildOptions?: esbuild.CommonOptions,
@@ -11,7 +15,7 @@ interface Opts {
 
 const pluginName = 'HTML';
 
-export function html(opts: Opts = {}): esbuild.Plugin {
+export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
   return {
     name: pluginName,
     setup(build) {
@@ -57,15 +61,16 @@ export function html(opts: Opts = {}): esbuild.Plugin {
               ...options,
               ...opts.buildOptions,
               entryPoints: [path],
-              metafile: true,
+              metafile: true as const,
               outdir: join(build.initialOptions.outdir!, src, '..'),
             };
 
-            const { errors, metafile } = await build.esbuild.build(finalOptions);
-            if (errors.length > 0) return { errors, pluginName };
-            watchFiles.push(...metafile!.outputs[Object.keys(metafile!.outputs)[0]].imports.map(input => input.path));
+            const result = await build.esbuild.build(finalOptions);
+            if (result.errors.length > 0) return { errors: result.errors, pluginName };
+            watchFiles.push(...result.metafile!.outputs[Object.keys(result.metafile!.outputs)[0]].imports.map(input => input.path));
+            if ($group) addToGroup(resultToCache(result), $group);
 
-            script.setAttribute('src', relative(finalOptions.outdir!, Object.keys(metafile!.outputs)[0]));
+            script.setAttribute('src', relative(finalOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
           } else {
             if (!script.innerHTML) return {
               errors: [{
@@ -95,7 +100,7 @@ export function html(opts: Opts = {}): esbuild.Plugin {
           const path = join(args.path, '..', link.getAttribute('href')!);
           watchFiles.push(path);
 
-          const { errors, metafile } = await build.esbuild.build({
+          const result = await build.esbuild.build({
             bundle: true,
             ...buildOptions,
             ...opts.esbuildOptions,
@@ -108,10 +113,11 @@ export function html(opts: Opts = {}): esbuild.Plugin {
             },
           });
 
-          if (errors.length > 0) return { errors, pluginName };
-          watchFiles.push(...Object.keys(metafile!.outputs[Object.keys(metafile!.outputs)[0]].inputs).map(p => join(Deno.cwd(), p)));
+          if (result.errors.length > 0) return { errors: result.errors, pluginName };
+          watchFiles.push(...Object.keys(result.metafile!.outputs[Object.keys(result.metafile!.outputs)[0]].inputs).map(p => join(Deno.cwd(), p)));
+          if ($group) addToGroup(resultToCache(result), $group);
 
-          link.setAttribute('href', relative(build.initialOptions.outdir!, Object.keys(metafile!.outputs)[0]));
+          link.setAttribute('href', relative(build.initialOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
         }
 
         const styles = document.getElementsByTagName('style');

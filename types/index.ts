@@ -10,8 +10,8 @@ export interface BrowserAPI {
   isBrowser: true,
   isSplash: false,
 
-  getThemes(): Promise<ThemeResponse[]>,
-  getUserStyles(): Promise<string[]>,
+  getThemes(): Promise<Set<ThemeResponse>>,
+  getUserStyles(): Promise<Config['userStyles']>,
   getConfig(): Required<Config>,
 }
 
@@ -23,7 +23,7 @@ export interface ElectronAPI extends Omit<BrowserAPI, 'isBrowser' | 'isSplash'>,
 
   // internals
   $getWindowData(): NonNullable<import('electron').WebContents['originalWindowData' | 'kernelWindowData']>,
-};
+}
 
 export interface MainAPI {
   saveState: {

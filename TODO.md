@@ -46,9 +46,9 @@
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
 - [ ] Add symlink support for the injector
-- [ ] Improve logging from building
-  - [ ] Grouping builds
-  - [ ] Add custom output files
+- [x] Improve logging from building
+  - [x] Grouping builds
+  - [x] Add custom output files
 
 ## Linting
 - [ ] https://typescript-eslint.io/rules/no-base-to-string/

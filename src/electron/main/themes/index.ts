@@ -9,13 +9,12 @@ import './ipc';
 
 const Logger = new CreateLogger('Themes');
 
-let themes: ThemeResponse[] | undefined;
+const themes = new Set<ThemeResponse>();
 export const themeLocationCache = new Map<Theme['id'], string>();
 
 export async function getThemes(force = false) {
-  if (themes && !force) return themes;
-
-  themes = [];
+  if (themes.size > 0 && !force) return themes;
+  themes.clear();
 
   for (const dir of config.themeDirs) {
     const themeDirFiles = await readdir(dir);
@@ -38,13 +37,13 @@ export async function getThemes(force = false) {
           continue;
         }
 
-        themes.push({
+        themes.add({
           location: themeDir,
           ...json,
         });
         themeLocationCache.set(json.id, themeDir);
       } catch (e) {
-        Logger.error(`Failed theme manifest in "${themeDir}":`, e);
+        Logger.error(`Failed to read theme manifest in "${themeDir}":`, e);
         continue;
       }
     }

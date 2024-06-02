@@ -35,12 +35,11 @@ export type ModuleExport = Partial<{
 }>;
 
 export type Options = Partial<{
-  'dev': boolean,
-  'watch': boolean,
-  'original-logs': boolean,
-  'types': string[],
-  'executables': string[],
-  '_': (string | number)[],
+  dev: boolean,
+  watch: boolean,
+  types: string[],
+  executables: string[],
+  _: (string | number)[],
   [key: string]: unknown,
 }>;
 
@@ -57,10 +56,12 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
   const killDevServer = devServer === undefined;
   devServer ??= watch ? new DevServer() : undefined;
 
-  const urlSearchParams = new URLSearchParams(Object.fromEntries(Object.entries(opts)
-    .map(([name, value]) => [name, typeof value === 'string' ? value : value?.toString()])
-    .filter(([, value]) => value !== undefined),
-  ));
+  const urlSearchParams = new URLSearchParams(
+    Object.fromEntries(Object.entries(opts)
+      .map(([name, value]) => [name, typeof value === 'string' ? value : value?.toString()])
+      .filter(([, value]) => value !== undefined),
+    ),
+  );
 
   const config: ModuleExport = await import(`file://${join(src, type, 'esbuild.config.mts')}?${urlSearchParams.toString()}`);
 
@@ -69,9 +70,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
   const typeOptionsArray = Array.isArray(config.default) ? config.default : [config.default];
 
   const contexts: esbuild.BuildContext[] = [];
-  for (let i = 0; i < typeOptionsArray.length; i++) {
-    const typeOptions = typeOptionsArray[i];
-
+  for (const [index, typeOptions] of typeOptionsArray.entries()) {
     // @ts-expect-error this works fine
     typeOptions.entryPoints = ((e) => {
       const relJoin = (...path: string[]) => relative(Deno.cwd(), join(...path));
@@ -139,8 +138,8 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
             });
           },
         },
-        customLogs(urlSearchParams),
         ...typeOptions.plugins ?? [],
+        customLogs(urlSearchParams, type, index === typeOptionsArray.length - 1),
       ],
       color: true,
       logLevel: 'info',

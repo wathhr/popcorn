@@ -2,6 +2,7 @@
 import { deepMerge } from 'std/collections/mod.ts';
 import { createPackage } from 'npm:@electron/asar';
 import { customFiles } from '#build/plugins/index.mts';
+import { addToGroup } from '#build/plugins/custom-logs.mts';
 
 const builds: import('#build').DefaultExport = [{ entryPoints: ['../../package.json'], plugins: [customFiles()] }];
 for await (const item of Deno.readDir(import.meta.dirname!)) {
@@ -20,12 +21,20 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
 builds.at(-1)?.plugins?.push({
   name: 'Create ASAR',
   setup(build) {
-    const outDir = build.initialOptions.outdir;
-    if (!outDir) return;
+    const outDir = build.initialOptions.outdir!;
 
     build.onEnd(async () => {
       const fileName = outDir.replace(/\/?$/, '.asar');
       await createPackage(outDir, fileName);
+
+      addToGroup({
+        files: [
+          {
+            path: fileName,
+            size: await Deno.stat(fileName).then(stat => stat.size),
+          },
+        ],
+      });
     });
   },
 });

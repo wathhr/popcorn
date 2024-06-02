@@ -1,14 +1,13 @@
 import { app } from 'electron';
 
-function parsePolicy(policy: string) {
+function parsePolicy(policy = '') {
   const result: Record<string, string[]> = {};
 
   for (const directive of policy.split(';')) {
     const [directiveKey, ...directiveValue] = directive.trim().split(/\s+/g);
+    if (!directiveKey) continue;
 
-    if (directiveKey && !(directiveKey in result)) {
-      result[directiveKey] = directiveValue;
-    }
+    result[directiveKey] ??= directiveValue;
   }
 
   return result;
@@ -22,11 +21,12 @@ app.on('session-created', (session) => {
       const header = Object.keys(responseHeaders).find(h => h.toLowerCase() === 'content-security-policy');
       if (!header) return cb({ cancel: false, responseHeaders });
 
-      const csp = parsePolicy(responseHeaders[header]![0]!);
+      const csp = parsePolicy(responseHeaders[header]![0]);
 
-      for (const directive of ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src']) {
+      const directives = ['style-src', 'connect-src', 'img-src', 'font-src', 'media-src', 'worker-src'];
+      for (const directive of directives) {
         csp[directive] ??= [];
-        csp[directive]!.push('*', 'blob:', 'data:', 'popcorn:', '\'unsafe-inline\'');
+        csp[directive]!.push('*', 'blob:', 'data:', '\'unsafe-inline\'', 'popcorn:');
       }
 
       csp['script-src'] ??= [];
@@ -42,5 +42,6 @@ app.on('session-created', (session) => {
     cb({ cancel: false, responseHeaders });
   });
 
-  session.webRequest.onHeadersReceived = () => { };
+  // TODO: Add a more sophisticated way of doing this instead of completely overwriting it
+  session.webRequest.onHeadersReceived = () => {};
 });
