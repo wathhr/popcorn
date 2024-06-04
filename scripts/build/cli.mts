@@ -57,7 +57,7 @@ for (const type of types)
 
 Deno.addSignalListener('SIGINT', () => {
   console.log('Stopping...');
-  builds.forEach(async build => await build.dispose());
+  builds.forEach(async build => await build.cancel());
 
   devServer?.stop?.();
   Deno.exit();
@@ -69,8 +69,9 @@ for (const context of builds)
   else {
     await context.rebuild();
     await context.dispose();
-    await context.cancel();
   }
 
-if (!watch && builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
-Deno.exit();
+if (!watch && builds.length > 1) {
+  console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
+  Deno.exit();
+}
