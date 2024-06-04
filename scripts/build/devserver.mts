@@ -91,20 +91,13 @@ export class DevServer {
 
   send<T extends keyof Message>(name: string, type: T, data: Message[T]) {
     if (name === '*') {
-      if (this.sockets.size === 0) {
-        // log('No clients connected');
-        return false;
-      }
+      if (this.sockets.size === 0) return false;
 
       for (const socket of this.sockets.keys()) this.send(socket, type, data);
       return true;
     }
 
-    if (!this.sockets.has(name)) {
-      // log(`[${name}]`, 'Not connected');
-      return false;
-    }
-
+    if (!this.sockets.has(name)) return false;
     this.sockets.get(name)!.send(JSON.stringify({
       type,
       data,

@@ -23,8 +23,8 @@ jobs:
         include:
           - build_type: browser
             extra_command: |
-              pnpm run lint:ext:mv2
-              pnpm run lint:ext:mv3
+              pnpm run lint:mv2
+              pnpm run lint:mv3
 
     name: Build ${{ matrix.build_type }}
     steps:

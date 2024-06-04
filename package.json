@@ -16,9 +16,9 @@
     "url": "https://github.com/wathhr/popcorn/issues"
   },
   "scripts": {
-    "lint": "eslint ./src ./types",
-    "lint:ext:mv2": "web-ext lint -s ./dist/browser-mv2",
-    "lint:ext:mv3": "web-ext lint -s ./dist/browser-mv3",
+    "lint": "eslint . --ignore-pattern app-src/*",
+    "lint:mv2": "web-ext lint -s ./dist/browser-mv2",
+    "lint:mv3": "web-ext lint -s ./dist/browser-mv3",
     "check": "run-s check:*",
     "check:electron": "tsc --noEmit --project ./src/electron/main/tsconfig.json && tsc --noEmit --project ./src/electron/preload/tsconfig.json",
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",

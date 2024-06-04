@@ -84,7 +84,7 @@ export function customLogs(params: URL['searchParams'], group?: string, print = 
           const sizeString = formatSize(file.size);
           const relPath = relative(Deno.cwd(), file.path);
 
-          const spacer = Math.max(1, longestName.length - relPath.length + 6 - sizeString.replace(/[A-Za-z]/g, '').length);
+          const spacer = Math.max(1, longestName.length - relPath.length + 6 - sizeString.replace(/[a-z]/gi, '').length);
 
           console.log(
             margin
