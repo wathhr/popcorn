@@ -71,7 +71,7 @@ for (const context of builds)
     await context.dispose();
   }
 
-if (!watch && builds.length > 1) {
-  console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
+if (!watch) {
+  if (builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
   Deno.exit();
 }
