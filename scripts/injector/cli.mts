@@ -5,10 +5,11 @@ import { injectLocal, injectRemote } from './index.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 const args = parseArgs(Deno.args, {
-  boolean: ['unpacked'],
+  boolean: ['unpacked', 'symlink'],
   string: ['location', 'version'],
   alias: {
     u: 'unpacked',
+    s: 'symlink',
     l: 'location',
     v: 'version',
   },
@@ -27,7 +28,11 @@ if (!args.version.startsWith('v')) {
 
 const isLocal = typeof import.meta.dirname !== 'undefined';
 
-if (isLocal) await injectLocal(location, args.unpacked);
+if (isLocal) await injectLocal(location, args.symlink
+  ? 'symlink'
+  : args.unpacked
+    ? 'unpacked'
+    : 'packed');
 else await injectRemote(location, args.version as `v${string}`);
 
 console.log('%c✔ Injected', 'color: green; font-weight: bold');
