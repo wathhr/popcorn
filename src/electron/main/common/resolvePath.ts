@@ -1,5 +1,5 @@
 import { isAbsolute, join, normalize } from 'node:path';
-import { configDir } from './constants';
+import { configDir } from '#/common';
 
 export function resolvePath(path: string, defaultPath = configDir) {
   const windowsRegex = /%([^%]+)%/g; // matches %variableName%

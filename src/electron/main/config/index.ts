@@ -1,7 +1,6 @@
-import { join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
-import { CreateLogger, configDir, resolvePath } from '#/common';
+import { CreateLogger, getConfig, getConfigDir, resolvePath } from '#/common';
 import { type Config, ConfigChecker } from '#types';
 
 import './ipc';
@@ -13,9 +12,9 @@ export const defaultConfig: Required<Config> = {
   configVersion: 1,
   enabled: {},
   hotkey: 'ctrl+shift+p',
-  quickCssDir: join(configDir, 'quickcss'),
+  quickCssDir: getConfigDir('quickcss'),
   themeDirs: [
-    join(configDir, 'themes/'),
+    getConfigDir('themes'),
     ...(process.platform === 'win32'
       ? [resolvePath('%USERPROFILE%/discord/themes/')]
       : [resolvePath('$HOME/discord/themes/')]),
@@ -26,7 +25,7 @@ export const defaultConfig: Required<Config> = {
 };
 
 export const config = ((): Required<Config> => {
-  const configFile = join(configDir, 'config.json');
+  const configFile = getConfig('config.json');
 
   if (!existsSync(configFile)) {
     Logger.info('config.json not found, creating one.');

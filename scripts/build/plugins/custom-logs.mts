@@ -5,11 +5,7 @@ import * as c from 'std/fmt/colors.ts';
 import type { Message } from 'esbuild';
 import { getConfig, resultToCache } from '#build/utils/index.mts';
 
-function formatSize(size: number) {
-  if (size < 1024) return `${size}b`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)}kb`;
-  return `${(size / 1024 / 1024).toFixed(1)}mb`;
-}
+let params: URL['searchParams'];
 
 export interface Cache {
   errors?: Message[],
@@ -23,6 +19,8 @@ export interface Cache {
 const groupCache = new Map<string, Cache[]>();
 
 export function addToGroup(result: Cache, group?: string) {
+  if (params.get('watch') === 'true') return;
+
   group ??= (() => {
     if (!import.meta.dirname) throw new Error('Please set a group manually');
 
@@ -35,7 +33,9 @@ export function addToGroup(result: Cache, group?: string) {
   groupCache.set(group, (groupCache.get(group) || []).concat(result));
 }
 
-export function customLogs(params: URL['searchParams'], group?: string, print = true) {
+export function customLogs(_params: URL['searchParams'], group?: string, print = true) {
+  params = _params;
+
   return {
     name: 'Custom logging',
     setup(build) {
@@ -107,4 +107,10 @@ export function customLogs(params: URL['searchParams'], group?: string, print = 
       });
     },
   } satisfies import('esbuild').Plugin;
+}
+
+function formatSize(size: number) {
+  if (size < 1024) return `${size}b`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)}kb`;
+  return `${(size / 1024 / 1024).toFixed(1)}mb`;
 }

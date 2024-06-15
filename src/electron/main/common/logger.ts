@@ -1,23 +1,22 @@
 import { appendFile, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { mkdirSync, writeFileSync } from 'node:fs';
 import { formatWithOptions } from 'node:util';
 import { app, ipcMain } from 'electron';
 import { sendToAll } from './sendToAll';
-import { configDir, startTimeString } from './constants';
+import { startTimeString } from './constants';
 import { type Color, colors, ipc } from '#shared';
+import { getConfig, getConfigDir } from '#/common';
 import type { MainAPI } from '~/types';
 
 const logFile = (() => {
-  const file = join(configDir, 'logs', `${startTimeString}.log`);
+  const dir = getConfigDir('logs');
+  const file = getConfig('logs', `${startTimeString}.log`);
 
-  mkdirSync(join(configDir, 'logs'), { recursive: true });
-  writeFileSync(file, '');
-  readdir(join(configDir, 'logs'))
+  readdir(dir)
     .then((files) => {
       if (files.length <= 3) return;
 
-      for (const file of files.slice(0, -1)) rm(join(configDir, 'logs', file), { force: true }).catch(() => {});
+      for (const file of files.slice(0, -1)) rm(join(dir, file), { force: true }).catch(() => {});
     })
     .catch(() => {});
 

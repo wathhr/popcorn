@@ -1,7 +1,7 @@
 import { isAbsolute, join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { app, net, protocol } from 'electron';
-import { CreateLogger, configDir } from '#/common';
+import { CreateLogger, getConfigDir } from '#/common';
 import { themeLocationCache } from '#/themes';
 import type { Theme } from '#types';
 
@@ -26,8 +26,8 @@ app.whenReady().then(() => {
 
     switch (host) {
       case 'theme': {
-        const path = join(configDir, 'themes', pathname);
-        const relativePath = relative(join(configDir, 'themes'), path);
+        const path = join(getConfigDir('themes'), pathname);
+        const relativePath = relative(getConfigDir('themes'), path);
 
         const isSafe = relativePath && !relativePath.startsWith('..') && !isAbsolute(relativePath);
         if (!isSafe) return new Response('Invalid path', { status: 404 });

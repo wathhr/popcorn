@@ -4,6 +4,8 @@ import { createPackage } from 'npm:@electron/asar';
 import { customFiles } from '#build/plugins/index.mts';
 import { addToGroup } from '#build/plugins/custom-logs.mts';
 
+const params = new URL(import.meta.url).searchParams;
+
 const builds: import('#build').DefaultExport = [{ entryPoints: ['../../package.json'], plugins: [customFiles()] }];
 for await (const item of Deno.readDir(import.meta.dirname!)) {
   if (item.isFile) continue;
@@ -18,13 +20,13 @@ for await (const item of Deno.readDir(import.meta.dirname!)) {
   ));
 }
 
-builds.at(-1)?.plugins?.push({
+const plugin: import('esbuild').Plugin = {
   name: 'Create ASAR',
   setup(build) {
     const outDir = build.initialOptions.outdir!;
+    const fileName = outDir.replace(/\/?$/, '.asar');
 
     build.onEnd(async () => {
-      const fileName = outDir.replace(/\/?$/, '.asar');
       await createPackage(outDir, fileName);
 
       addToGroup({
@@ -37,6 +39,19 @@ builds.at(-1)?.plugins?.push({
       });
     });
   },
-});
+};
+
+if (params.get('watch') === 'true')
+  for (const i in builds) {
+    const build = builds[i];
+
+    build.plugins ??= [];
+    build.plugins.push(plugin);
+  }
+else {
+  const build = builds.at(-1)!;
+  build.plugins ??= [];
+  build.plugins.push(plugin);
+}
 
 export default builds;
