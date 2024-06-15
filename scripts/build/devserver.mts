@@ -26,7 +26,7 @@ export class DevServer {
   constructor(port = 7331) {
     this.server = Deno.serve({
       port,
-      onError: (event) => {
+      onError(event) {
         log(event);
         return new Response(null, { status: 500 });
       },
@@ -34,8 +34,8 @@ export class DevServer {
       if (req.headers.get('upgrade') !== 'websocket') return new Response(null, { status: 501 });
       const { socket, response } = Deno.upgradeWebSocket(req);
 
+      const nonce = this.sockets.size;
       socket.onopen = () => {
-        const nonce = Math.random();
         socket.send(JSON.stringify({ type: 'hello', data: { nonce } }));
 
         this.timers.set(nonce, setTimeout(() => {
@@ -47,21 +47,25 @@ export class DevServer {
       const listener = (event: MessageEvent) => {
         const json = parse<'hello'>(event.data);
 
-        if (json.type !== 'hello') {
-          socket.close(1024, 'Invalid message');
-          return;
-        }
+        if (json.type !== 'hello') return socket.close(1024, 'Invalid message');
 
         log(`[${json.data.roles[1]}]`, 'Connected');
         clearTimeout(this.timers.get(json.data.nonce));
         this.timers.delete(json.data.nonce);
-        for (const role of json.data.roles) this.sockets.set(role, socket);
+        for (const i in json.data.roles) {
+          const name = json.data.roles[i] = `${json.data.roles[i]}-${nonce}`;
+          this.sockets.set(name, socket);
+        }
 
         socket.removeEventListener('message', listener);
         socket.addEventListener('message', this.handleMessage(json.data.roles[0]));
         socket.addEventListener('close', () => {
-          for (const role of json.data.roles) this.sockets.delete(role);
           log(`[${json.data.roles[0]}]`, 'Disconnected');
+          this.timers.delete(json.data.nonce);
+          for (const i in json.data.roles) {
+            const name = json.data.roles[i] = `${json.data.roles[i]}-${nonce}`;
+            this.sockets.delete(name);
+          }
         });
       };
 
@@ -89,26 +93,24 @@ export class DevServer {
     };
   }
 
-  send<T extends keyof Message>(name: string, type: T, data: Message[T]) {
+  send<T extends keyof Message>(name: string, type: T, data: Message[T]): boolean {
     if (name === '*') {
       if (this.sockets.size === 0) return false;
 
-      for (const socket of this.sockets.keys()) this.send(socket, type, data);
+      for (const socket of this.sockets.values()) socket.send(JSON.stringify({ type, data }));
       return true;
     }
 
-    if (!this.sockets.has(name)) return false;
-    this.sockets.get(name)!.send(JSON.stringify({
-      type,
-      data,
-    }));
+    const sockets = [...this.sockets].filter(([socket]) => socket.startsWith(name));
+    if (sockets.length === 0) return false;
+    for (const [_, socket] of sockets) socket.send(JSON.stringify({ type, data }));
 
     return true;
   }
 
-  stop() {
+  async stop() {
     this.sockets.forEach(socket => socket.close());
-    this.server.shutdown();
+    await this.server.shutdown();
   }
 
   get connections() {

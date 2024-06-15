@@ -154,7 +154,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
     contexts.push(await esbuild.context(processedTypeOptions));
   }
 
-  if (killDevServer) devServer?.stop?.();
+  if (killDevServer) await devServer?.stop?.();
   return contexts;
 }
 
