@@ -1,6 +1,6 @@
 #!/bin/usr/env false
 
-import { corejs, legacyImport } from '#build/plugins/index.mts';
+import { aliasImport, corejs } from '#build/plugins/index.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 const params = new URL(import.meta.url).searchParams;
@@ -10,7 +10,7 @@ export default {
   format: 'cjs',
   external: ['electron'],
   plugins: [
-    legacyImport,
+    aliasImport,
     corejs(pkg.browserslist['electron-main']),
     {
       name: 'Nodemon ripoff',

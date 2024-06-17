@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
-import { CreateLogger, getConfig, getConfigDir, resolvePath } from '#/common';
+import { CreateLogger, getConfig, getConfigDir } from '#/common';
+import { resolvePath } from '#/utils';
 import { type Config, ConfigChecker } from '#types';
 
 import './ipc';

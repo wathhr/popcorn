@@ -29,12 +29,11 @@ app.whenReady().then(() => {
         const path = join(getConfigDir('themes'), pathname);
         const relativePath = relative(getConfigDir('themes'), path);
 
-        const isSafe = relativePath && !relativePath.startsWith('..') && !isAbsolute(relativePath);
+        const isSafe = !relativePath.startsWith('..') && !isAbsolute(relativePath);
         if (!isSafe) return new Response('Invalid path', { status: 404 });
 
         const pathnameArray = pathname.split('/').filter(Boolean);
 
-        Logger.log(themeLocationCache);
         const themeID = ((): Theme['id'] | undefined => {
           const id = pathnameArray.shift() as Theme['id'];
           if (!/\w+\.\w+/.test(id)) return undefined;
@@ -54,7 +53,7 @@ app.whenReady().then(() => {
         const path = join(__dirname, pathname);
         const relativePath = relative(__dirname, path);
 
-        const isSafe = relativePath && !relativePath.startsWith('..') && !isAbsolute(relativePath);
+        const isSafe = !relativePath.startsWith('..') && !isAbsolute(relativePath);
         if (!isSafe) return new Response('Invalid path', { status: 404 });
 
         return net.fetch(pathToFileURL(path).toString());

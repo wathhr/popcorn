@@ -37,7 +37,7 @@
 - [x] Add the ability to import legacy versions of electron in case of deprecated stuff
   - [ ] ~~Do the same for node~~
   - [ ] For some reason typescript can't get type declarations when importing from `electron-legacy/[main,renderer,...]`
-- [ ] Add file system manager
+- [x] Add file system manager
 
 ## Scripts
 - [ ] ~~Figure out a better way to add kernel-types, currently they are manually written~~
@@ -45,7 +45,7 @@
 - [ ] ~~Add a way to easily create patches~~
 - [x] Support multiple connections on the dev server
 - [x] Rewrite in TS instead of JS with JSDoc
-- [ ] Add symlink support for the injector
+- [x] Add symlink support for the injector
 - [x] Improve logging from building
   - [x] Grouping builds
   - [x] Add custom output files

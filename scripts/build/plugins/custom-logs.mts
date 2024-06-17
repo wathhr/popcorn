@@ -39,7 +39,7 @@ export function customLogs(_params: URL['searchParams'], group?: string, print =
   return {
     name: 'Custom logging',
     setup(build) {
-      if (build.initialOptions.logLevel === 'silent') return;
+      if (build.initialOptions.logLevel === 'silent' || params.get('original-logs') === 'true') return;
       let start = Date.now();
       build.onStart(() => void (start = Date.now()));
       build.initialOptions.logLevel = 'error';

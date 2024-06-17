@@ -38,8 +38,8 @@ export function corejs(target: ReturnType<typeof browserslist> | (keyof typeof p
         file = await Deno.makeTempFile({ prefix: 'corejs-', suffix: '.js' });
         await Deno.writeTextFile(file, imports);
 
-        build.initialOptions.inject ??= [];
         build.initialOptions.inject &&= build.initialOptions.inject.filter(i => !basename(i).startsWith('corejs-'));
+        build.initialOptions.inject ??= [];
         build.initialOptions.inject.push(file);
       });
 

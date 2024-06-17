@@ -72,6 +72,7 @@ for (const context of builds)
   }
 
 if (!watch) {
-  if (builds.length > 1) console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
+  if (builds.length > 1 && !Deno.args.includes('--original-args'))
+    console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
   Deno.exit();
 }
