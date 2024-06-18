@@ -49,23 +49,19 @@ export class DevServer {
 
         if (json.type !== 'hello') return socket.close(1024, 'Invalid message');
 
-        log(`[${json.data.roles[1]}]`, 'Connected');
+        log(`[${json.data.roles[0]}]`, 'Connected');
         clearTimeout(this.timers.get(json.data.nonce));
         this.timers.delete(json.data.nonce);
         for (const i in json.data.roles) {
-          const name = json.data.roles[i] = `${json.data.roles[i]}-${nonce}`;
-          this.sockets.set(name, socket);
+          json.data.roles[i] = `${json.data.roles[i]}-${nonce}`;
+          this.sockets.set(json.data.roles[i], socket);
         }
 
         socket.removeEventListener('message', listener);
         socket.addEventListener('message', this.handleMessage(json.data.roles[0]));
         socket.addEventListener('close', () => {
           log(`[${json.data.roles[0]}]`, 'Disconnected');
-          this.timers.delete(json.data.nonce);
-          for (const i in json.data.roles) {
-            const name = json.data.roles[i] = `${json.data.roles[i]}-${nonce}`;
-            this.sockets.delete(name);
-          }
+          for (const role of json.data.roles) this.sockets.delete(role);
         });
       };
 

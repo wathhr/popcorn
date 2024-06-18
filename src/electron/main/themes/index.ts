@@ -24,7 +24,7 @@ export async function getThemes(force = false) {
       const children = await readdir(themeDir);
 
       if (!children.includes('index.json')) {
-        Logger.warn(`No index.json in "${themeDir}". Skipping...`);
+        Logger.warn(`No index.json in "${themeDir}".`);
         continue;
       }
 
@@ -34,6 +34,11 @@ export async function getThemes(force = false) {
 
         if (errors.length > 0) {
           Logger.warn(`Invalid theme manifest in "${themeDir}":`, errors);
+          continue;
+        }
+
+        if (themeLocationCache.has(json.id)) {
+          Logger.warn(`Duplicate theme ID "${json.id}" in "${themeDir}".`);
           continue;
         }
 

@@ -1,12 +1,6 @@
 import type { ElectronAPI, EventName, MainAPI } from '~/types';
 import type { NumRange } from '~/types/utils';
 
-// stub for renderer
-declare const require: NodeRequire;
-interface NodeRequire {
-  cache?: Record<string, unknown>,
-}
-
 type IpcValues =
   keyof ElectronAPI |
   keyof MainAPI |
@@ -15,7 +9,7 @@ type IpcValues =
 /** @param name must be camelCase */
 export const ipc = <T extends IpcValues>(name?: T) => `POPCORN_${(name ?? '').replace(/([A-Z])/g, '_$1').toUpperCase()}` as EventName<T>;
 
-export const isKernel = 'kernel' in globalThis || Object.keys(require?.cache ?? {}).some(str => str.includes('kernel.asar'));
+export const isKernel = 'kernel' in globalThis || Object.keys(globalThis?.require?.cache ?? {}).some(str => str.includes('kernel.asar'));
 
 export interface Color {
   str: string,

@@ -49,16 +49,6 @@ app.whenReady().then(() => {
           .catch(() => new Response('Invalid path', { status: 404 }));
       }
 
-      case 'core': {
-        const path = join(__dirname, pathname);
-        const relativePath = relative(__dirname, path);
-
-        const isSafe = !relativePath.startsWith('..') && !isAbsolute(relativePath);
-        if (!isSafe) return new Response('Invalid path', { status: 404 });
-
-        return net.fetch(pathToFileURL(path).toString());
-      }
-
       default: {
         Logger.warn('Invalid host', host);
         return new Response('Invalid host', { status: 404 });

@@ -38,7 +38,7 @@ export interface MainAPI {
   },
 }
 
-export type EventName<T> = T extends string
+export type EventName<T = string> = T extends string
   ? `POPCORN_${CamelToScreamingSnakeCase<T>}`
   : never;
 

@@ -1,7 +1,7 @@
 import { webFrame } from 'electron';
 import { CreateLogger } from '../../browser/common/logger';
-import manifest from '~/index.json' assert { type: 'json' };
-import { ipc, isKernel } from '#shared';
+import type { EventName } from '~/types';
+import { ipc } from '#shared';
 
 const Logger = new CreateLogger('DevServer');
 
@@ -55,16 +55,26 @@ class DevServer {
       case is(json, 'reload'): {
         switch (json.data.file) {
           case 'renderer.js': {
-            Logger.info('Reloading the renderer script');
+            Logger.info('Reloading renderer');
             window.postMessage(ipc('stop'), '*');
 
-            if (!process.contextIsolated && isKernel) await import(`${kernel.importProtocol}://${kernel.packages.getPackages()[manifest.id]!.path}`);
-            else webFrame.executeJavaScript(await fetch('popcorn://core/renderer.js').then(res => res.text()));
+            const listener = (event: MessageEvent<EventName>) => {
+              if (event.data === ipc('stopped')) {
+                webFrame.executeJavaScript(json.data.content);
+                window.removeEventListener('message', listener);
+              }
+            };
+
+            window.addEventListener('message', listener);
           } break;
           case 'preload.js': {
             location.reload();
           } break;
         }
+      } break;
+
+      default: {
+        Logger.warn('Unknown message:', json);
       } break;
     }
   }

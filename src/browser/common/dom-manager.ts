@@ -1,26 +1,21 @@
 import { CreateLogger } from '#/common';
+import renderer from '#/content';
 
 export class DomManager {
-  static managedElements: HTMLElement[] = [];
-  static comments = {
-    start: document.createComment(' start:Popcorn '),
-    end: document.createComment(' end:Popcorn '),
-    extra: {} as { [name: string]: { start: Comment, end: Comment },
-    },
-  };
-
-  logger: CreateLogger;
+  static comments: Record<string, { start: Comment, end: Comment }> = {};
+  private logger: CreateLogger;
+  managedElements: HTMLElement[] = [];
 
   constructor(private name: string) {
-    this.logger = new CreateLogger('DOM', name);
+    this.logger ??= new CreateLogger('DOM', name);
 
-    if (!(name in DomManager.comments.extra)) {
-      const comments = DomManager.comments.extra[name] = {
+    if (!(name in DomManager.comments)) {
+      const comments = DomManager.comments[name] = {
         start: document.createComment(` start:${name} `),
         end: document.createComment(` end:${name} `),
       };
 
-      DomManager.comments.end.before(comments.start, comments.end);
+      renderer.comments.end.before(comments.start, comments.end);
     }
   }
 
@@ -30,25 +25,27 @@ export class DomManager {
 
     switch (position) {
       case 'start': {
-        DomManager.managedElements.unshift(element);
-        DomManager.comments.extra[this.name]!.start.after(element);
+        this.managedElements.unshift(element);
+        DomManager.comments[this.name]!.start.after(element);
       } break;
+
       case 'end': {
-        DomManager.managedElements.push(element);
-        DomManager.comments.extra[this.name]!.end.before(element);
+        this.managedElements.push(element);
+        DomManager.comments[this.name]!.end.before(element);
       } break;
+
       default: {
-        DomManager.managedElements.splice(position, 0, element);
-        if (position > DomManager.managedElements.length) DomManager.comments.extra[this.name]!.end.before(element);
-        else DomManager.managedElements[position]!.before(element);
+        this.managedElements.splice(position, 0, element);
+        if (position > this.managedElements.length) DomManager.comments[this.name]!.end.before(element);
+        else this.managedElements[position]!.before(element);
       } break;
     }
-    if (position === 'start') {
-      DomManager.managedElements.unshift(element);
-      DomManager.comments.extra[this.name]!.start.after(element);
-    } else {
-      DomManager.managedElements.push(element);
-      DomManager.comments.extra[this.name]!.end.before(element);
-    }
+  }
+}
+
+export function stop() {
+  for (const comments of Object.values(DomManager.comments)) {
+    comments.start.remove();
+    comments.end.remove();
   }
 }

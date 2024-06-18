@@ -1,4 +1,6 @@
-globalThis.PopcornAPI = {
+import type { BrowserAPI } from '~/types';
+
+export default {
   isBrowser: true,
   isSplash: false,
 
@@ -37,6 +39,4 @@ globalThis.PopcornAPI = {
       userStyles: [],
     };
   },
-};
-
-export default globalThis.PopcornAPI;
+} satisfies BrowserAPI;
