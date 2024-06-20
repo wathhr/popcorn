@@ -1,26 +1,17 @@
-import renderer from '#/content';
-import { ipc } from '#shared/constants';
+import renderer, { start, stop } from '#/content';
+import { ipc } from '&/common';
 
-export class IPC {
-  private async messageHandler(event: MessageEvent) {
-    if (!(event.source === window && event.data.startsWith(ipc()))) return;
+async function messageHandler(event: MessageEvent) {
+  if (!(event.source === window && event.data.startsWith(ipc()))) return;
 
-    event.stopPropagation();
-    switch (event.data) {
-      case ipc('stop'): {
-        await renderer.stop();
-        window.postMessage(ipc('stopped'), '*');
-      } break;
-    }
+  event.stopPropagation();
+  switch (event.data) {
+    case ipc('stop'): {
+      await renderer.stop();
+      window.postMessage(ipc('rendererStopped'), '*');
+    } break;
   }
+}
 
-  start() {
-    window.addEventListener('message', this.messageHandler);
-  }
-
-  stop() {
-    window.removeEventListener('message', this.messageHandler);
-  }
-};
-
-export default IPC;
+start(() => window.addEventListener('message', messageHandler));
+stop(() => window.removeEventListener('message', messageHandler));

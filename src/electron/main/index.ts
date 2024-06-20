@@ -1,7 +1,7 @@
 import { app } from 'electron';
 import { CreateLogger } from './common';
 import { config } from './config';
-import { isKernel } from '#shared';
+import { isKernel } from '&/common';
 
 import './patch-csp';
 import './protocol';

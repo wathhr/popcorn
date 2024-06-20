@@ -2,8 +2,7 @@
   "extends": "../../tsconfig.json",
   "include": ["./**/*.ts"],
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
     "target": "ESNext",
 
     "lib": [
@@ -22,10 +21,7 @@
       "~/*": ["../../*"],
       "#": ["."],
       "#/*": ["./*"],
-      "#shared": ["../#shared"],
-      "#shared/*": ["../#shared/*"],
-      "#types": ["../types"],
-      "#types/*": ["../types/*"],
+      "&/*": ["../*"],
     },
   },
 }

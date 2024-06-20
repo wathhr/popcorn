@@ -1,6 +1,6 @@
 #!/bin/usr/env false
 
-import type { Message, MessageResponse } from '../../src/electron/preload/devserver.ts';
+import { type Message, is, parse } from '../../src/common/deveserver.ts';
 
 const log: Console['log'] = (...args) => {
   const [head, ...tail] = args;
@@ -9,14 +9,6 @@ const log: Console['log'] = (...args) => {
 
   return console.log('[DevServer]', ...args);
 };
-
-function parse<T extends keyof Message = keyof Message>(text: string): MessageResponse<T> {
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error(`Invalid JSON: ${text}`);
-  }
-}
 
 export class DevServer {
   private server: Deno.HttpServer;
@@ -45,9 +37,9 @@ export class DevServer {
       };
 
       const listener = (event: MessageEvent) => {
-        const json = parse<'hello'>(event.data);
+        const json = parse(event.data);
 
-        if (json.type !== 'hello') return socket.close(1024, 'Invalid message');
+        if (!is(json, 'hello')) return socket.close(1024, 'Invalid message');
 
         log(`[${json.data.roles[0]}]`, 'Connected');
         clearTimeout(this.timers.get(json.data.nonce));

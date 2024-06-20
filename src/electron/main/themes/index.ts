@@ -2,7 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { config } from '#/config';
 import { CreateLogger } from '#/common';
-import { type Theme, ThemeChecker } from '#types';
+import { type Theme, ThemeChecker } from '&/types';
 import type { ThemeResponse } from '~/types';
 
 import './ipc';

@@ -1,5 +1,5 @@
 import type { CamelToScreamingSnakeCase, ForceArr } from './utils';
-import type { Config, Theme } from '#types';
+import type { Config, Theme } from '&/types';
 
 export interface ThemeResponse extends Theme {
   /** The location of the directory of the theme */
@@ -31,9 +31,9 @@ export interface MainAPI {
     status: 'saved' | 'failed',
   },
   sendLog: {
-    component?: string,
+    component: string,
     level: 'log' | 'info' | 'debug' | 'warn' | 'error',
-    message: any,
+    message: any[],
     time?: number,
   },
 }

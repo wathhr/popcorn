@@ -1,68 +1,75 @@
 import API from './api';
-import IPC from './ipc';
-import Themes from './themes';
-import { CreateLogger } from '#/common';
-import * as DomManager from '#/common/dom-manager';
-import { isKernel } from '#shared';
+import { CreateLogger } from '#/common/logger';
+import { isKernel } from '&/common';
 import type { BrowserAPI, ElectronAPI, MainAPI } from '~/types';
 
 globalThis.PopcornAPI ??= API;
 
+let hasStarted = false;
 const Logger = new CreateLogger();
+const comments = {
+  start: document.createComment(' start:Popcorn'),
+  end: document.createComment(' end:Popcorn '),
+};
 
-export const renderer = new class {
-  ipc!: IPC;
-  themes!: Themes;
+type StartFunction = () => void | Promise<void>;
+const startFunctions = new Set<StartFunction>();
+const start = (callback: StartFunction) => hasStarted ? callback() : startFunctions.add(callback);
+start(() => {
+  Logger.info('Starting...');
+  Logger.debug('Kernel:', isKernel);
+  for (const comment of Object.values(comments)) document.head.appendChild(comment);
 
-  comments = {
-    start: document.createComment(' start:Popcorn'),
-    end: document.createComment(' end:Popcorn '),
-  };
+  import('./api.ts');
+  import('./ipc');
+  import('./themes');
+});
 
-  async start() {
-    Logger.info('Starting...');
-    Logger.debug('Kernel:', isKernel);
-    for (const comment of Object.values(this.comments)) document.head.appendChild(comment);
-    if (PopcornAPI.isBrowser) await this.browser();
-    else await this.electron();
+type StopFunction = () => void | Promise<void>;
+const stopFunctions = new Set<StopFunction>();
+const stop = (callback: StopFunction) => stopFunctions.add(callback);
+stop(() => {
+  Logger.info('Stopping...');
+  for (const comment of Object.values(comments)) comment.remove();
+});
 
-    this.ipc = new IPC();
-    this.ipc.start();
-    this.themes = new Themes();
-    await this.themes.start();
+if (PopcornAPI.isBrowser) start(async () => {
+  const PopcornAPI = globalThis.PopcornAPI as BrowserAPI;
+});
+
+else start(async () => {
+  const PopcornAPI = globalThis.PopcornAPI as ElectronAPI;
+
+  const MainLogger = new CreateLogger('Main');
+  function createLog(log: MainAPI['sendLog']) {
+    if (log.component !== 'Popcorn') return new CreateLogger('Main', log.component)[log.level](...log.message);
+
+    MainLogger[log.level](...log.message);
   }
 
-  async browser() {
-    const PopcornAPI = globalThis.PopcornAPI as BrowserAPI;
-  }
+  PopcornAPI.getMainLogs().then((logs) => {
+    for (const log of logs) createLog(log);
+  });
+  PopcornAPI.onSendLog((_, log) => createLog(log));
+});
 
-  async electron() {
-    const PopcornAPI = globalThis.PopcornAPI as ElectronAPI;
+async function init() {
+  hasStarted = true;
+  for (const callback of startFunctions) await callback();
+}
 
-    const MainLogger = new CreateLogger('Main');
-    function createLog(log: MainAPI['sendLog']) {
-      if (log.component) return new CreateLogger('Main', log.component)[log.level](...[log.message].flat());
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
 
-      MainLogger[log.level](...log.message);
-    }
+export {
+  comments,
+  start,
+  stop,
+};
 
-    PopcornAPI.getMainLogs().then((logs) => {
-      for (const log of logs) createLog(log);
-    });
-    PopcornAPI.onSendLog((_, log) => createLog(log));
-  }
-
+export default {
+  start: init,
   async stop() {
-    Logger.info('Stopping...');
-    for (const comment of Object.values(this.comments)) comment.remove();
-
-    this.ipc.stop();
-    this.themes.stop();
-    DomManager.stop();
-  }
-}();
-
-export default renderer;
-
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', async () => await renderer.start());
-else renderer.start();
+    for (const callback of stopFunctions) await callback();
+  },
+};

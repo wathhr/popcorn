@@ -21,8 +21,7 @@
     "paths": {
       "~": ["./"],
       "~/*": ["./*"],
-      "#types": ["./src/types"],
-      "#types/*": ["./src/types/*"],
+      "&/*": ["./src/*"],
     },
   },
   "exclude": ["./app-src", "./dist", "node_modules"]

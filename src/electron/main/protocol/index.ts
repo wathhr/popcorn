@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url';
 import { app, net, protocol } from 'electron';
 import { CreateLogger, getConfigDir } from '#/common';
 import { themeLocationCache } from '#/themes';
-import type { Theme } from '#types';
+import type { Theme } from '&/types';
 
 const Logger = new CreateLogger('Protocol');
 

@@ -4,7 +4,7 @@ import { formatWithOptions } from 'node:util';
 import { app, ipcMain } from 'electron';
 import { startTimeString } from './constants';
 import { sendToAll } from '#/utils/sendToAll';
-import { type Color, colors, ipc } from '#shared';
+import { type Color, colors, ipc } from '&/common';
 import { getConfig, getConfigDir } from '#/common';
 import type { MainAPI } from '~/types';
 

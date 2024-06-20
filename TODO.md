@@ -38,6 +38,7 @@
   - [ ] ~~Do the same for node~~
   - [ ] For some reason typescript can't get type declarations when importing from `electron-legacy/[main,renderer,...]`
 - [x] Add file system manager
+- [ ] Keep hot-reloading going on renderer even with an unhandled exception
 
 ## Scripts
 - [ ] ~~Figure out a better way to add kernel-types, currently they are manually written~~

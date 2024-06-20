@@ -2,8 +2,8 @@
 
 import type * as esbuild from 'esbuild';
 import { join, relative } from 'std/path/mod.ts';
-import { minifyHTML } from 'https://deno.land/x/minify/mod.ts';
-import { DOMParser } from 'https://deno.land/x/deno_dom/deno-dom-wasm.ts';
+import { minifyHTML } from 'https://deno.land/x/minify@1.0.1/mod.ts';
+import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts';
 import { addToGroup } from '#build/plugins/custom-logs.mts';
 import { resultToCache } from '#build/utils/index.mts';
 

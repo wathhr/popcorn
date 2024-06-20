@@ -1,36 +1,9 @@
 import { webFrame } from 'electron';
-import { CreateLogger } from '../../browser/common/logger';
 import type { EventName } from '~/types';
-import { ipc } from '#shared';
+import { CreateLogger } from '&/browser/common/logger';
+import { type Message, ipc, is, parse } from '&/common';
 
 const Logger = new CreateLogger('DevServer');
-
-export interface Message {
-  hello: {
-    roles: [string, ...string[]],
-    nonce: number,
-  },
-  stop: never,
-  reload: {
-    file: string,
-    content: string,
-  },
-}
-
-export interface MessageResponse<T extends keyof Message = keyof Message> {
-  type: T,
-  data: Message[T],
-}
-
-const is = <T extends keyof Message>(json: MessageResponse, type: T): json is MessageResponse<T> & boolean => json.type === type;
-
-function parse(text: string) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error(`Invalid JSON: ${text}`);
-  }
-}
 
 class DevServer {
   private wss: WebSocket;
@@ -53,20 +26,22 @@ class DevServer {
       } break;
 
       case is(json, 'reload'): {
-        switch (json.data.file) {
+        const { data } = json; // typescript forgets what type json.data is without this why why why why
+
+        switch (data.file) {
           case 'renderer.js': {
-            Logger.info('Reloading renderer');
-            window.postMessage(ipc('stop'), '*');
+            function listener(event: MessageEvent<EventName>) {
+              if (event.data !== ipc('rendererStopped')) return;
+              window.removeEventListener('message', listener);
 
-            const listener = (event: MessageEvent<EventName>) => {
-              if (event.data === ipc('stopped')) {
-                webFrame.executeJavaScript(json.data.content);
-                window.removeEventListener('message', listener);
-              }
-            };
+              webFrame.executeJavaScript(data.content);
+            }
 
+            Logger.debug('Waiting for renderer to stop...');
             window.addEventListener('message', listener);
+            window.postMessage(ipc('stop'), '*');
           } break;
+
           case 'preload.js': {
             location.reload();
           } break;

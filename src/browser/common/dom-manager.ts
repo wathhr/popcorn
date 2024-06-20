@@ -1,5 +1,5 @@
 import { CreateLogger } from '#/common';
-import renderer from '#/content';
+import { comments, stop } from '#/content';
 
 export class DomManager {
   static comments: Record<string, { start: Comment, end: Comment }> = {};
@@ -10,12 +10,12 @@ export class DomManager {
     this.logger ??= new CreateLogger('DOM', name);
 
     if (!(name in DomManager.comments)) {
-      const comments = DomManager.comments[name] = {
+      const c = DomManager.comments[name] = {
         start: document.createComment(` start:${name} `),
         end: document.createComment(` end:${name} `),
       };
 
-      renderer.comments.end.before(comments.start, comments.end);
+      comments.end.before(c.start, c.end);
     }
   }
 
@@ -43,9 +43,9 @@ export class DomManager {
   }
 }
 
-export function stop() {
+stop(() => {
   for (const comments of Object.values(DomManager.comments)) {
     comments.start.remove();
     comments.end.remove();
   }
-}
+});

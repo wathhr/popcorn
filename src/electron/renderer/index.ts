@@ -1,1 +1,1 @@
-import '../../browser/content/index';
+import '&/browser/content/index';

@@ -1,4 +1,4 @@
-import { colors } from '#shared';
+import { colors } from '&/common';
 
 class Logger {
   private name: string;

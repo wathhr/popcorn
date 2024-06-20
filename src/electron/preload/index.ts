@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { ipc, isKernel } from '#shared';
+import { ipc, isKernel } from '&/common';
 import type { ElectronAPI } from '~/types';
 
 if (!isKernel) import('./inject');

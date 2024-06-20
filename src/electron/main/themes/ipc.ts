@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
 import { getThemes } from '.';
-import { ipc } from '#shared';
+import { ipc } from '&/common';
 
 ipcMain.handle(ipc('getThemes'), () => getThemes());

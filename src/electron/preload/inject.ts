@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { ipcRenderer, webFrame } from 'electron';
-import { ipc } from '#shared';
+import { ipc } from '&/common';
 
 const windowData = ipcRenderer.sendSync(ipc('$getWindowData'));
 if (windowData!.originalPreload) require(windowData!.originalPreload);
