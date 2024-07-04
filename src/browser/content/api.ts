@@ -28,7 +28,6 @@ export default {
 
   getConfig() {
     return {
-      $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
       configVersion: 1,
       enabled: {},
       hotkey: 'ctrl+shift+p',

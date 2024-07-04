@@ -16,6 +16,7 @@ class DevServer {
     ws.onerror = event => Logger.error(event);
   }
 
+  private rendererErrored = false;
   private async handleMessage(message: MessageEvent<string>) {
     const json = parse(message.data);
 
@@ -30,16 +31,23 @@ class DevServer {
 
         switch (data.file) {
           case 'renderer.js': {
-            function listener(event: MessageEvent<EventName>) {
+            const listener = async (event: MessageEvent<EventName>) => {
               if (event.data !== ipc('rendererStopped')) return;
               window.removeEventListener('message', listener);
 
-              webFrame.executeJavaScript(data.content);
-            }
+              await webFrame.executeJavaScript(data.content)
+                .then(() => this.rendererErrored = false)
+                .catch(() => this.rendererErrored = true);
+            };
 
-            Logger.debug('Waiting for renderer to stop...');
-            window.addEventListener('message', listener);
-            window.postMessage(ipc('stop'), '*');
+            if (this.rendererErrored) await webFrame.executeJavaScript(data.content)
+              .then(() => this.rendererErrored = false)
+              .catch(() => this.rendererErrored = true);
+            else {
+              Logger.debug('Waiting for renderer to stop...');
+              window.addEventListener('message', listener);
+              window.postMessage(ipc('stop'), '*');
+            }
           } break;
 
           case 'preload.js': {

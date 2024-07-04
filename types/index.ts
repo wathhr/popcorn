@@ -12,7 +12,7 @@ export interface BrowserAPI {
 
   getThemes(): Promise<Set<ThemeResponse>>,
   getUserStyles(): Promise<Config['userStyles']>,
-  getConfig(): Required<Config>,
+  getConfig(): Required<Omit<Config, '$schema'>>,
 }
 
 export interface ElectronAPI extends Omit<BrowserAPI, 'isBrowser' | 'isSplash'>, MappedMainAPI {
@@ -20,6 +20,7 @@ export interface ElectronAPI extends Omit<BrowserAPI, 'isBrowser' | 'isSplash'>,
   isSplash: boolean,
 
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
+  checkUpdate(): Promise<boolean>,
 
   // internals
   $getWindowData(): NonNullable<import('electron').WebContents['originalWindowData' | 'kernelWindowData']>,

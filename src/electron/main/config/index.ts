@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { CreateLogger, getConfig, getConfigDir } from '#/common';
 import { resolvePath } from '#/utils';
@@ -8,8 +8,7 @@ import './ipc';
 
 const Logger = new CreateLogger('Config');
 
-export const defaultConfig: Required<Config> = {
-  $schema: `https://github.com/wathhr/popcorn/releases/download/v${pkg.version}/config.json`,
+export const defaultConfig: Required<Omit<Config, '$schema'>> = {
   configVersion: 1,
   enabled: {},
   hotkey: 'ctrl+shift+p',
@@ -25,10 +24,11 @@ export const defaultConfig: Required<Config> = {
   userStyles: [],
 };
 
-export const config = ((): Required<Config> => {
+export const config: Required<Omit<Config, '$schema'>> = globalThis.popcornConfig = (() => {
   const configFile = getConfig('config.json');
 
-  if (!existsSync(configFile)) {
+  const content = readFileSync(configFile, 'utf8');
+  if (!content.trim()) {
     Logger.info('config.json not found, creating one.');
     writeFile(configFile, JSON.stringify(defaultConfig, null, 2));
 
@@ -36,16 +36,18 @@ export const config = ((): Required<Config> => {
   }
 
   try {
-    const json: Config = JSON.parse(readFileSync(configFile, 'utf8'));
-    const errors = [...ConfigChecker.Errors(json)];
+    const json = JSON.parse(content);
 
-    if (errors.length > 0) {
+    if (!ConfigChecker.Check(json)) {
+      const errors = [...ConfigChecker.Errors(json)];
       Logger.error('Invalid config.json:', errors);
+
       return defaultConfig;
     }
 
     json.quickCssDir &&= resolvePath(json.quickCssDir);
     json.themeDirs &&= json.themeDirs.map(d => resolvePath(d));
+    delete json.$schema;
 
     return { ...defaultConfig, ...json };
   } catch (e) {
@@ -53,3 +55,5 @@ export const config = ((): Required<Config> => {
     return defaultConfig;
   }
 })();
+
+Object.assign(globalThis, { popcornConfig: config });

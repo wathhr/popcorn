@@ -1,2 +1,2 @@
 // eslint-disable-next-line no-var
-declare var PopcornAPI: import('~/types').BrowserAPI | import('~/types').ElectronAPI;
+declare var PopcornAPI: Omit<import('~/types').BrowserAPI, `$${string}`> | Omit<import('~/types').ElectronAPI, `$${string}`>;

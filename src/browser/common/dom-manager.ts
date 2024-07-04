@@ -1,14 +1,19 @@
-import { CreateLogger } from '#/common';
-import { comments, stop } from '#/content';
+import { start, stop } from '#/content';
+
+const comments = {
+  start: document.createComment(' start:Popcorn'),
+  end: document.createComment(' end:Popcorn '),
+};
+
+start(() => {
+  for (const comment of Object.values(comments)) document.head.appendChild(comment);
+});
 
 export class DomManager {
   static comments: Record<string, { start: Comment, end: Comment }> = {};
-  private logger: CreateLogger;
   managedElements: HTMLElement[] = [];
 
   constructor(private name: string) {
-    this.logger ??= new CreateLogger('DOM', name);
-
     if (!(name in DomManager.comments)) {
       const c = DomManager.comments[name] = {
         start: document.createComment(` start:${name} `),
@@ -20,9 +25,6 @@ export class DomManager {
   }
 
   addElement(element: HTMLElement, position: 'start' | 'end' | number = 'end') {
-    // eslint-disable-next-line prefer-rest-params
-    this.logger.debug(this.name, 'addElement', arguments);
-
     switch (position) {
       case 'start': {
         this.managedElements.unshift(element);
@@ -44,6 +46,7 @@ export class DomManager {
 }
 
 stop(() => {
+  for (const comment of Object.values(comments)) comment.remove();
   for (const comments of Object.values(DomManager.comments)) {
     comments.start.remove();
     comments.end.remove();

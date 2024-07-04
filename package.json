@@ -30,23 +30,22 @@
     "start:chrome:mv3": "web-ext run --source-dir ./dist/browser-mv3/ -t chromium --browser-console --devtools"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.19.2",
+    "@antfu/eslint-config": "^2.21.1",
     "@types/chrome": "^0.0.266",
-    "@types/node": "^18.19.33",
-    "@types/semver": "^7.5.8",
+    "@types/node": "^18.19.38",
     "@types/webextension-polyfill": "^0.10.7",
     "electron": "28.2.10",
     "electron-latest": "npm:electron@30.0.1",
-    "eslint": "^9.4.0",
+    "eslint": "^9.5.0",
     "npm-run-all": "^4.1.5",
-    "type-fest": "^4.18.3",
-    "typescript": "^5.4.5",
+    "type-fest": "^4.20.1",
+    "typescript": "^5.5.2",
     "web-ext": "^7.12.0"
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.32.31",
+    "@sinclair/typebox": "^0.32.33",
+    "@std/semver": "npm:@jsr/std__semver@^0.224.3",
     "core-js": "^3.37.1",
-    "semver": "^7.6.2",
     "webextension-polyfill": "^0.11.0"
   },
   "pnpm": {

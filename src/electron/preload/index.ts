@@ -4,7 +4,7 @@ import type { ElectronAPI } from '~/types';
 
 if (!isKernel) import('./inject');
 
-const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
+const PopcornAPI: Omit<ElectronAPI, `$${string}`> = globalThis.PopcornAPI = {
   isBrowser: false,
   isSplash: (() => {
     const possibleVars = [
@@ -21,7 +21,7 @@ const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
     ];
 
     for (const varName of possibleVars) if (varName in window) return true;
-    if (/(?:public)?(?:splash\.html?|splash[\\/]\w+\.html?)$/i.test(location.href)) return true;
+    if (/splash(?:\.html?|[\\/]\w+\.html?)$/i.test(location.href)) return true;
 
     return false;
   })(),
@@ -29,6 +29,7 @@ const PopcornAPI: Omit<ElectronAPI, `$${string}`> = {
   getThemes: () => ipcRenderer.invoke(ipc('getThemes')),
   getConfig: () => ipcRenderer.sendSync(ipc('getConfig')),
   getMainLogs: () => ipcRenderer.invoke(ipc('getMainLogs')),
+  checkUpdate: () => ipcRenderer.invoke(ipc('checkUpdate')),
 
   async getUserStyles() {
     return PopcornAPI.getConfig().userStyles;

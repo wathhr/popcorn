@@ -1,10 +1,16 @@
 import { app } from 'electron';
-import { CreateLogger } from './common';
 import { config } from './config';
+import { CreateLogger } from './common';
 import { isKernel } from '&/common';
 
-import './patch-csp';
-import './protocol';
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var popcornConfig: typeof config;
+}
+
+import('./patch-csp');
+import('./protocol');
+import('./updater');
 
 const Logger = new CreateLogger();
 Logger.info('Starting...');
@@ -16,11 +22,9 @@ if (!isKernel) require('./inject');
 
 Logger.debug('Effective config:', config);
 
-app.on('browser-window-created', (_, window) => {
-  if (process.argv.includes('--devtools')) window.webContents.openDevTools();
-});
+if (process.argv.includes('--devtools')) app.on('browser-window-created', (_, window) => window.webContents.openDevTools());
 
 // TODO: Add better error handling, https://stackoverflow.com/questions/41102060/typescript-extending-error-class
 process.on('uncaughtExceptionMonitor', (err, origin) => {
-  Logger.error('Uncaught exception', err, origin);
+  Logger.error('Uncaught exception', origin, err);
 });

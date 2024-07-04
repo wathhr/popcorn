@@ -15,6 +15,7 @@ export const Theme = Type.Object({
     }),
   ),
   main: Type.String({ description: 'Relative path to the theme\'s CSS file' }),
+  splash: Type.Optional(Type.String({ description: 'Relative path to the theme\'s splash screen CSS file' })),
   name: Type.Optional(Type.String({ description: 'The name of the theme displayed on the UI' })),
   description: Type.Optional(Type.String()),
   metaLinks: Type.Optional(

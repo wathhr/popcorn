@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join, normalize } from 'node:path';
+import { join, normalize, sep } from 'node:path';
 import { CreateLogger } from '#/common';
 
 let Logger: CreateLogger | undefined;
@@ -16,13 +16,14 @@ export const configDir = join((() => {
 })(), 'Popcorn');
 
 export function getConfig(...args: string[]) {
-  const path = join(configDir, ...args);
+  const path = normalize(join(...args)).startsWith(configDir) ? join(...args) : join(configDir, ...args);
+  const pathItems = normalize(args.join(sep)).split(sep);
 
   try {
-    getConfigDir(...args.splice(-1));
+    if (pathItems.length > 1) getConfigDir(...pathItems.slice(0, -1));
     if (!existsSync(path)) writeFileSync(path, '');
   } catch (e) {
-    if (!Logger) Logger = new CreateLogger('Config');
+    Logger ??= new CreateLogger('Config');
     Logger.error('Failed to create config file', e);
   }
 
@@ -30,12 +31,12 @@ export function getConfig(...args: string[]) {
 }
 
 export function getConfigDir(...args: string[]) {
-  const path = normalize(args[0]!).startsWith(configDir) ? join(...args) : join(configDir, ...args);
+  const path = normalize(join(...args)).startsWith(configDir) ? join(...args) : join(configDir, ...args);
 
   try {
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
   } catch (e) {
-    if (!Logger) Logger = new CreateLogger('Config');
+    Logger ??= new CreateLogger('Config');
     Logger.error('Failed to create config dir', e);
   }
 
