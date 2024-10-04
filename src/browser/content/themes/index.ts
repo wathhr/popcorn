@@ -1,8 +1,7 @@
 import { start, stop } from '#/content';
-import { CreateLogger, DomManager } from '#/common';
+import { DomManager } from '#/common';
 
 let DOM: DomManager; // TODO: Remove the need to do this
-const Logger = new CreateLogger('Themes');
 
 start(async () => {
   DOM = new DomManager('themes');

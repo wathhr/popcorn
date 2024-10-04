@@ -1,5 +1,5 @@
-import { writeFileSync } from 'node:original-fs';
 import { dirname, join } from 'node:path';
+import { writeFileSync } from 'node:original-fs';
 import { compare, parse } from '@std/semver';
 import { ipcMain } from 'electron';
 import { type Release, ReleaseChecker } from './release-type';

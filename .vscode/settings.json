@@ -17,7 +17,6 @@
 
   "deno.importMap": "./deno.jsonc",
 
-  "eslint.experimental.useFlatConfig": true,
   "eslint.validate": [
     "javascript",
     "typescript",
