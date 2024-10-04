@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 /// <reference types="npm:@types/chrome" />
 
 import pkg from '#pkg' with { type: 'json' };

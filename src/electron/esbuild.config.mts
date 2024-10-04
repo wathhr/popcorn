@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 import { deepMerge } from 'std/collections/mod.ts';
 import { createPackage } from 'npm:@electron/asar';
 import { customFiles } from '#build/plugins/index.mts';

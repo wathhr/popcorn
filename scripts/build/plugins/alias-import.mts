@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 import pkg from '#pkg' with { type: 'json' };
 
 export const aliasImport: import('esbuild').Plugin = {

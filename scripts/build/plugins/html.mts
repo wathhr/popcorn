@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import type * as esbuild from 'esbuild';
 import { join, relative } from 'std/path/mod.ts';

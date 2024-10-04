@@ -1,3 +1,5 @@
+import { PopcornError } from './error.ts';
+
 export interface Message {
   hello: {
     roles: [string, ...string[]],
@@ -20,6 +22,6 @@ export function parse(text: string): MessageResponse {
   try {
     return JSON.parse(text);
   } catch {
-    throw new Error(`Invalid JSON: ${text}`);
+    throw new PopcornError(`Invalid JSON: ${text}`);
   }
 }

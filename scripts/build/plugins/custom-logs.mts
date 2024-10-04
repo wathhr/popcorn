@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { basename, join, relative } from 'std/path/mod.ts';
 import * as c from 'std/fmt/colors.ts';

@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import * as esbuild from 'esbuild';
 import { deepMerge } from 'std/collections/mod.ts';

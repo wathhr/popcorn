@@ -1,7 +1,7 @@
 import { appendFile, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { formatWithOptions } from 'node:util';
-import { app, ipcMain } from 'electron';
+import { ipcMain } from 'electron';
 import { startTimeString } from './constants';
 import { sendToAll } from '#/utils/sendToAll';
 import { type Color, colors, ipc } from '&/common';
@@ -25,11 +25,9 @@ const logFile = (() => {
 
 const logs: MainAPI['sendLog'][] = [];
 
-// TODO: Only send this if we are confident it's the main window
-app.on('web-contents-created', (_, contents) => logs.forEach(log => contents.send(ipc('sendLog'), log)));
 ipcMain.handle(ipc('getMainLogs'), () => logs);
 
-class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'trace' | 'profile' | 'profileEnd' | 'Console'> {
+class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'timeStamp' | 'trace' | 'profile' | 'profileEnd' | 'Console'> {
   private name: string;
   constructor(...name: string[]) {
     if (name.length === 0) name = ['Popcorn'];
@@ -41,7 +39,7 @@ class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'tr
     return `\x1b[38;2;${color[0]};${color[1]};${color[2]}m${text}\x1b[0m`;
   }
 
-  async #appendLog(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
+  async #appendLog(level: MainAPI['sendLog']['type'], ...msg: Parameters<Console['log']>) {
     await appendFile(logFile, [
       `[${new Date().toLocaleString('en-US')}] `,
       `${level.toUpperCase()}: `,
@@ -55,21 +53,22 @@ class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'tr
     ].join(''), 'utf-8');
   }
 
-  private indent = 0;
-  #log(level: MainAPI['sendLog']['level'], ...msg: Parameters<Console['log']>) {
-    const indent = this.indent ? `${'  '.repeat(this.indent)}|` : '';
+  private static indent = 0;
+  #log(level: MainAPI['sendLog']['type'], ...msg: Parameters<Console['log']>) {
+    const indent = Logger.indent > 0 ? `${'  '.repeat(Logger.indent)}|` : '';
 
+    const color = colors[level in colors ? level as keyof typeof colors : 'brand'].rgb;
     const banner = this.name !== 'Popcorn'
-      ? `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)} > ${this.name}]`
-      : `[${this.color('Popcorn', colors[level === 'log' ? 'brand' : level].rgb)}]`;
+      ? `[${this.color('Popcorn', color)} > ${this.name}]`
+      : `[${this.color('Popcorn', color)}]`;
 
     const finalMessage = [...(indent ? [indent] : []), banner, ...msg];
 
-    if (DEBUG || popcornConfig.verbose || level !== 'debug') console[level](...finalMessage);
+    if (DEBUG || $popcornConfig.verbose || level !== 'debug') console[level](...finalMessage);
 
     queueMicrotask(async () => await this.#appendLog(level, ...msg));
 
-    if (DEBUG || popcornConfig.verbose || level === 'error') {
+    if (DEBUG || $popcornConfig.verbose || level === 'error') {
       const message = (() => {
         try {
           return structuredClone(msg);
@@ -83,7 +82,7 @@ class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'tr
 
       const log: MainAPI['sendLog'] = {
         component: this.name,
-        level,
+        type: level,
         message,
         time: Date.now(),
       };
@@ -101,22 +100,59 @@ class Logger implements Omit<Console, 'clear' | 'dir' | 'dirxml' | 'table' | 'tr
   log: Console['log'] = (...msg) => this.#log('log', ...msg);
   warn: Console['warn'] = (...msg) => this.#log('warn', ...msg);
 
-  // TODO: Send all of the following to the renderer as well
-  count = (label?: string) => console.count(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
-  countReset = (label?: string) => console.countReset(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
+  private static countMap = new Map<string, number>();
+  count(label = 'default') {
+    const newValue = (Logger.countMap.get(label) ?? 0) + 1;
+    Logger.countMap.set(label, newValue);
+    this.#log('log', `${label}:`, newValue);
+  }
+
+  countReset = (label = 'default') => void Logger.countMap.delete(label);
 
   group: Console['group'] = (...label) => {
-    this.indent++;
-    if (label.length > 0) this.#log('log', ...label);
+    this.#log('log', ...label);
+    Logger.indent++;
   };
 
   groupCollapsed = this.group;
-  groupEnd = () => this.indent--;
+  groupEnd = () => Logger.indent--;
 
-  time = (label?: string) => console.time(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
-  timeEnd = (label?: string) => console.timeEnd(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
-  timeLog = (label?: string) => console.timeLog(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
-  timeStamp = (label?: string) => console.timeStamp(label ? `Popcorn > ${this.name} > ${label}` : `Popcorn > ${this.name}`);
+  private static timeMap = new Map<string, number>();
+  time(label = 'default') {
+    const start = Date.now();
+
+    if (Logger.timeMap.has(label)) {
+      this.#log('warn', `Timer "${label}" already exists.`);
+      return;
+    }
+
+    Logger.timeMap.set(label, start);
+  }
+
+  timeEnd(label = 'default') {
+    const end = Date.now();
+    const start = Logger.timeMap.get(label);
+
+    if (!start) {
+      this.#log('warn', `Timer "${label}" doesn't exist.`);
+      return;
+    }
+
+    this.#log('log', `${label}: ${end - start}ms - timer ended`);
+    Logger.timeMap.delete(label);
+  }
+
+  timeLog(label = 'default') {
+    const now = Date.now();
+    const start = Logger.timeMap.get(label);
+
+    if (!start) {
+      this.#log('warn', `Timer "${label}" doesn't exist.`);
+      return;
+    }
+
+    this.#log('log', `${label}: ${now - start}ms`);
+  }
 }
 
 export {

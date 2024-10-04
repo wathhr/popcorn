@@ -1,6 +1,6 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
-import { copy, exists } from 'std/fs/mod.ts';
+import { copy, ensureDir, exists } from 'std/fs/mod.ts';
 import { basename, join } from 'std/path/mod.ts';
 
 export async function injectLocal(location: string, type: 'packed' | 'unpacked' | 'symlink' = 'packed') {
@@ -51,11 +51,13 @@ export async function injectLocal(location: string, type: 'packed' | 'unpacked' 
   }
 
   if (type === 'symlink') {
+    location = location.replace(/\.asar$/, '');
+    await ensureDir(location);
     for await (const entry of Deno.readDir(popcornDist)) await Deno.link(join(popcornDist, entry.name), join(location, entry.name));
     return;
   }
 
-  await copy(popcornDist, join(location, `../${basename(location).replace('.asar', '')}${type === 'packed' ? '.asar' : ''}`));
+  await copy(popcornDist, join(location, `../${basename(location).replace(/\.asar$/, '')}${type === 'packed' ? '.asar' : ''}`));
 }
 
 export async function injectRemote(location: string, version: `v${string}`) {

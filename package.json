@@ -1,7 +1,7 @@
 {
   "name": "popcorn",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "GPL-3.0-or-later",
   "description": "Another theming extension.",
   "main": "./main.js",
@@ -60,7 +60,7 @@
       "electron@28.2.10": "patches/electron@28.2.10.patch"
     }
   },
-  "packageManager": "pnpm@9.0.6",
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
   "engines": {
     "pnpm": ">=8"
   },
@@ -75,10 +75,10 @@
       "not iOS > 0"
     ],
     "electron-renderer": [
-      "electron >= 28"
+      "electron >= 31"
     ],
     "electron-main": [
-      "node >= 18"
+      "node >= 20"
     ]
   }
 }

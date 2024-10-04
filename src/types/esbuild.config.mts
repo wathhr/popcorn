@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 const jsonFiles = [];
 for await (const file of Deno.readDir(import.meta.dirname!))

@@ -1,4 +1,4 @@
-#!/bin/usr/env deno
+#!/usr/bin/env -S deno run --allow-all
 
 import type * as esbuild from 'esbuild';
 import { exists } from 'std/fs/mod.ts';
@@ -14,13 +14,12 @@ const src = join(root, 'src');
 
 const args = parseArgs(Deno.args, {
   boolean: ['watch', 'dev'],
-  string: ['types', 'executables'],
-  collect: ['types', 'executables'],
+  string: ['types'],
+  collect: ['types'],
   alias: {
     d: 'dev',
     t: 'types',
     w: 'watch',
-    e: 'executables',
   },
   default: {
     dev: Deno.env.get('NODE_ENV') === 'development',

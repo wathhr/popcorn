@@ -11,7 +11,7 @@ import('./themes');
 
 const Logger = new CreateLogger();
 
-type StartFunction = () => void;
+type StartFunction = () => Promise<void> | void;
 const startFunctions: StartFunction[] = [];
 const start = (callback: StartFunction) => document.readyState === 'loading' ? startFunctions.push(callback) : callback();
 
@@ -22,15 +22,15 @@ async function init() {
   if (!PopcornAPI.isBrowser) {
     const MainLogger = new CreateLogger('Main');
     function createLog(log: MainAPI['sendLog']) {
-      if (log.component !== 'Popcorn') return new CreateLogger('Main', log.component)[log.level](...log.message);
+      if (log.component !== 'Popcorn') return new CreateLogger('Main', log.component)[log.type](...log.message);
 
-      MainLogger[log.level](...log.message);
+      MainLogger[log.type](...log.message);
     }
 
+    PopcornAPI.onSendLog((_, log) => createLog(log));
     PopcornAPI.getMainLogs().then((logs) => {
       for (const log of logs) createLog(log);
     });
-    PopcornAPI.onSendLog((_, log) => createLog(log));
   }
 
   for (const callback of startFunctions) await callback();
@@ -39,7 +39,7 @@ async function init() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
 
-type StopFunction = () => void;
+type StopFunction = () => Promise<void> | void;
 const stopFunctions: StopFunction[] = [];
 const stop = (callback: StopFunction) => stopFunctions.push(callback);
 

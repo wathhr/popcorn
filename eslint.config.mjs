@@ -2,6 +2,30 @@ import antfu from '@antfu/eslint-config';
 
 export default antfu(
   {
+    // plugins: {
+    //   custom: {
+    //     rules: {
+    //       'no-throw': {
+    //         name: 'no-throw',
+    //         meta: {
+    //           docs: {
+    //             description: 'Forbid the use of `throw`.',
+    //             recommended: 'error',
+    //             type: 'problem',
+    //           },
+    //         },
+    //         create: context => ({
+    //           ThrowStatement(node) {
+    //             context.report({
+    //               node,
+    //               message: 'Disallowed use of `throw`',
+    //             });
+    //           },
+    //         }),
+    //       },
+    //     },
+    //   },
+    // },
     typescript: true,
     // svelte: true,
     // parses normal json files as jsonc
@@ -97,4 +121,10 @@ export default antfu(
       'ts/no-var-requires': 'off',
     },
   },
+  // {
+  //   files: ['src/**/*.ts'],
+  //   rules: {
+  //     'custom/no-throw': 'error',
+  //   },
+  // },
 );

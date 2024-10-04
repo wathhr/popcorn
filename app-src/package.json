@@ -18,16 +18,16 @@
     "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
-    "@types/node": "^18.19.9",
-    "electron": ">=22.3.26",
-    "electron-builder": "^24.9.1",
-    "electron-vite": "^2.0.0",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.12"
+    "@types/node": "^22.7.4",
+    "electron": ">=28.2.10",
+    "electron-builder": "^25.0.5",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
   }
 }

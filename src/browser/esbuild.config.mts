@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { join } from 'std/path/join.ts';
 import { copy, exists, walk } from 'std/fs/mod.ts';

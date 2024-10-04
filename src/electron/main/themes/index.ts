@@ -17,7 +17,11 @@ export async function getThemes(force = false) {
   themes.clear();
 
   for (const dir of config.themeDirs) {
-    const themeDirFiles = await readdir(dir);
+    const themeDirFiles = await readdir(dir).catch(e => e as Error);
+    if (themeDirFiles instanceof Error) {
+      Logger.warn(`Failed to read theme directory "${dir}":`, themeDirFiles);
+      continue;
+    }
 
     for (const theme of themeDirFiles) {
       const themeDir = join(dir, theme);

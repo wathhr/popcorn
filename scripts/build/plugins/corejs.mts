@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import compat from 'npm:core-js-compat';
 import browserslist from 'npm:browserslist';

@@ -21,6 +21,7 @@ export interface ElectronAPI extends Omit<BrowserAPI, 'isBrowser' | 'isSplash'>,
 
   getMainLogs(): Promise<MainAPI['sendLog'][]>,
   checkUpdate(): Promise<boolean>,
+  installUpdate(version?: `v${string}`): Promise<void>,
 
   // internals
   $getWindowData(): NonNullable<import('electron').WebContents['originalWindowData' | 'kernelWindowData']>,
@@ -33,7 +34,7 @@ export interface MainAPI {
   },
   sendLog: {
     component: string,
-    level: 'log' | 'info' | 'debug' | 'warn' | 'error',
+    type: 'log' | 'info' | 'debug' | 'warn' | 'error',
     message: any[],
     time?: number,
   },

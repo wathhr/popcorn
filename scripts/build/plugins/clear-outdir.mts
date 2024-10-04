@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { exists } from 'std/fs/mod.ts';
 

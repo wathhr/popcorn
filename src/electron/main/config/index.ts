@@ -13,18 +13,13 @@ export const defaultConfig: Required<Omit<Config, '$schema'>> = {
   enabled: {},
   hotkey: 'ctrl+shift+p',
   quickCssDir: getConfigDir('quickcss'),
-  themeDirs: [
-    getConfigDir('themes'),
-    ...(process.platform === 'win32'
-      ? [resolvePath('%USERPROFILE%/discord/themes/')]
-      : [resolvePath('$HOME/discord/themes/')]),
-  ],
+  themeDirs: [getConfigDir('themes')],
   verbose: process.argv.includes('--verbose') || NODE_ENV === 'development',
   transparencyType: 'none',
   userStyles: [],
 };
 
-export const config: Required<Omit<Config, '$schema'>> = globalThis.popcornConfig = (() => {
+export const config: Required<Omit<Config, '$schema'>> = globalThis.$popcornConfig = (() => {
   const configFile = getConfig('config.json');
 
   const content = readFileSync(configFile, 'utf8');
@@ -56,4 +51,4 @@ export const config: Required<Omit<Config, '$schema'>> = globalThis.popcornConfi
   }
 })();
 
-Object.assign(globalThis, { popcornConfig: config });
+Object.assign(globalThis, { $popcornConfig: config });

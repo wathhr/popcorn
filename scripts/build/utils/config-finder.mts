@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 export function getConfig() {
   const importPath = new Error('Figuring out where the function was called from')

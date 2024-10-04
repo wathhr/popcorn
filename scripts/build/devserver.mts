@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { type Message, is, parse } from '../../src/common/deveserver.ts';
 

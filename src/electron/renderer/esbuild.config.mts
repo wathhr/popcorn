@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { corejs } from '#build/plugins/index.mts';
 import pkg from '#pkg' with { type: 'json' };

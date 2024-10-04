@@ -8,6 +8,9 @@
 
 ## Code management
 - [x] Move `src/electron/renderer` to `src/browser` and use it from there instead
+- [ ] Make nothing throw
+  - [Does it throw](https://github.com/michaelangeloio/does-it-throw)
+  - [DIT cli tool](https://github.com/michaelangeloio/does-it-throw/issues/59) / [DIT Eslint plugin](https://github.com/michaelangeloio/does-it-throw/issues/70)
 
 ## Extension
 - [x] Implement
@@ -39,6 +42,7 @@
   - [ ] For some reason typescript can't get type declarations when importing from `electron-legacy/[main,renderer,...]`
 - [x] Add file system manager
 - [ ] Keep hot-reloading going on renderer even with an unhandled exception
+- [ ] Change all injection based logic to follow only the [valid packages](https://github.com/electron/electron/blob/0346e0a8bff7b712f86f51075b3effcc1d8358f1/lib/browser/init.ts#L221)
 
 ## Scripts
 - [ ] ~~Figure out a better way to add kernel-types, currently they are manually written~~

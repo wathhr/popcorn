@@ -1,4 +1,4 @@
-#!/bin/usr/env false
+#!/usr/bin/env false
 
 import { aliasImport, corejs } from '#build/plugins/index.mts';
 import pkg from '#pkg' with { type: 'json' };
@@ -17,17 +17,19 @@ export default {
       setup(build) {
         if (!params.get('executables') || params.get('dev') === 'false') return;
 
-        let command: Deno.ChildProcess | undefined;
+        const command: Record<string, Deno.ChildProcess> = {};
 
         build.onEnd(() => {
-          for (const executable of (params.get('executables') ?? '').split(',')) {
-            if (command) try {
-              command.kill();
+          const executables = params.get('executables') ?? '';
+
+          for (const executable of executables.split(',')) {
+            if (executable in command) try {
+              command[executable].kill();
             } catch { /* omitted */ };
 
             const [cmd, ...args] = executable.split(' ');
 
-            command = new Deno.Command(cmd, { args }).spawn();
+            command[executable] = new Deno.Command(cmd, { args }).spawn();
           }
         });
       },

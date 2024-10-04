@@ -12,14 +12,6 @@ exports.default = {
   electronDist: '../node_modules/electron/dist',
   electronVersion: rootPkg.devDependencies.electron,
 
-  // Windows
-  nsis: {
-    artifactName: '${name}-${version}-setup.${ext}',
-    shortcutName: pkg.name,
-    uninstallDisplayName: pkg.name,
-    createDesktopShortcut: false,
-  },
-
   // MacOS
   mac: {
     entitlementsInherit: 'build/entitlements.mac.plist',
@@ -38,9 +30,6 @@ exports.default = {
       },
     ],
   },
-  dmg: {
-    artifactName: '${pkg.name}-${pkg.version}.${ext}',
-  },
 
   // Linux
   linux: {
@@ -51,9 +40,6 @@ exports.default = {
     ],
     maintainer: 'https://github.com/wathhr/popcorn',
     category: 'Utility',
-  },
-  appImage: {
-    artifactName: '${pkg.name}-${pkg.version}.${ext}',
   },
 
   // Misc
