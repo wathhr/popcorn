@@ -24,6 +24,7 @@
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",
     "build": "deno run --allow-all scripts/build/cli.mts",
     "watch": "deno run --allow-all scripts/build/cli.mts --watch --dev",
+    "inject": "deno run --allow-all scripts/inject/cli.mts",
     "start:firefox:mv2": "web-ext run --source-dir ./dist/browser-mv2/ --browser-console --devtools",
     "start:firefox:mv3": "web-ext run --source-dir ./dist/browser-mv3/ --browser-console --devtools",
     "start:chrome:mv2": "web-ext run --source-dir ./dist/browser-mv2/ -t chromium --browser-console --devtools",

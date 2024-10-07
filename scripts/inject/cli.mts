@@ -21,7 +21,7 @@ const args = parseArgs(Deno.args, {
   },
 });
 
-function help() {
+function help(code = 0) {
   console.log(`
   Usage: injector [options] <location>
 
@@ -30,14 +30,13 @@ function help() {
     -s, --symlink     Use symlinks instead of copies
     -l, --location    Location of the app's asar or app folder
     -v, --version     Which version of popcorn to inject
-    -h, --help        Show this help
-`);
+    -h, --help        Show this help`);
+
+  Deno.exit(code);
 }
 
-if (Deno.args.length < 1 || args.help) {
-  help();
-  Deno.exit(0);
-}
+if (args.help) help();
+if (Deno.args.length < 1) help(1);
 
 const location = await (async () => {
   const arg = args.location ?? args._[0];

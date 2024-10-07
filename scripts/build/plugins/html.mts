@@ -79,8 +79,8 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
                 pluginName,
               }],
             };
-            const result = await build.esbuild.transform(script.innerHTML, { ...options, ...opts.transformOptions });
 
+            const result = await build.esbuild.transform(script.innerHTML, { ...options, ...opts.transformOptions });
             script.innerHTML = result.code.trim();
           }
         }

@@ -27,7 +27,7 @@ async function init() {
       MainLogger[log.type](...log.message);
     }
 
-    PopcornAPI.onSendLog((_, log) => createLog(log));
+    PopcornAPI.onSendLog(log => createLog(log));
     PopcornAPI.getMainLogs().then((logs) => {
       for (const log of logs) createLog(log);
     });

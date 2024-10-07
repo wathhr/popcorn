@@ -45,9 +45,5 @@ export type EventName<T = string> = T extends string
   : never;
 
 type MappedMainAPI = {
-  [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (
-    // TODO: Remove the event field maybe for privacy concerns
-    event: import('electron').IpcRendererEvent,
-    ...args: ForceArr<MainAPI[K]>
-  ) => void) => () => void;
+  [K in keyof MainAPI as `on${Capitalize<K & string>}`]: (handler: (...args: ForceArr<MainAPI[K]>) => void) => () => void;
 };

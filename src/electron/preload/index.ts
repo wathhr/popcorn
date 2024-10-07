@@ -1,8 +1,12 @@
+import type { IpcRendererEvent } from 'electron';
 import { contextBridge, ipcRenderer } from 'electron';
 import { ipc, isKernel } from '&/common';
 import type { ElectronAPI } from '~/types';
 
 if (!isKernel) import('./inject');
+
+// eslint-disable-next-line ts/no-explicit-any
+type Handler<T extends (...args: any) => any> = (_: IpcRendererEvent, ...args: Parameters<T>) => ReturnType<T>;
 
 const PopcornAPI: Omit<ElectronAPI, `$${string}`> = globalThis.PopcornAPI = {
   isBrowser: false,
@@ -43,12 +47,14 @@ const PopcornAPI: Omit<ElectronAPI, `$${string}`> = globalThis.PopcornAPI = {
     return PopcornAPI.getConfig().userStyles;
   },
 
-  onSaveState(handler) {
+  onSaveState(_handler) {
+    const handler: Handler<typeof _handler> = (_, ...args) => _handler(...args);
     ipcRenderer.on(ipc('saveState'), handler);
     return () => ipcRenderer.off(ipc('saveState'), handler);
   },
 
-  onSendLog(handler) {
+  onSendLog(_handler) {
+    const handler: Handler<typeof _handler> = (_, ...args) => _handler(...args);
     ipcRenderer.on(ipc('sendLog'), handler);
     return () => ipcRenderer.off(ipc('sendLog'), handler);
   },

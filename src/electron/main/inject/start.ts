@@ -12,7 +12,7 @@ interface AppInternal extends electron.App {
   setAppPath(path: string | null): void,
 }
 
-const Logger = new CreateLogger('Injector');
+const Logger = new CreateLogger('Inject');
 
 const basePath = join(dirname(require.main!.filename), '..');
 const baseFilename = basename(dirname(require.main!.filename)).replace(/\.asar$|[\\/]$/, '');

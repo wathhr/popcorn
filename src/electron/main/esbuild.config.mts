@@ -1,5 +1,7 @@
 #!/usr/bin/env false
 
+import { exists } from 'std/fs/mod.ts';
+import { join } from 'std/path/mod.ts';
 import { aliasImport, corejs } from '#build/plugins/index.mts';
 import pkg from '#pkg' with { type: 'json' };
 
@@ -14,22 +16,37 @@ export default {
     corejs(pkg.browserslist['electron-main']),
     {
       name: 'Nodemon ripoff',
-      setup(build) {
-        if (!params.get('executables') || params.get('dev') === 'false') return;
+      async setup(build) {
+        const executables = params.get('executable');
+        if (!executables || params.get('dev') === 'false') return;
 
         const command: Record<string, Deno.ChildProcess> = {};
 
-        build.onEnd(() => {
-          const executables = params.get('executables') ?? '';
+        const auto = await (async () => {
+          const appSrcDist = join(import.meta.dirname ?? '', '../../../app-src/dist');
+          if (!await exists(appSrcDist)) throw new Error('Test application is not built');
 
+          for await (const child of Deno.readDir(appSrcDist))
+            if (child.name.endsWith('-unpacked')) {
+              const dir = join(appSrcDist, child.name);
+              for await (const child of Deno.readDir(dir)) if (child.name.startsWith('popcorn')) return join(dir, child.name);
+            }
+        })();
+
+        build.onEnd(() => {
           for (const executable of executables.split(',')) {
             if (executable in command) try {
               command[executable].kill();
             } catch { /* omitted */ };
 
             const [cmd, ...args] = executable.split(' ');
+            const exe = (() => {
+              if (cmd === 'auto' && import.meta.dirname && auto) return auto;
 
-            command[executable] = new Deno.Command(cmd, { args }).spawn();
+              return cmd;
+            })();
+
+            command[executable] = new Deno.Command(exe, { args }).spawn();
           }
         });
       },
