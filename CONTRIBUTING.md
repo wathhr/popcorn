@@ -53,7 +53,7 @@ pnpm build:unpack
 cd ..
 
 # Inject the project into the test application
-pnpm inject --location=auto
+pnpm inject --location=auto --symlink
 
 # Watch a project for changes (with live reload)
 pnpm watch [PROJECT]

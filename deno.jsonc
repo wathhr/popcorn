@@ -1,4 +1,5 @@
 {
+  "nodeModulesDir": "none",
   "imports": {
     "esbuild": "https://deno.land/x/esbuild@v0.24.0/mod.js",
     "std/": "https://deno.land/std@0.224.0/",
@@ -7,6 +8,5 @@
     "#utils": "./scripts/utils/index.mts",
     "#utils/": "./scripts/utils/",
     "#pkg": "./package.json"
-  },
-  "nodeModulesDir": false
+  }
 }
