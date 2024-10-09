@@ -1,5 +1,6 @@
 import { app } from 'electron';
 
+// ! https://github.com/Vendicated/Vencord/blob/013c8d061d1c1481badb39189a80d13f7db02ccb/src/main/index.ts#L66-L130
 function parsePolicy(policy = '') {
   const result: Record<string, string[]> = {};
 
