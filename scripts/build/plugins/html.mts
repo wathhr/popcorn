@@ -35,19 +35,13 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
           }],
         };
 
-        // TODO: Most of these are dropped because of transform which is not necessary, create a different object for transform and build
-        const dropKeys = ['assetNames', 'bundle', 'chunkNames', 'entryPoints', 'entryNames', 'inject', 'metafile', 'outExtension', 'outbase', 'outdir', 'outfile', 'plugins', 'write'] as const satisfies (keyof esbuild.BuildOptions)[];
-        const buildOptions = { ...build.initialOptions as esbuild.CommonOptions };
-        for (const key of dropKeys) if (key in buildOptions) delete (buildOptions as esbuild.BuildOptions)[key];
-
         const scripts = document.getElementsByTagName('script');
         for (const script of scripts) {
           const options: esbuild.CommonOptions = {
-            // The object is sorted like this so each option object can overwrite the previous keys
-            format: script.getAttribute('type') === 'module' ? 'esm' : 'cjs',
-            ...buildOptions,
+            ...build.initialOptions,
             logLevel: 'error',
             ...opts.esbuildOptions,
+            format: script.getAttribute('type') === 'module' ? 'esm' : 'cjs',
             platform: 'browser',
           };
 
@@ -57,7 +51,7 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
             const path = join(args.path, '..', src);
             watchFiles.push(path);
 
-            const finalOptions = {
+            const buildOptions = {
               ...options,
               ...opts.buildOptions,
               entryPoints: [path],
@@ -65,12 +59,12 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
               outdir: join(build.initialOptions.outdir!, src, '..'),
             };
 
-            const result = await build.esbuild.build(finalOptions);
+            const result = await build.esbuild.build(buildOptions);
             if (result.errors.length > 0) return { errors: result.errors, pluginName };
             watchFiles.push(...result.metafile!.outputs[Object.keys(result.metafile!.outputs)[0]].imports.map(input => input.path));
             if ($group) addToGroup(resultToCache(result), $group);
 
-            script.setAttribute('src', relative(finalOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
+            script.setAttribute('src', relative(buildOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
           } else {
             if (!script.innerHTML) return {
               errors: [{
@@ -80,7 +74,12 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
               }],
             };
 
-            const result = await build.esbuild.transform(script.innerHTML, { ...options, ...opts.transformOptions });
+            const result = await build.esbuild.transform(script.innerHTML, {
+              banner: build.initialOptions.banner?.js,
+              footer: build.initialOptions.footer?.js,
+              ...options,
+              ...opts.transformOptions,
+            });
             script.innerHTML = result.code.trim();
           }
         }
@@ -102,7 +101,7 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
 
           const result = await build.esbuild.build({
             bundle: true,
-            ...buildOptions,
+            ...build.initialOptions,
             ...opts.esbuildOptions,
             ...opts.buildOptions,
             entryPoints: [path],
@@ -130,8 +129,14 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
             }],
           };
 
+          const transformedInitialOptions: Omit<esbuild.TransformOptions, 'loader'> = {
+            ...build.initialOptions,
+            banner: build.initialOptions.banner?.css,
+            footer: build.initialOptions.footer?.css,
+          };
+
           const result = await build.esbuild.transform(style.innerHTML, {
-            ...buildOptions,
+            ...transformedInitialOptions,
             ...opts.esbuildOptions,
             ...opts.transformOptions,
             loader: style.getAttribute('local') === 'true' ? 'local-css' : 'css',
@@ -145,7 +150,7 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
         let contents = doctype + document.documentElement!.outerHTML;
 
         if (
-          buildOptions.minify
+          build.initialOptions.minify
           || opts.esbuildOptions?.minify
           || opts.buildOptions?.minify
           || opts.transformOptions?.minify
