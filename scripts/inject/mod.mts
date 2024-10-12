@@ -47,7 +47,7 @@ export async function injectLocal(location: string, type: 'packed' | 'unpacked' 
     : join(import.meta.dirname, '../../dist/electron');
 
   if (!await exists(popcornDist)) {
-    const { build } = await import('#build/index.mts');
+    const { build } = await import('../build/mod.mts');
 
     await build('electron', { dev: type === 'symlink' });
   }

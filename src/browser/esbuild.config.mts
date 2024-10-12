@@ -2,7 +2,7 @@
 
 import { join } from 'std/path/join.ts';
 import { copy, exists, walk } from 'std/fs/mod.ts';
-import { clearOutdir, corejs, html } from '#build/plugins/index.mts';
+import { clearOutdir, corejs, html } from '#build/plugins/mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 import { addToGroup } from '#build/plugins/custom-logs.mts';
 
@@ -22,7 +22,7 @@ export default [
     outdir: `browser-m${versions[0]}`,
     plugins: [
       clearOutdir,
-      manifest(versions[0]),
+      manifest(versions[0]!),
     ],
   },
   {
@@ -34,9 +34,7 @@ export default [
     outdir: `browser-m${versions[0]}`,
     platform: 'browser',
     format: 'iife',
-    plugins: [
-      corejs(pkg.browserslist.production),
-    ],
+    plugins: [corejs(pkg.browserslist.production)],
   },
   // HTML files
   {
@@ -91,8 +89,8 @@ export default [
         },
       ],
     }]
-    : []) satisfies import('#build').DefaultExport,
-] satisfies import('#build').DefaultExport;
+    : []) satisfies import('#build/mod.mts').DefaultExport,
+] satisfies import('#build/mod.mts').DefaultExport;
 
 function manifest(version: `v${2 | 3}`): import('esbuild').Plugin {
   const regex = /\.ts(?=[\s"',]|$)/gm;

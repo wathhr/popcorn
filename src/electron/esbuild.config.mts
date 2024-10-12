@@ -1,12 +1,12 @@
 #!/usr/bin/env false
 import { deepMerge } from 'std/collections/mod.ts';
 import { createPackage } from 'npm:@electron/asar';
-import { customFiles } from '#build/plugins/index.mts';
+import { customFiles } from '#build/plugins/mod.mts';
 import { addToGroup } from '#build/plugins/custom-logs.mts';
 
 const params = new URL(import.meta.url).searchParams;
 
-const builds: import('#build').DefaultExport = [{ entryPoints: ['../../package.json'], plugins: [customFiles()] }];
+const builds: import('#build/mod.mts').DefaultExport = [{ entryPoints: ['../../package.json'], plugins: [customFiles()] }];
 for await (const item of Deno.readDir(import.meta.dirname!)) {
   if (item.isFile) continue;
   const type = item.name;
@@ -42,9 +42,7 @@ const plugin: import('esbuild').Plugin = {
 };
 
 if (params.get('watch') === 'true')
-  for (const i in builds) {
-    const build = builds[i];
-
+  for (const build of builds) {
     build.plugins ??= [];
     build.plugins.push(plugin);
   }

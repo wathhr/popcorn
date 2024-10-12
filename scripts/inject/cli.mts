@@ -3,7 +3,7 @@
 import { parseArgs } from 'std/cli/mod.ts';
 import { basename, join } from 'std/path/mod.ts';
 import { exists } from 'std/fs/mod.ts';
-import { injectLocal, injectRemote } from './index.mts';
+import { injectLocal, injectRemote } from './mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 const args = parseArgs(Deno.args, {

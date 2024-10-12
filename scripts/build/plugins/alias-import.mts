@@ -15,12 +15,12 @@ export const aliasImport: import('esbuild').Plugin = {
 
     const filter = new RegExp(`^${[...packages.keys()].join('|')}`);
     build.onResolve({ filter }, (args) => {
-      const packageName = args.path.split('/')[0];
+      const packageName = args.path.split('/')[0]!;
       const path = args.path.replace(packageName, packages.get(packageName)!);
 
       return {
         path,
-        external: build.initialOptions.external?.includes(packageName),
+        external: build.initialOptions.external?.includes(packageName) ?? false,
       };
     });
   },

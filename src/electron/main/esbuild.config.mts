@@ -2,7 +2,7 @@
 
 import { exists } from 'std/fs/mod.ts';
 import { join } from 'std/path/mod.ts';
-import { aliasImport, corejs } from '#build/plugins/index.mts';
+import { aliasImport, corejs } from '#build/plugins/mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 const params = new URL(import.meta.url).searchParams;
@@ -31,15 +31,19 @@ export default {
               const dir = join(appSrcDist, child.name);
               for await (const child of Deno.readDir(dir)) if (child.name.startsWith('popcorn')) return join(dir, child.name);
             }
+
+          throw new Error('Could not find test application');
         })();
 
         build.onEnd(() => {
           for (const executable of executables.split(',')) {
             if (executable in command) try {
-              command[executable].kill();
+              command[executable]!.kill();
             } catch { /* omitted */ };
 
             const [cmd, ...args] = executable.split(' ');
+            if (!cmd) continue;
+
             const exe = (() => {
               if (cmd === 'auto' && import.meta.dirname && auto) return auto;
 
@@ -52,4 +56,4 @@ export default {
       },
     },
   ],
-} satisfies import('#build').DefaultExport;
+} satisfies import('#build/mod.mts').DefaultExport;

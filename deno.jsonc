@@ -1,12 +1,19 @@
 {
   "nodeModulesDir": "none",
   "imports": {
-    "esbuild": "https://deno.land/x/esbuild@v0.24.0/mod.js",
-    "std/": "https://deno.land/std@0.224.0/",
-    "#build": "./scripts/build/index.mts",
     "#build/": "./scripts/build/",
-    "#utils": "./scripts/utils/index.mts",
-    "#utils/": "./scripts/utils/",
-    "#pkg": "./package.json"
+    "#pkg": "./package.json",
+    "esbuild": "https://deno.land/x/esbuild@v0.24.0/mod.js",
+    "std/": "https://deno.land/std@0.224.0/"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    // "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true
   }
 }

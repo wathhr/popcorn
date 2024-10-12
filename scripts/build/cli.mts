@@ -6,11 +6,7 @@ import { join } from 'std/path/mod.ts';
 import * as c from 'std/fmt/colors.ts';
 import { parseArgs } from 'std/cli/mod.ts';
 import { DevServer } from '#build/devserver.mts';
-import { processConfigFile } from '#build/index.mts';
-
-const __dirname = import.meta.dirname!;
-const root = join(__dirname, '../..');
-const src = join(root, 'src');
+import { processConfigFile } from '#build/mod.mts';
 
 const args = parseArgs(Deno.args, {
   boolean: ['watch', 'dev'],
@@ -27,9 +23,10 @@ const args = parseArgs(Deno.args, {
   },
 });
 
-const { dev, watch, _ } = args;
+const src = join(import.meta.dirname!, '../../src');
+const { dev, watch } = args;
 
-const types = new Set(...args.types, _.filter(t => typeof t === 'string'));
+const types = new Set(...args.types, args._.filter(t => typeof t === 'string'));
 if (types.size === 0) types.add('all');
 
 const validTypes = [];
@@ -73,5 +70,6 @@ for (const context of builds)
 if (!watch) {
   if (builds.length > 1 && !Deno.args.includes('--original-args'))
     console.log(c.brightMagenta(`\nTotal build time: ${Date.now() - startTime}ms`));
+
   Deno.exit();
 }

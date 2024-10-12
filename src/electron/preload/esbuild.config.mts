@@ -1,6 +1,6 @@
 #!/usr/bin/env false
 
-import { aliasImport, corejs } from '#build/plugins/index.mts';
+import { aliasImport, corejs } from '#build/plugins/mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 export default {
@@ -8,4 +8,4 @@ export default {
   format: 'cjs',
   external: ['electron'],
   plugins: [aliasImport, corejs(pkg.browserslist['electron-main'])],
-} satisfies import('#build').DefaultExport;
+} satisfies import('#build/mod.mts').DefaultExport;

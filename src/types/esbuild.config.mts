@@ -30,4 +30,4 @@ export default {
       },
     },
   ],
-} satisfies import('#build').DefaultExport;
+} satisfies import('#build/mod.mts').DefaultExport;

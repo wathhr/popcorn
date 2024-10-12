@@ -4,9 +4,9 @@ import * as esbuild from 'esbuild';
 import { deepMerge } from 'std/collections/mod.ts';
 import { ensureDir, exists } from 'std/fs/mod.ts';
 import { join, relative } from 'std/path/mod.ts';
+import { customLogs } from './plugins/mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 import { DevServer } from '#build/devserver.mts';
-import { customLogs } from '#build/plugins/index.mts';
 
 if (!import.meta.dirname) throw new Error('This script must be run locally');
 
@@ -128,7 +128,7 @@ export async function processConfigFile(type: string, opts: Options = {}, devSer
                 if (!devServer) continue;
 
                 const relFilePath = relative(typeOptions.outdir!, file.path).replace(/\\/g, '/');
-                const name = relFilePath.split('/')[0].replace(/\.\w+$/, '');
+                const name = relFilePath.split('/')[0]!.replace(/\.\w+$/, '');
 
                 devServer.send(name, 'reload', {
                   content: file.text,

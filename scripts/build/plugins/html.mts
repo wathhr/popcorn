@@ -4,8 +4,8 @@ import type * as esbuild from 'esbuild';
 import { join, relative } from 'std/path/mod.ts';
 import { minifyHTML } from 'https://deno.land/x/minify@1.0.1/mod.ts';
 import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts';
-import { addToGroup } from '#build/plugins/custom-logs.mts';
-import { resultToCache } from '#build/utils/index.mts';
+import { addToGroup } from './custom-logs.mts';
+import { resultToCache } from '#build/utils/mod.mts';
 
 interface Opts {
   esbuildOptions?: esbuild.CommonOptions,
@@ -61,10 +61,12 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
 
             const result = await build.esbuild.build(buildOptions);
             if (result.errors.length > 0) return { errors: result.errors, pluginName };
-            watchFiles.push(...result.metafile!.outputs[Object.keys(result.metafile!.outputs)[0]].imports.map(input => input.path));
+            const outputFile = Object.keys(result.metafile!.outputs)[0]!;
+
+            watchFiles.push(...result.metafile!.outputs[outputFile]!.imports.map(input => input.path));
             if ($group) addToGroup(resultToCache(result), $group);
 
-            script.setAttribute('src', relative(buildOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
+            script.setAttribute('src', relative(buildOptions.outdir!, outputFile));
           } else {
             if (!script.innerHTML) return {
               errors: [{
@@ -74,9 +76,16 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
               }],
             };
 
+            // this is stupid
+            const initialOptionsCopy = structuredClone(build.initialOptions);
+            const banner = initialOptionsCopy.banner?.js;
+            const footer = initialOptionsCopy.footer?.js;
+            delete initialOptionsCopy.banner;
+            delete initialOptionsCopy.footer;
+
             const result = await build.esbuild.transform(script.innerHTML, {
-              banner: build.initialOptions.banner?.js,
-              footer: build.initialOptions.footer?.js,
+              banner: banner!,
+              footer: footer!,
               ...options,
               ...opts.transformOptions,
             });
@@ -113,10 +122,12 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
           });
 
           if (result.errors.length > 0) return { errors: result.errors, pluginName };
-          watchFiles.push(...Object.keys(result.metafile!.outputs[Object.keys(result.metafile!.outputs)[0]].inputs).map(p => join(Deno.cwd(), p)));
+          const outputFile = Object.keys(result.metafile!.outputs)[0]!;
+
+          watchFiles.push(...Object.keys(result.metafile!.outputs[outputFile]!.inputs).map(p => join(Deno.cwd(), p)));
           if ($group) addToGroup(resultToCache(result), $group);
 
-          link.setAttribute('href', relative(build.initialOptions.outdir!, Object.keys(result.metafile!.outputs)[0]));
+          link.setAttribute('href', relative(build.initialOptions.outdir!, outputFile));
         }
 
         const styles = document.getElementsByTagName('style');
@@ -129,10 +140,17 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
             }],
           };
 
+          // this is stupid
+          const initialOptionsCopy = structuredClone(build.initialOptions);
+          const banner = initialOptionsCopy.banner?.css;
+          const footer = initialOptionsCopy.footer?.css;
+          delete initialOptionsCopy.banner;
+          delete initialOptionsCopy.footer;
+
           const transformedInitialOptions: Omit<esbuild.TransformOptions, 'loader'> = {
-            ...build.initialOptions,
-            banner: build.initialOptions.banner?.css,
-            footer: build.initialOptions.footer?.css,
+            ...initialOptionsCopy,
+            banner: banner!,
+            footer: footer!,
           };
 
           const result = await build.esbuild.transform(style.innerHTML, {
@@ -146,7 +164,7 @@ export function html(opts: Opts = {}, $group?: string): esbuild.Plugin {
         }
 
         const firstLine = fileContent.split('\n')[0];
-        const doctype = /^<!doctype/i.test(firstLine) ? `${firstLine}\n` : '';
+        const doctype = /^<!doctype/i.test(firstLine ?? '') ? `${firstLine}\n` : '';
         let contents = doctype + document.documentElement!.outerHTML;
 
         if (

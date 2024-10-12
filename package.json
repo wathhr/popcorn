@@ -22,6 +22,7 @@
     "check": "run-s check:*",
     "check:electron": "tsc --noEmit --project ./src/electron/main/tsconfig.json && tsc --noEmit --project ./src/electron/preload/tsconfig.json",
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",
+    "check:scripts": "deno check **/*.mts",
     "build": "deno run --allow-all scripts/build/cli.mts",
     "watch": "deno run --allow-all scripts/build/cli.mts --watch --dev",
     "inject": "deno run --allow-all scripts/inject/cli.mts",

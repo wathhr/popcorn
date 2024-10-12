@@ -3,7 +3,7 @@
 import { basename, join, relative } from 'std/path/mod.ts';
 import * as c from 'std/fmt/colors.ts';
 import type { Message } from 'esbuild';
-import { getConfig, resultToCache } from '#build/utils/index.mts';
+import { getConfig, resultToCache } from '#build/utils/mod.mts';
 
 let params: URL['searchParams'];
 
