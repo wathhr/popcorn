@@ -2,7 +2,7 @@
 
 import { exists } from 'std/fs/mod.ts';
 import { join } from 'std/path/mod.ts';
-import { aliasImport, corejs } from '#build/plugins/mod.mts';
+import { corejs } from '#build/plugins/mod.mts';
 import pkg from '#pkg' with { type: 'json' };
 
 const params = new URL(import.meta.url).searchParams;
@@ -12,7 +12,6 @@ export default {
   format: 'cjs',
   external: ['electron'],
   plugins: [
-    aliasImport,
     corejs(pkg.browserslist['electron-main']),
     {
       name: 'Nodemon ripoff',

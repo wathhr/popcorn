@@ -57,7 +57,6 @@
 
 ## Linting
 - [ ] https://typescript-eslint.io/rules/no-base-to-string/
-- [ ] https://github.com/jgchk/eslint-import-resolver-deno
 
 ## Misc
 - [ ] ~~Use BiomeJS instead of eslint~~

@@ -23,9 +23,9 @@
     "check:electron": "tsc --noEmit --project ./src/electron/main/tsconfig.json && tsc --noEmit --project ./src/electron/preload/tsconfig.json",
     "check:browser": "tsc --noEmit --project ./src/browser/tsconfig.json",
     "check:scripts": "deno check **/*.mts",
-    "build": "deno run --allow-all scripts/build/cli.mts",
-    "watch": "deno run --allow-all scripts/build/cli.mts --watch --dev",
-    "inject": "deno run --allow-all scripts/inject/cli.mts",
+    "build": "deno run -A scripts/build/cli.mts",
+    "watch": "deno run -A --watch scripts/build/cli.mts --watch --dev",
+    "inject": "deno run -A scripts/inject/cli.mts",
     "start:firefox:mv2": "web-ext run --source-dir ./dist/browser-mv2/ --browser-console --devtools",
     "start:firefox:mv3": "web-ext run --source-dir ./dist/browser-mv3/ --browser-console --devtools",
     "start:chrome:mv2": "web-ext run --source-dir ./dist/browser-mv2/ -t chromium --browser-console --devtools",
@@ -36,8 +36,7 @@
     "@types/chrome": "^0.0.266",
     "@types/node": "^18.19.38",
     "@types/webextension-polyfill": "^0.10.7",
-    "electron": "28.2.10",
-    "electron-latest": "npm:electron@30.0.1",
+    "electron": "33.0.1",
     "eslint": "^9.5.0",
     "npm-run-all": "^4.1.5",
     "type-fest": "^4.20.1",
@@ -48,6 +47,7 @@
     "@sinclair/typebox": "^0.32.33",
     "@std/semver": "npm:@jsr/std__semver@^0.224.3",
     "core-js": "^3.37.1",
+    "svelte": "next",
     "webextension-polyfill": "^0.11.0"
   },
   "pnpm": {
@@ -58,8 +58,7 @@
       }
     },
     "patchedDependencies": {
-      "electron@30.0.1": "patches/electron@30.0.1.patch",
-      "electron@28.2.10": "patches/electron@28.2.10.patch"
+      "electron": "patches/electron.patch"
     }
   },
   "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
